@@ -27,7 +27,7 @@ defmodule Gakimint.Mint do
 
     # Id of the keyset is computed from the public keys
     # For now we will take a random value
-    id = Base.encode16(:crypto.strong_rand_bytes(32))
+    id = Gakimint.Keyset.derive_keyset_id(public_keys)
 
     {:ok, keyset} =
       %Keyset{id: id}
@@ -47,8 +47,8 @@ defmodule Gakimint.Mint do
       {private_key, public_key} = Gakimint.Crypto.generate_keypair()
 
       {
-        Map.put(priv, amount, Base.encode16(private_key)),
-        Map.put(pub, amount, Base.encode16(public_key))
+        Map.put(priv, amount, Base.encode16(private_key, case: :lower)),
+        Map.put(pub, amount, Base.encode16(public_key, case: :lower))
       }
     end)
   end

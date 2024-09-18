@@ -58,12 +58,6 @@ mix test
 mix format
 ```
 
-- Generate documentation:
-
-```bash
-mix docs
-```
-
 ## Database management
 
 - Create the database:
