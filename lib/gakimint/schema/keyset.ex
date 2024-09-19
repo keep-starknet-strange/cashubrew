@@ -37,24 +37,12 @@ defmodule Gakimint.Schema.Keyset do
       |> Gakimint.Repo.insert!()
     end)
 
-    # Log the number of keys inserted
-    IO.inspect(length(keys), label: "Number of keys inserted")
-
     keyset
   end
 
   def derive_keyset_id(keys) do
     keys
-    |> Enum.sort_by(fn key ->
-      case Integer.parse(key.amount) do
-        {int, _} ->
-          int
-
-        :error ->
-          "0x" <> hex = key.amount
-          String.to_integer(hex, 16)
-      end
-    end)
+    |> Enum.sort_by(fn key -> key.amount end)
     |> Enum.map(fn key -> Base.decode16!(key.public_key, case: :lower) end)
     |> Enum.reduce(<<>>, fn pubkey, acc -> acc <> pubkey end)
     |> (&:crypto.hash(:sha256, &1)).()
@@ -63,8 +51,8 @@ defmodule Gakimint.Schema.Keyset do
   end
 
   defp generate_keys do
-    Enum.map(0..62, fn i ->
-      amount = power_of_two(i)
+    Enum.map(0..63, fn i ->
+      amount = 1 <<< i
       {private_key, public_key} = Gakimint.Crypto.generate_keypair()
 
       %{
@@ -73,9 +61,5 @@ defmodule Gakimint.Schema.Keyset do
         public_key: Base.encode16(public_key, case: :lower)
       }
     end)
-  end
-
-  defp power_of_two(i) do
-    Integer.to_string(1 <<< i)
   end
 end

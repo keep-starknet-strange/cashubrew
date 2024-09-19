@@ -1,10 +1,11 @@
 defmodule Gakimint.Schema.Key do
   use Ecto.Schema
   import Ecto.Changeset
+  alias Gakimint.Types.BigInteger
 
   schema "keys" do
     field(:keyset_id, :string)
-    field(:amount, :string)
+    field(:amount, BigInteger)
     field(:private_key, :binary)
     field(:public_key, :string)
 

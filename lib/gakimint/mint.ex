@@ -42,10 +42,12 @@ defmodule Gakimint.Mint do
   end
 
   def get_keys_for_keyset(keyset_id) do
-    keys = Repo.all(from(k in Key, where: k.keyset_id == ^keyset_id))
-    # Log the number of keys retrieved
-    IO.inspect(length(keys), label: "Number of keys retrieved from database")
-    keys
+    Repo.all(
+      from(k in Key,
+        where: k.keyset_id == ^keyset_id,
+        order_by: [asc: k.amount]
+      )
+    )
   end
 
   def get_pubkey do

@@ -1,5 +1,6 @@
 defmodule GakimintWeb.MintController do
   use GakimintWeb, :controller
+  alias GakimintWeb.{Keys, KeysetResponse}
 
   def info(conn, _params) do
     info = %{
@@ -66,21 +67,22 @@ defmodule GakimintWeb.MintController do
   def keys(conn, _params) do
     keysets = Gakimint.Mint.get_keysets()
 
+    keysets_responses =
+      Enum.map(keysets, fn keyset ->
+        keys = Gakimint.Mint.get_keys_for_keyset(keyset.id)
+
+        keys_list =
+          Enum.map(keys, fn key -> {key.amount, key.public_key} end)
+
+        %KeysetResponse{
+          id: keyset.id,
+          unit: keyset.unit,
+          keys: %Keys{pairs: keys_list}
+        }
+      end)
+
     response = %{
-      keysets:
-        Enum.map(keysets, fn keyset ->
-          keys = Gakimint.Mint.get_keys_for_keyset(keyset.id)
-          keys_map = Enum.into(keys, %{}, fn key -> {key.amount, key.public_key} end)
-
-          # Log the number of keys in the response
-          IO.inspect(Map.keys(keys_map) |> length(), label: "Number of keys in API response")
-
-          %{
-            id: keyset.id,
-            unit: keyset.unit,
-            keys: keys_map
-          }
-        end)
+      keysets: keysets_responses
     }
 
     json(conn, response)
