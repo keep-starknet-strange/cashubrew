@@ -6,7 +6,7 @@ defmodule Gakimint.Repo.Migrations.CreateKeys do
       add :keyset_id, references(:keysets, type: :string, on_delete: :delete_all), null: false
       add :amount, :text, null: false
       add :private_key, :binary, null: false
-      add :public_key, :string, null: false
+      add :public_key, :binary, null: false
 
       timestamps()
     end

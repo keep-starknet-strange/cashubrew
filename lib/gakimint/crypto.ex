@@ -7,16 +7,27 @@ defmodule Gakimint.Crypto do
 
   @doc """
   Generate a new keypair.
+  Take private key as input or generate a new one if not provided.
   """
-  def generate_keypair do
-    private_key = :crypto.strong_rand_bytes(32)
+  def generate_keypair(private_key \\ nil) do
+    private_key =
+      case private_key do
+        nil -> :crypto.strong_rand_bytes(32)
+        <<0, key::binary-size(32)>> -> key
+        <<key::binary-size(32)>> -> key
+        _ -> raise "Invalid private key format"
+      end
+
+    # Generate the corresponding public key
     {:ok, public_key_point} = ExSecp256k1.create_public_key(private_key)
+
+    # Compress the public key
     public_key_compressed = compress_public_key(public_key_point)
     {private_key, public_key_compressed}
   end
 
   # Compress the public key point
-  defp compress_public_key(<<4, x::binary-size(32), y::binary-size(32)>>) do
+  def compress_public_key(<<4, x::binary-size(32), y::binary-size(32)>>) do
     prefix = if :binary.decode_unsigned(y) |> rem(2) == 0, do: <<2>>, else: <<3>>
     prefix <> x
   end

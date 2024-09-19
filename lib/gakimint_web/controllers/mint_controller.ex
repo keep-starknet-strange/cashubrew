@@ -72,7 +72,7 @@ defmodule GakimintWeb.MintController do
         keys = Gakimint.Mint.get_keys_for_keyset(keyset.id)
 
         keys_list =
-          Enum.map(keys, fn key -> {key.amount, key.public_key} end)
+          Enum.map(keys, fn key -> {key.amount, Base.encode16(key.public_key, case: :lower)} end)
 
         %KeysetResponse{
           id: keyset.id,

@@ -22,7 +22,7 @@ defmodule Gakimint.Mint do
   defp load_or_create_keysets do
     case Repo.all(Keyset) do
       [] ->
-        keyset = Keyset.generate()
+        keyset = Keyset.generate("sat")
         [keyset]
 
       existing ->

@@ -7,7 +7,7 @@ defmodule Gakimint.Schema.Key do
     field(:keyset_id, :string)
     field(:amount, BigInteger)
     field(:private_key, :binary)
-    field(:public_key, :string)
+    field(:public_key, :binary)
 
     timestamps()
   end

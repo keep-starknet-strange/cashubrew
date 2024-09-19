@@ -38,7 +38,8 @@ defmodule Gakimint.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:ex_secp256k1, "~> 0.7.0"},
-      {:ex_bech32, "~> 0.5.0"}
+      {:ex_bech32, "~> 0.5.0"},
+      {:block_keys, "~> 1.0.2"}
     ]
   end
 
