@@ -10,8 +10,15 @@ defmodule Gakimint.Crypto do
   """
   def generate_keypair do
     private_key = :crypto.strong_rand_bytes(32)
-    {:ok, public_key} = ExSecp256k1.create_public_key(private_key)
-    {private_key, public_key}
+    {:ok, public_key_point} = ExSecp256k1.create_public_key(private_key)
+    public_key_compressed = compress_public_key(public_key_point)
+    {private_key, public_key_compressed}
+  end
+
+  # Compress the public key point
+  defp compress_public_key(<<4, x::binary-size(32), y::binary-size(32)>>) do
+    prefix = if :binary.decode_unsigned(y) |> rem(2) == 0, do: <<2>>, else: <<3>>
+    prefix <> x
   end
 
   @doc """

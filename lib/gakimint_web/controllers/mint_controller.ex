@@ -1,12 +1,10 @@
 defmodule GakimintWeb.MintController do
   use GakimintWeb, :controller
 
-  alias Gakimint.Mint
-
   def info(conn, _params) do
     info = %{
       name: "Gakimint Cashu Mint",
-      pubkey: Mint.get_keyset().public_keys[1],
+      pubkey: "",
       version: "Gakimint/0.1.0",
       description: "An Elixir implementation of Cashu Mint",
       description_long: "A Cashu Mint implementation in Elixir.",
@@ -66,16 +64,23 @@ defmodule GakimintWeb.MintController do
   end
 
   def keys(conn, _params) do
-    keyset = Mint.get_keyset()
+    keysets = Gakimint.Mint.get_keysets()
 
     response = %{
-      keysets: [
-        %{
-          id: keyset.id,
-          unit: "sat",
-          keys: keyset.public_keys
-        }
-      ]
+      keysets:
+        Enum.map(keysets, fn keyset ->
+          keys = Gakimint.Mint.get_keys_for_keyset(keyset.id)
+          keys_map = Enum.into(keys, %{}, fn key -> {key.amount, key.public_key} end)
+
+          # Log the number of keys in the response
+          IO.inspect(Map.keys(keys_map) |> length(), label: "Number of keys in API response")
+
+          %{
+            id: keyset.id,
+            unit: keyset.unit,
+            keys: keys_map
+          }
+        end)
     }
 
     json(conn, response)
