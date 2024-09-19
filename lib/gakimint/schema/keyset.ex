@@ -3,7 +3,6 @@ defmodule Gakimint.Schema.Keyset do
   import Ecto.Changeset
 
   import Bitwise
-  alias ExBIP32
   @max_order 64
 
   @primary_key {:id, :string, autogenerate: false}
