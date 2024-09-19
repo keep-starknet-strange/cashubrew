@@ -7,7 +7,7 @@ config :gakimint, GakimintWeb.Endpoint,
   check_origin: false,
   code_reloader: true,
   debug_errors: true,
-  secret_key_base: "your_secret_key_base_here",
+  secret_key_base: System.get_env("SECRET_KEY_BASE"),
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}

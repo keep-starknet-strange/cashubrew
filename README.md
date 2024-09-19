@@ -78,6 +78,23 @@ mix ecto.migrate
 mix ecto.reset
 ```
 
+### Phoenix Live Dashboard
+
+To access the Phoenix Live Dashboard, run the server and navigate to `http://localhost:4000/dashboard`.
+
+You need to set the `SECRET_KEY_BASE` environment variable in order to access the dashboard.
+
+You can set it locally with:
+
+```bash
+# First generate a random secret key base
+SECRET_KEY_BASE=$(mix phx.gen.secret)
+# Then set it
+export SECRET_KEY_BASE=$SECRET_KEY_BASE
+# Run the server in dev mode
+MIX_ENV=dev mix phx.server
+```
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
