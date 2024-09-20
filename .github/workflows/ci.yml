@@ -44,12 +44,7 @@ jobs:
       - name: Run tests
         run: mix test
         env:
-          MIX_ENV: test
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: gakimint_test
+          MIX_ENV: dev
 
       - name: Check formatting
         run: mix format --check-formatted
