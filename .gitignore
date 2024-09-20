@@ -30,3 +30,5 @@ gakimint-*.tar
 **/.DS_Store
 
 priv/static/
+
+benchmarks/output

@@ -18,11 +18,35 @@ defmodule Mix.Tasks.Bench do
     Benchee.run(
       %{
         "BDHKE End-to-End Flow" => fn ->
-          Gakimint.BDHKEModule.run_bdhke_flow(a, a_pub, secret_msg, r)
+          run_bdhke_flow(a, a_pub, secret_msg, r)
         end
       },
+      formatters: [
+        Benchee.Formatters.HTML,
+        Benchee.Formatters.Console
+      ],
       time: 10,
       memory_time: 2
     )
+  end
+
+  def run_bdhke_flow(a, a_pub, secret_msg, r) do
+    # STEP 1: Alice blinds the message
+    {b_prime, _} = Gakimint.Crypto.step1_alice(secret_msg, r)
+
+    # STEP 2: Bob signs the blinded message
+    {c_prime, e, s} = Gakimint.Crypto.step2_bob(b_prime, a)
+
+    # STEP 3: Alice unblinds the signature
+    c = Gakimint.Crypto.step3_alice(c_prime, r, a_pub)
+
+    # CAROL VERIFY: Carol verifies the unblinded signature
+    carol_verification = Gakimint.Crypto.carol_verify_dleq(secret_msg, r, c, e, s, a_pub)
+
+    if carol_verification do
+      :ok
+    else
+      raise "Carol's DLEQ verification failed"
+    end
   end
 end
