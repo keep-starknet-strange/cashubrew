@@ -65,7 +65,7 @@ defmodule GakimintWeb.MintController do
   end
 
   def keys(conn, _params) do
-    keysets = Gakimint.Mint.get_keysets()
+    keysets = Gakimint.Mint.get_active_keysets()
 
     keysets_responses =
       Enum.map(keysets, fn keyset ->

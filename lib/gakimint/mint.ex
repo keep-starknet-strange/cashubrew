@@ -56,4 +56,8 @@ defmodule Gakimint.Mint do
     keys_map = Enum.into(keys, %{}, fn key -> {key.amount, key.public_key} end)
     keys_map["1"]
   end
+
+  def get_active_keysets do
+    Repo.all(from(k in Keyset, where: k.active == true))
+  end
 end
