@@ -2,6 +2,7 @@ defmodule Gakimint.Crypto do
   @moduledoc """
   Cryptographic functions for the Gakimint mint, including BDHKE implementation.
   """
+  require Logger
 
   alias ExSecp256k1
 
@@ -76,7 +77,8 @@ defmodule Gakimint.Crypto do
          {e, s} <- step2_bob_dleq(b_prime, a) do
       {c_prime, e, s}
     else
-      error -> error
+      error ->
+        error
     end
   end
 
@@ -195,15 +197,15 @@ defmodule Gakimint.Crypto do
     p = @secp256k1_p
     x = :binary.decode_unsigned(x)
     y = :binary.decode_unsigned(y)
-    left_side = rem(y * y, p)
-    right_side = rem(rem(x * x * x, p) + @secp256k1_b, p)
+    left_side = mod(y * y, p)
+    right_side = mod(mod(x * x * x, p) + @secp256k1_b, p)
     left_side == right_side
   end
 
   # Modular inverse
   defp inv_mod(a, p) do
     case extended_gcd(a, p) do
-      {1, x, _} -> rem(x + p, p)
+      {1, x, _} -> mod(x, p)
       {_gcd, _x, _y} -> raise "Inverse does not exist"
     end
   end
@@ -222,39 +224,27 @@ defmodule Gakimint.Crypto do
   end
 
   # Modular addition
-  defp mod_add(a, b, n), do: rem(a + b, n)
+  defp mod_add(a, b, n), do: mod(a + b, n)
 
   # Modular multiplication
-  defp mod_mul(a, b, n), do: rem(a * b, n)
-
-  # Scalar multiplication
-  defp secp256k1_point_mul(0, _P), do: nil
-  defp secp256k1_point_mul(1, P), do: P
-  defp secp256k1_point_mul(k, P) when k > 1, do: secp256k1_point_mul(k, P, nil)
-
-  defp secp256k1_point_mul(_, nil, acc), do: acc
-  defp secp256k1_point_mul(1, P, acc), do: secp256k1_point_add(acc, P)
-
-  defp secp256k1_point_mul(k, P, acc) do
-    acc = if rem(k, 2) == 1, do: secp256k1_point_add(acc, P), else: acc
-    P = secp256k1_point_add(P, P)
-    secp256k1_point_mul(div(k, 2), P, acc)
-  end
+  defp mod_mul(a, b, n), do: mod(a * b, n)
 
   # Point addition
-  defp secp256k1_point_add(nil, P), do: P
-  defp secp256k1_point_add(P, nil), do: P
+  defp secp256k1_point_add(nil, P) do
+    P
+  end
 
-  defp secp256k1_point_add({x1, y1}, {x2, y2}) when x1 == x2 and rem(y1 + y2, @secp256k1_p) == 0,
-    do: nil
+  defp secp256k1_point_add(P, nil) do
+    P
+  end
 
   defp secp256k1_point_add({x1, y1}, {x1, y1}) do
     # Point doubling
     numerator = 3 * x1 * x1 + @secp256k1_a
     denominator = 2 * y1
-    s = rem(numerator * inv_mod(denominator, @secp256k1_p), @secp256k1_p)
-    x3 = rem(s * s - 2 * x1, @secp256k1_p)
-    y3 = rem(s * (x1 - x3) - y1, @secp256k1_p)
+    s = mod(numerator * inv_mod(denominator, @secp256k1_p), @secp256k1_p)
+    x3 = mod(s * s - 2 * x1, @secp256k1_p)
+    y3 = mod(s * (x1 - x3) - y1, @secp256k1_p)
     {x3, y3}
   end
 
@@ -262,9 +252,9 @@ defmodule Gakimint.Crypto do
     # Point addition
     numerator = y2 - y1
     denominator = x2 - x1
-    s = rem(numerator * inv_mod(denominator, @secp256k1_p), @secp256k1_p)
-    x3 = rem(s * s - x1 - x2, @secp256k1_p)
-    y3 = rem(s * (x1 - x3) - y1, @secp256k1_p)
+    s = mod(numerator * inv_mod(denominator, @secp256k1_p), @secp256k1_p)
+    x3 = mod(s * s - x1 - x2, @secp256k1_p)
+    y3 = mod(s * (x1 - x3) - y1, @secp256k1_p)
     {x3, y3}
   end
 
@@ -293,14 +283,15 @@ defmodule Gakimint.Crypto do
 
       _x = :binary.decode_unsigned(x_bin)
       y = :binary.decode_unsigned(y_bin)
-      y_neg = rem(-y, @secp256k1_p)
+      y_neg = @secp256k1_p - y
 
       y_neg_bin = pad_left(:binary.encode_unsigned(y_neg), 32)
       result = <<4::8, x_bin::binary-size(32), y_neg_bin::binary-size(32)>>
       {:ok, compressed} = ExSecp256k1.public_key_compress(result)
       {:ok, compressed}
     else
-      error -> error
+      error ->
+        error
     end
   end
 
@@ -345,27 +336,64 @@ defmodule Gakimint.Crypto do
     end
   end
 
-  # Point multiplication
-  defp point_mul(point, scalar_bin) do
-    with {:ok, point_decomp} <- ExSecp256k1.public_key_decompress(point) do
-      <<4::8, x_bin::binary-size(32), y_bin::binary-size(32)>> = point_decomp
-      x = :binary.decode_unsigned(x_bin)
-      y = :binary.decode_unsigned(y_bin)
-      scalar = :binary.decode_unsigned(scalar_bin)
+  def secp256k1_point_mul(k, x, y) do
+    result = do_secp256k1_point_mul(k, x, y, nil)
+    result
+  end
 
-      result_point = secp256k1_point_mul(scalar, {x, y})
+  defp do_secp256k1_point_mul(k, x, y, acc) do
+    cond do
+      k == 0 ->
+        acc
 
-      case result_point do
-        nil ->
-          {:error, :point_at_infinity}
+      k == 1 ->
+        if acc == nil do
+          {x, y}
+        else
+          secp256k1_point_add(acc, {x, y})
+        end
 
-        {x_res, y_res} ->
-          result_pubkey = encode_point(x_res, y_res)
-          {:ok, compressed} = ExSecp256k1.public_key_compress(result_pubkey)
-          {:ok, compressed}
-      end
-    else
-      error -> error
+      true ->
+        new_acc =
+          if rem(k, 2) == 1 do
+            if acc == nil do
+              {x, y}
+            else
+              secp256k1_point_add(acc, {x, y})
+            end
+          else
+            acc
+          end
+
+        {x, y} = secp256k1_point_add({x, y}, {x, y})
+        do_secp256k1_point_mul(div(k, 2), x, y, new_acc)
+    end
+  end
+
+  def point_mul(point, scalar_bin) do
+    # Decompress the point to get x and y coordinates
+    case ExSecp256k1.public_key_decompress(point) do
+      {:ok, point_decomp} ->
+        <<4::8, x_bin::binary-size(32), y_bin::binary-size(32)>> = point_decomp
+        x = :binary.decode_unsigned(x_bin)
+        y = :binary.decode_unsigned(y_bin)
+        scalar = :binary.decode_unsigned(scalar_bin)
+
+        # Perform scalar multiplication
+        result_point = secp256k1_point_mul(scalar, x, y)
+
+        case result_point do
+          nil ->
+            {:error, :point_at_infinity}
+
+          {x_res, y_res} ->
+            result_pubkey = encode_point(x_res, y_res)
+            {:ok, compressed} = ExSecp256k1.public_key_compress(result_pubkey)
+            {:ok, compressed}
+        end
+
+      error ->
+        error
     end
   end
 
@@ -374,5 +402,15 @@ defmodule Gakimint.Crypto do
     {:ok, p1_decomp} = ExSecp256k1.public_key_decompress(p1)
     {:ok, p2_decomp} = ExSecp256k1.public_key_decompress(p2)
     p1_decomp == p2_decomp
+  end
+
+  defp mod(a, b) do
+    rem = rem(a, b)
+
+    if rem < 0 do
+      rem + b
+    else
+      rem
+    end
   end
 end
