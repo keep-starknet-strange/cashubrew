@@ -1,4 +1,4 @@
-defmodule GakimintWeb.Telemetry do
+defmodule Gakimint.Web.Telemetry do
   use Supervisor
   import Telemetry.Metrics
 

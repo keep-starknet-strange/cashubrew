@@ -1,12 +1,12 @@
-defmodule GakimintWeb do
+defmodule Gakimint.Web do
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, components, channels, and so on.
 
   This can be used in your application as:
 
-      use GakimintWeb, :controller
-      use GakimintWeb, :html
+      use Gakimint.Web, :controller
+      use Gakimint.Web, :html
 
   The definitions below will be executed for every controller,
   component, etc, so keep them short and clean, focused
@@ -40,10 +40,9 @@ defmodule GakimintWeb do
     quote do
       use Phoenix.Controller,
         formats: [:html, :json],
-        layouts: [html: GakimintWeb.Layouts]
+        layouts: [html: Gakimint.Web.Layouts]
 
       import Plug.Conn
-      import GakimintWeb.Gettext
 
       unquote(verified_routes())
     end
@@ -52,7 +51,7 @@ defmodule GakimintWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {GakimintWeb.Layouts, :app}
+        layout: {Gakimint.Web.Layouts, :app}
 
       unquote(html_helpers())
     end
@@ -83,10 +82,6 @@ defmodule GakimintWeb do
     quote do
       # HTML escaping functionality
       import Phoenix.HTML
-      # Core UI components and translation
-      import GakimintWeb.CoreComponents
-      import GakimintWeb.Gettext
-
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
 
@@ -95,12 +90,16 @@ defmodule GakimintWeb do
     end
   end
 
+  @spec verified_routes() ::
+          {:use,
+           [{:context, Gakimint.Web} | {:end_of_expression, [...]} | {:imports, [...]}, ...],
+           [[{any(), any()}, ...] | {:__aliases__, [...], [...]}, ...]}
   def verified_routes do
     quote do
       use Phoenix.VerifiedRoutes,
-        endpoint: GakimintWeb.Endpoint,
-        router: GakimintWeb.Router,
-        statics: GakimintWeb.static_paths()
+        endpoint: Gakimint.Web.Endpoint,
+        router: Gakimint.Web.Router,
+        statics: Gakimint.Web.static_paths()
     end
   end
 

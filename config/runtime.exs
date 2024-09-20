@@ -19,7 +19,7 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  config :gakimint, GakimintWeb.Endpoint,
+  config :gakimint, Gakimint.Web.Endpoint,
     http: [
       port: String.to_integer(System.get_env("PORT") || "4000"),
       transport_options: [socket_opts: [:inet6]]

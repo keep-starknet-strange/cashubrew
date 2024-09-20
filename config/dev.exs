@@ -1,6 +1,6 @@
 import Config
 
-config :gakimint, GakimintWeb.Endpoint,
+config :gakimint, Gakimint.Web.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: 4000],
@@ -8,18 +8,13 @@ config :gakimint, GakimintWeb.Endpoint,
   code_reloader: true,
   debug_errors: true,
   secret_key_base: System.get_env("SECRET_KEY_BASE"),
-  watchers: [
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
-  ]
+  watchers: []
 
 # Watch static and templates for browser reloading.
-config :gakimint, GakimintWeb.Endpoint,
+config :gakimint, Gakimint.Web.Endpoint,
   live_reload: [
     patterns: [
-      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
-      ~r"priv/gettext/.*(po)$",
-      ~r"lib/gakimint_web/(controllers|live|components)/.*(ex|heex)$"
+      ~r"lib/gakimint/web/(controllers|live|components)/.*(ex|heex)$"
     ]
   ]
 

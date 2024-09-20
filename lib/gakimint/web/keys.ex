@@ -1,12 +1,12 @@
-defmodule GakimintWeb.Keys do
+defmodule Gakimint.Web.Keys do
   @moduledoc """
   Keys for the Gakimint mint.
   """
   defstruct [:pairs]
 end
 
-defimpl Jason.Encoder, for: GakimintWeb.Keys do
-  def encode(%GakimintWeb.Keys{pairs: pairs}, opts) do
+defimpl Jason.Encoder, for: Gakimint.Web.Keys do
+  def encode(%Gakimint.Web.Keys{pairs: pairs}, opts) do
     # Convert amounts to strings and sort them in ascending order
     sorted_pairs =
       pairs

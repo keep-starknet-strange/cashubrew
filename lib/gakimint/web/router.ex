@@ -1,12 +1,12 @@
-defmodule GakimintWeb.Router do
-  use GakimintWeb, :router
+defmodule Gakimint.Web.Router do
+  use Gakimint.Web, :router
   import Phoenix.LiveDashboard.Router
 
   pipeline :browser do
     plug(:accepts, ["html"])
     plug(:fetch_session)
     plug(:fetch_live_flash)
-    plug(:put_root_layout, {GakimintWeb.LayoutView, :root})
+    plug(:put_root_layout, {Gakimint.Web.LayoutView, :root})
     plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
   end
@@ -15,7 +15,7 @@ defmodule GakimintWeb.Router do
     plug(:accepts, ["json"])
   end
 
-  scope "/api", GakimintWeb do
+  scope "/api", Gakimint.Web do
     pipe_through(:api)
 
     get("/v1/info", MintController, :info)
@@ -26,7 +26,7 @@ defmodule GakimintWeb.Router do
   if Mix.env() == :dev do
     scope "/" do
       pipe_through(:browser)
-      live_dashboard("/dashboard", metrics: GakimintWeb.Telemetry)
+      live_dashboard("/dashboard", metrics: Gakimint.Web.Telemetry)
     end
   end
 end

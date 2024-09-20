@@ -1,4 +1,4 @@
-defmodule GakimintWeb.KeysetResponse do
+defmodule Gakimint.Web.KeysetResponse do
   @moduledoc """
   Keyset response for the Gakimint mint.
   """

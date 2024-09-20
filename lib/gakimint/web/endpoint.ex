@@ -1,4 +1,4 @@
-defmodule GakimintWeb.Endpoint do
+defmodule Gakimint.Web.Endpoint do
   use Phoenix.Endpoint, otp_app: :gakimint
 
   # The session will be stored in the cookie and signed,
@@ -21,7 +21,7 @@ defmodule GakimintWeb.Endpoint do
     at: "/",
     from: :gakimint,
     gzip: false,
-    only: GakimintWeb.static_paths()
+    only: Gakimint.Web.static_paths()
   )
 
   # Code reloading can be explicitly enabled under the
@@ -50,5 +50,5 @@ defmodule GakimintWeb.Endpoint do
   plug(Plug.MethodOverride)
   plug(Plug.Head)
   plug(Plug.Session, @session_options)
-  plug(GakimintWeb.Router)
+  plug(Gakimint.Web.Router)
 end

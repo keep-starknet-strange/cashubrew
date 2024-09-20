@@ -1,6 +1,6 @@
-defmodule GakimintWeb.MintController do
-  use GakimintWeb, :controller
-  alias GakimintWeb.{Keys, KeysetResponse}
+defmodule Gakimint.Web.MintController do
+  use Gakimint.Web, :controller
+  alias Gakimint.Web.{Keys, KeysetResponse}
 
   def info(conn, _params) do
     info = %{

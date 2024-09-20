@@ -1,14 +1,15 @@
 defmodule Gakimint.Application do
   @moduledoc false
   use Application
+  alias Gakimint.Web.Endpoint
 
   @impl true
   def start(_type, _args) do
     children = [
-      GakimintWeb.Telemetry,
+      Gakimint.Web.Telemetry,
       Gakimint.Repo,
       {Phoenix.PubSub, name: Gakimint.PubSub},
-      GakimintWeb.Endpoint,
+      Endpoint,
       Gakimint.Mint
     ]
 
@@ -18,7 +19,7 @@ defmodule Gakimint.Application do
 
   @impl true
   def config_change(changed, _new, removed) do
-    GakimintWeb.Endpoint.config_change(changed, removed)
+    Endpoint.config_change(changed, removed)
     :ok
   end
 end

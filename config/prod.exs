@@ -1,6 +1,6 @@
 import Config
 
-config :gakimint, GakimintWeb.Endpoint,
+config :gakimint, Gakimint.Web.Endpoint,
   url: [
     host: System.get_env("APP_HOST", "localhost"),
     port: String.to_integer(System.get_env("PORT", "4000"))
@@ -14,7 +14,7 @@ config :gakimint, Gakimint.Repo,
 
 config :logger, level: :info
 
-config :gakimint, GakimintWeb.Endpoint, secret_key_base: System.get_env("SECRET_KEY_BASE")
+config :gakimint, Gakimint.Web.Endpoint, secret_key_base: System.get_env("SECRET_KEY_BASE")
 
 # Do not print debug messages in production
 config :logger, level: :info

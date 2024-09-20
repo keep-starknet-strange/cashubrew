@@ -1,5 +1,5 @@
-defmodule GakimintWeb.ErrorHTML do
-  use GakimintWeb, :html
+defmodule Gakimint.Web.ErrorHTML do
+  use Gakimint.Web, :html
 
   # If you want to customize your error pages,
   # uncomment the embed_templates/1 call below
