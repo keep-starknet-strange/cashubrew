@@ -122,6 +122,36 @@ Rev up your engines:
 mix bench
 ```
 
+## 🧩 Supported NUTs
+
+Here's a table of the currently supported mandatory NUTs:
+
+| NUT                                           | Description             | Supported |
+| --------------------------------------------- | ----------------------- | --------- |
+| [NUT-00](https://cashubtc.github.io/nuts/00/) | Cryptography and Models |           |
+| [NUT-01](https://cashubtc.github.io/nuts/01/) | Mint public keys        | ✅         |
+| [NUT-02](https://cashubtc.github.io/nuts/02/) | Keysets and fees        | ✅         |
+| [NUT-03](https://cashubtc.github.io/nuts/03/) | Swapping tokens         |           |
+| [NUT-04](https://cashubtc.github.io/nuts/04/) | Minting tokens          |           |
+| [NUT-05](https://cashubtc.github.io/nuts/05/) | Melting tokens          |           |
+| [NUT-06](https://cashubtc.github.io/nuts/06/) | Mint info               |           |
+
+Here's a table of the currently supported optional NUTs:
+
+| NUT                                           | Description                       | Supported |
+| --------------------------------------------- | --------------------------------- | --------- |
+| [NUT-07](https://cashubtc.github.io/nuts/07/) | Token state check                 |           |
+| [NUT-08](https://cashubtc.github.io/nuts/08/) | Overpaid Lightning fees           |           |
+| [NUT-09](https://cashubtc.github.io/nuts/09/) | Signature restore                 |           |
+| [NUT-10](https://cashubtc.github.io/nuts/10/) | Spending conditions               |           |
+| [NUT-11](https://cashubtc.github.io/nuts/11/) | Pay-To-Pubkey (P2PK)              |           |
+| [NUT-12](https://cashubtc.github.io/nuts/12/) | DLEQ proofs                       |           |
+| [NUT-13](https://cashubtc.github.io/nuts/13/) | Deterministic secrets             |           |
+| [NUT-14](https://cashubtc.github.io/nuts/14/) | Hashed Timelock Contracts (HTLCs) |           |
+| [NUT-15](https://cashubtc.github.io/nuts/15/) | Partial multi-path payments (MPP) |           |
+| [NUT-16](https://cashubtc.github.io/nuts/16/) | Animated QR codes                 |           |
+| [NUT-17](https://cashubtc.github.io/nuts/17/) | WebSocket subscriptions           |           |
+
 ## 🤝 Join the Gakimint Community
 
 We're always looking for fellow wizards to join our quest. Check out our [contribution guidelines](docs/CONTRIBUTING.md) and let's make magic together!
