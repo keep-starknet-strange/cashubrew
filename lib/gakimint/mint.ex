@@ -1,8 +1,11 @@
 defmodule Gakimint.Mint do
   use GenServer
   alias Gakimint.Repo
-  alias Gakimint.Schema.{Keyset, Key}
+  alias Gakimint.Schema.{Keyset, Key, MintConfiguration}
   import Ecto.Query
+
+  @keyset_generation_seed_key "keyset_generation_seed"
+  @keyset_generation_derivation_path "m/0'/0'/0'"
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
@@ -15,14 +18,33 @@ defmodule Gakimint.Mint do
 
   @impl true
   def handle_continue(:load_keysets, state) do
-    keysets = load_or_create_keysets()
+    seed = get_or_create_seed()
+    keysets = load_or_create_keysets(seed)
     {:noreply, %{state | keysets: keysets}}
   end
 
-  defp load_or_create_keysets do
+  defp get_or_create_seed do
+    case Repo.get_by(MintConfiguration, key: @keyset_generation_seed_key) do
+      nil ->
+        seed =
+          System.get_env("KEYSET_GENERATION_SEED") ||
+            :crypto.strong_rand_bytes(32) |> Base.encode16(case: :lower)
+
+        %MintConfiguration{}
+        |> MintConfiguration.changeset(%{key: @keyset_generation_seed_key, value: seed})
+        |> Repo.insert!()
+
+        seed
+
+      config ->
+        config.value
+    end
+  end
+
+  defp load_or_create_keysets(seed) do
     case Repo.all(Keyset) do
       [] ->
-        keyset = Keyset.generate("sat")
+        keyset = Keyset.generate("sat", seed, @keyset_generation_derivation_path)
         [keyset]
 
       existing ->

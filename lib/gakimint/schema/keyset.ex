@@ -19,10 +19,7 @@ defmodule Gakimint.Schema.Keyset do
     |> validate_required([:id, :unit])
   end
 
-  def generate(unit \\ "sat") do
-    # TODO: Configure seed as environment variable or generate randomly if not set
-    seed = "TEST_PRIVATE_KEY"
-    derivation_path = "m/0'/0'/0'"
+  def generate(unit \\ "sat", seed, derivation_path \\ "m/0'/0'/0'") do
     keys = generate_keys(seed, derivation_path)
     id = derive_keyset_id(keys)
 
