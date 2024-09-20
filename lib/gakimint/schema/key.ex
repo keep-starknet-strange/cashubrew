@@ -1,4 +1,7 @@
 defmodule Gakimint.Schema.Key do
+  @moduledoc """
+  Key schema for the Gakimint mint.
+  """
   use Ecto.Schema
   import Ecto.Changeset
   alias Gakimint.Types.BigInteger

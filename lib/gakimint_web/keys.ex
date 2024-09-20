@@ -1,4 +1,7 @@
 defmodule GakimintWeb.Keys do
+  @moduledoc """
+  Keys for the Gakimint mint.
+  """
   defstruct [:pairs]
 end
 

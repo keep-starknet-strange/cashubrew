@@ -40,7 +40,8 @@ defmodule Gakimint.MixProject do
       {:ex_secp256k1, "~> 0.7.0"},
       {:ex_bech32, "~> 0.5.0"},
       {:block_keys, "~> 1.0.2"},
-      {:benchee, "~> 1.0", only: :dev}
+      {:benchee, "~> 1.0", only: :dev},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 

@@ -26,7 +26,7 @@ defmodule GakimintWeb.MintController do
               method: "bolt11",
               unit: "sat",
               min_amount: 0,
-              max_amount: 10000
+              max_amount: 10_000
             }
           ],
           disabled: false
@@ -37,7 +37,7 @@ defmodule GakimintWeb.MintController do
               method: "bolt11",
               unit: "sat",
               min_amount: 100,
-              max_amount: 10000
+              max_amount: 10_000
             }
           ],
           disabled: false

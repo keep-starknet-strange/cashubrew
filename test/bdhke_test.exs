@@ -1,4 +1,7 @@
 defmodule BDHKETest do
+  @moduledoc """
+  Test for the Blind Diffie-Hellman Key Exchange (BDHKE) implementation.
+  """
   use ExUnit.Case
   require Logger
   alias Gakimint.Crypto

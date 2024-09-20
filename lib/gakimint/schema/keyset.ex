@@ -1,4 +1,7 @@
 defmodule Gakimint.Schema.Keyset do
+  @moduledoc """
+  Keyset schema for the Gakimint mint.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

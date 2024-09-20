@@ -1,4 +1,7 @@
 defmodule Mix.Tasks.Test.E2e.Bdhke do
+  @moduledoc """
+  Test for the Blind Diffie-Hellman Key Exchange (BDHKE) end-to-end flow.
+  """
   use Mix.Task
 
   @shortdoc "Runs the BDHKE end-to-end test"

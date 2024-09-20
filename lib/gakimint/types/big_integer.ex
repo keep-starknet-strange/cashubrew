@@ -1,4 +1,7 @@
 defmodule Gakimint.Types.BigInteger do
+  @moduledoc """
+  Custom Ecto type for big integers.
+  """
   use Ecto.Type
 
   def type, do: :string

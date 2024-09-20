@@ -13,7 +13,6 @@ defmodule Gakimint.Crypto do
   @secp256k1_p 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F
   @secp256k1_n 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
   @secp256k1_a 0
-  @secp256k1_b 7
 
   @doc """
   Generate a new keypair.
@@ -41,7 +40,7 @@ defmodule Gakimint.Crypto do
     hash_to_curve_loop(msg_hash, 0)
   end
 
-  defp hash_to_curve_loop(msg_hash, counter) when counter < 65536 do
+  defp hash_to_curve_loop(msg_hash, counter) when counter < 65_536 do
     to_hash = msg_hash <> <<counter::little-32>>
     hash = :crypto.hash(:sha256, to_hash)
 
@@ -172,11 +171,10 @@ defmodule Gakimint.Crypto do
     keys = [r1, r2, a, c_prime]
 
     data =
-      Enum.map(keys, fn key ->
+      Enum.map_join(keys, "", fn key ->
         {:ok, uncompressed} = ExSecp256k1.public_key_decompress(key)
         uncompressed
       end)
-      |> Enum.join()
 
     :crypto.hash(:sha256, data)
   end
@@ -188,18 +186,6 @@ defmodule Gakimint.Crypto do
     {:ok, uncompressed_key} = ExSecp256k1.public_key_decompress(key)
     <<4::8, x::binary-size(32), y::binary-size(32)>> = uncompressed_key
     {x, y}
-  end
-
-  @doc """
-  Check if a point is on the secp256k1 curve
-  """
-  def is_on_curve?(x, y) do
-    p = @secp256k1_p
-    x = :binary.decode_unsigned(x)
-    y = :binary.decode_unsigned(y)
-    left_side = mod(y * y, p)
-    right_side = mod(mod(x * x * x, p) + @secp256k1_b, p)
-    left_side == right_side
   end
 
   # Modular inverse
@@ -278,18 +264,19 @@ defmodule Gakimint.Crypto do
 
   # Negate point
   defp negate_point(point) do
-    with {:ok, point_decomp} <- ExSecp256k1.public_key_decompress(point) do
-      <<4::8, x_bin::binary-size(32), y_bin::binary-size(32)>> = point_decomp
+    case ExSecp256k1.public_key_decompress(point) do
+      {:ok, point_decomp} ->
+        <<4::8, x_bin::binary-size(32), y_bin::binary-size(32)>> = point_decomp
 
-      _x = :binary.decode_unsigned(x_bin)
-      y = :binary.decode_unsigned(y_bin)
-      y_neg = @secp256k1_p - y
+        _x = :binary.decode_unsigned(x_bin)
+        y = :binary.decode_unsigned(y_bin)
+        y_neg = @secp256k1_p - y
 
-      y_neg_bin = pad_left(:binary.encode_unsigned(y_neg), 32)
-      result = <<4::8, x_bin::binary-size(32), y_neg_bin::binary-size(32)>>
-      {:ok, compressed} = ExSecp256k1.public_key_compress(result)
-      {:ok, compressed}
-    else
+        y_neg_bin = pad_left(:binary.encode_unsigned(y_neg), 32)
+        result = <<4::8, x_bin::binary-size(32), y_neg_bin::binary-size(32)>>
+        {:ok, compressed} = ExSecp256k1.public_key_compress(result)
+        {:ok, compressed}
+
       error ->
         error
     end

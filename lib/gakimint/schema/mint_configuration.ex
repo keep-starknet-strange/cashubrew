@@ -1,5 +1,8 @@
 # lib/gakimint/schema/mint_configuration.ex
 defmodule Gakimint.Schema.MintConfiguration do
+  @moduledoc """
+  Mint configuration for the Gakimint mint.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

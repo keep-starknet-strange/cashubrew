@@ -1,4 +1,8 @@
 defmodule Gakimint.Mint do
+  @moduledoc """
+  Mint operations for the Gakimint mint.
+  """
+
   use GenServer
   alias Gakimint.Repo
   alias Gakimint.Schema.{Keyset, Key, MintConfiguration}

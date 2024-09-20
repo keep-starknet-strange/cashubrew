@@ -1,4 +1,7 @@
 defmodule Mix.Tasks.Bench do
+  @moduledoc """
+  Benchmark for the Gakimint mint.
+  """
   use Mix.Task
 
   @shortdoc "Runs the BDHKE benchmark"
@@ -11,6 +14,7 @@ defmodule Mix.Tasks.Bench do
     secret_msg = "test_message"
     {r, _r_pub} = Gakimint.Crypto.generate_keypair(<<1::256>>)
 
+    # Run the BDHKE benchmark
     Benchee.run(
       %{
         "BDHKE End-to-End Flow" => fn ->

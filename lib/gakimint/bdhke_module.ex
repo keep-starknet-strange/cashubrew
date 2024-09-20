@@ -1,4 +1,7 @@
 defmodule Gakimint.BDHKEModule do
+  @moduledoc """
+  BDHKE module for the benchmark.
+  """
   require Logger
   alias Gakimint.Crypto
 
