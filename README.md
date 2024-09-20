@@ -163,7 +163,7 @@ Gakimint is released under the MIT License. See the [LICENSE](LICENSE) file for 
 ---
 
 <p align="center">
-  Made with ❤️ by @AbdelStark
+  Made with ❤️ by <a href="https://github.com/AbdelStark">@AbdelStark</a>
 </p>
 
 <p align="center">
