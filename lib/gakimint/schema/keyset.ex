@@ -4,6 +4,7 @@ defmodule Gakimint.Schema.Keyset do
   """
   use Ecto.Schema
   import Ecto.Changeset
+  alias Gakimint.{Crypto, Repo, Schema}
 
   import Bitwise
   @max_order 64
@@ -32,15 +33,15 @@ defmodule Gakimint.Schema.Keyset do
       unit: unit
     }
 
-    {:ok, keyset} = Gakimint.Repo.insert(keyset)
+    {:ok, keyset} = Repo.insert(keyset)
 
     # Insert keys into the database
     Enum.each(keys, fn key ->
       key = Map.put(key, :keyset_id, id)
 
-      %Gakimint.Schema.Key{}
-      |> Gakimint.Schema.Key.changeset(key)
-      |> Gakimint.Repo.insert!()
+      %Schema.Key{}
+      |> Schema.Key.changeset(key)
+      |> Repo.insert!()
     end)
 
     keyset
@@ -83,7 +84,7 @@ defmodule Gakimint.Schema.Keyset do
       private_key_bytes = :binary.part(private_key.key, 1, 32)
 
       # Get the public key
-      {_, public_key} = Gakimint.Crypto.generate_keypair(private_key_bytes)
+      {_, public_key} = Crypto.generate_keypair(private_key_bytes)
 
       %{
         amount: amount,

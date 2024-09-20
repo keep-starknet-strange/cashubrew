@@ -5,7 +5,7 @@ defmodule Gakimint.Mint do
 
   use GenServer
   alias Gakimint.Repo
-  alias Gakimint.Schema.{Keyset, Key, MintConfiguration}
+  alias Gakimint.Schema.{Key, Keyset, MintConfiguration}
   import Ecto.Query
 
   @keyset_generation_seed_key "keyset_generation_seed"

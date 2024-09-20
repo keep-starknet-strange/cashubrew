@@ -52,6 +52,41 @@ mix phx.server
   - Migrate: `mix ecto.migrate`
   - Reset: `mix ecto.reset`
 
+### 🔍 Code Quality and Security
+
+Ensure your code is top-notch with these magical incantations:
+
+- **Security Checks**: `mix sobelow`
+- **Elixir Best Practices**: `mix credo`
+- **Static Analysis**: `mix dialyzer`
+
+Run these spells regularly to keep your code base clean and secure!
+
+## 🐳 Docker Deployment
+
+Sail the high seas with Gakimint in a Docker container:
+
+1. **Build your ship**:
+
+   ```bash
+   docker build -t gakimint:latest .
+   ```
+
+2. **Set sail**:
+
+   ```bash
+   docker run \
+     --name gakimint \
+     --network host \
+     -e DATABASE_URL="ecto://postgres:postgres@localhost/gakimint_dev" \
+     -e SECRET_KEY_BASE=$(mix phx.gen.secret) \
+     -e PORT=4000 \
+     -e MIX_ENV=prod \
+     gakimint:latest
+   ```
+
+   Adjust the `DATABASE_URL` and other environment variables as needed for your voyage.
+
 ## 🕵️ Phoenix Live Dashboard
 
 Peek behind the curtain at `http://localhost:4000/dashboard`. Don't forget your secret key!
@@ -69,6 +104,10 @@ Rev up your engines:
 ```bash
 mix bench
 ```
+
+## 🤝 Join the Gakimint Community
+
+We're always looking for fellow wizards to join our quest. Check out our [contribution guidelines](CONTRIBUTING.md) and let's make magic together!
 
 ## 📜 License
 
