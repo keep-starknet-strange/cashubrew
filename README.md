@@ -107,7 +107,7 @@ mix bench
 
 ## 🤝 Join the Gakimint Community
 
-We're always looking for fellow wizards to join our quest. Check out our [contribution guidelines](CONTRIBUTING.md) and let's make magic together!
+We're always looking for fellow wizards to join our quest. Check out our [contribution guidelines](docs/CONTRIBUTING.md) and let's make magic together!
 
 ## 📜 License
 
