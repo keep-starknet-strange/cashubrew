@@ -28,12 +28,14 @@ COPY priv priv
 COPY lib lib
 
 # Compile and build release
-RUN mix do compile, release
+RUN mix do phx.digest, compile, release
 
 # Start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
 FROM alpine:3.20.3 AS app
-RUN apk add --no-cache openssl libstdc++
+
+# Install runtime dependencies
+RUN apk add --no-cache openssl libstdc++ ncurses-libs
 
 WORKDIR /app
 
@@ -44,5 +46,14 @@ USER nobody:nobody
 COPY --from=build --chown=nobody:nobody /app/_build/prod/rel/gakimint ./
 
 ENV HOME=/app
+ENV MIX_ENV=prod
+
+# Set default environment variables
+ENV PORT=4000
+ENV DATABASE_URL=ecto://postgres:postgres@localhost/gakimint_prod
+ENV SECRET_KEY_BASE=changeme
+
+# Expose the port the app runs on
+EXPOSE 4000
 
 CMD ["bin/gakimint", "start"]

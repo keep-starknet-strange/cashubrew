@@ -215,15 +215,6 @@ defmodule Gakimint.Crypto do
   # Modular multiplication
   defp mod_mul(a, b, n), do: mod(a * b, n)
 
-  # Point addition
-  defp secp256k1_point_add(nil, P) do
-    P
-  end
-
-  defp secp256k1_point_add(P, nil) do
-    P
-  end
-
   defp secp256k1_point_add({x1, y1}, {x1, y1}) do
     # Point doubling
     numerator = 3 * x1 * x1 + @secp256k1_a
@@ -310,9 +301,6 @@ defmodule Gakimint.Crypto do
       result_point = secp256k1_point_add(point1, point2)
 
       case result_point do
-        nil ->
-          {:error, :point_at_infinity}
-
         {x3, y3} ->
           result_pubkey = encode_point(x3, y3)
           {:ok, compressed} = ExSecp256k1.public_key_compress(result_pubkey)
@@ -329,31 +317,28 @@ defmodule Gakimint.Crypto do
   end
 
   defp do_secp256k1_point_mul(k, x, y, acc) do
-    cond do
-      k == 0 ->
-        acc
+    case k do
+      0 -> acc
+      1 -> handle_k_one(acc, x, y)
+      _ -> handle_k_greater_than_one(k, x, y, acc)
+    end
+  end
 
-      k == 1 ->
-        if acc == nil do
-          {x, y}
-        else
-          secp256k1_point_add(acc, {x, y})
-        end
+  defp handle_k_one(acc, x, y) do
+    if acc == nil, do: {x, y}, else: secp256k1_point_add(acc, {x, y})
+  end
 
-      true ->
-        new_acc =
-          if rem(k, 2) == 1 do
-            if acc == nil do
-              {x, y}
-            else
-              secp256k1_point_add(acc, {x, y})
-            end
-          else
-            acc
-          end
+  defp handle_k_greater_than_one(k, x, y, acc) do
+    new_acc = update_accumulator(k, acc, x, y)
+    {new_x, new_y} = secp256k1_point_add({x, y}, {x, y})
+    do_secp256k1_point_mul(div(k, 2), new_x, new_y, new_acc)
+  end
 
-        {x, y} = secp256k1_point_add({x, y}, {x, y})
-        do_secp256k1_point_mul(div(k, 2), x, y, new_acc)
+  defp update_accumulator(k, acc, x, y) do
+    if rem(k, 2) == 1 do
+      if acc == nil, do: {x, y}, else: secp256k1_point_add(acc, {x, y})
+    else
+      acc
     end
   end
 
