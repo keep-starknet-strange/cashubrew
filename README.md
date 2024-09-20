@@ -2,12 +2,6 @@
 
 Gakimint is a Cashu Mint implementation in Elixir.
 
-## Prerequisites
-
-- Elixir 1.14 or later
-- Erlang/OTP 24 or later
-- PostgreSQL 12 or later
-
 ## Setup
 
 1. Clone the repository:
@@ -93,6 +87,14 @@ SECRET_KEY_BASE=$(mix phx.gen.secret)
 export SECRET_KEY_BASE=$SECRET_KEY_BASE
 # Run the server in dev mode
 MIX_ENV=dev mix phx.server
+```
+
+## Benchmarks
+
+To run the benchmarks, run:
+
+```bash
+mix bench
 ```
 
 ## License
