@@ -33,20 +33,6 @@ defmodule Gakimint.Crypto do
   end
 
   @doc """
-  Sign a message with a private key.
-  """
-  def sign(message, private_key) do
-    ExSecp256k1.sign(message, private_key)
-  end
-
-  @doc """
-  Verify a signature with a public key.
-  """
-  def verify(message, signature, public_key) do
-    ExSecp256k1.verify(signature, message, public_key)
-  end
-
-  @doc """
   Hash to curve function.
   """
   def hash_to_curve(message) do
