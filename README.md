@@ -109,10 +109,10 @@ Sail the high seas with Gakimint in a Docker container:
 Peek behind the curtain at `http://localhost:4000/dashboard`. Don't forget your secret key!
 
 ```bash
-SECRET_KEY_BASE=$(mix phx.gen.secret)
-export SECRET_KEY_BASE=$SECRET_KEY_BASE
-MIX_ENV=dev mix phx.server
+SECRET_KEY_BASE=$(mix phx.gen.secret) MIX_ENV=dev mix phx.server
 ```
+
+> 💡 Note: The dashboard is only available in the `dev` environment.
 
 ## 🏎️ Turbocharge with Benchmarks
 
