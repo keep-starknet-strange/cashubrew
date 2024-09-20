@@ -134,7 +134,7 @@ Here's a table of the currently supported mandatory NUTs:
 | [NUT-03](https://cashubtc.github.io/nuts/03/) | Swapping tokens         |           |
 | [NUT-04](https://cashubtc.github.io/nuts/04/) | Minting tokens          |           |
 | [NUT-05](https://cashubtc.github.io/nuts/05/) | Melting tokens          |           |
-| [NUT-06](https://cashubtc.github.io/nuts/06/) | Mint info               |           |
+| [NUT-06](https://cashubtc.github.io/nuts/06/) | Mint info               | ✅         |
 
 Here's a table of the currently supported optional NUTs:
 

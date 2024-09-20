@@ -19,6 +19,7 @@ defmodule Gakimint.Web.MintController do
           value: "npub1hr6v96g0phtxwys4x0tm3khawuuykz6s28uzwtj5j0zc7lunu99snw2e29"
         }
       ],
+      time: System.os_time(:second),
       nuts: %{
         "4": %{
           methods: [
