@@ -128,9 +128,9 @@ Here's a table of the currently supported mandatory NUTs:
 
 | NUT                                           | Description             | Supported |
 | --------------------------------------------- | ----------------------- | --------- |
-| [NUT-00](https://cashubtc.github.io/nuts/00/) | Cryptography and Models |           |
+| [NUT-00](https://cashubtc.github.io/nuts/00/) | Cryptography and Models | ✅         |
 | [NUT-01](https://cashubtc.github.io/nuts/01/) | Mint public keys        | ✅         |
-| [NUT-02](https://cashubtc.github.io/nuts/02/) | Keysets and fees        | ✅         |
+| [NUT-02](https://cashubtc.github.io/nuts/02/) | Keysets and fees        |           |
 | [NUT-03](https://cashubtc.github.io/nuts/03/) | Swapping tokens         |           |
 | [NUT-04](https://cashubtc.github.io/nuts/04/) | Minting tokens          |           |
 | [NUT-05](https://cashubtc.github.io/nuts/05/) | Melting tokens          |           |
