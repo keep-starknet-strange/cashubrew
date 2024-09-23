@@ -4,7 +4,7 @@ defmodule Gakimint.Schema.Keyset do
   """
   use Ecto.Schema
   import Ecto.Changeset
-  alias Gakimint.{Crypto, Repo, Schema}
+  alias Gakimint.{Crypto.BDHKE, Repo, Schema}
 
   import Bitwise
   @max_order 64
@@ -84,7 +84,7 @@ defmodule Gakimint.Schema.Keyset do
       private_key_bytes = :binary.part(private_key.key, 1, 32)
 
       # Get the public key
-      {_, public_key} = Crypto.generate_keypair(private_key_bytes)
+      {_, public_key} = BDHKE.generate_keypair(private_key_bytes)
 
       %{
         amount: amount,
@@ -94,6 +94,7 @@ defmodule Gakimint.Schema.Keyset do
     end)
   end
 
+  @spec derive_keyset_id(any()) :: <<_::16, _::_*8>>
   @doc """
   Derives a keyset ID from a set of public keys.
 

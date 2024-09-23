@@ -4,7 +4,7 @@ defmodule Gakimint.Mint do
   """
 
   use GenServer
-  alias Gakimint.{Crypto, Repo}
+  alias Gakimint.{Crypto.BDHKE, Repo}
   alias Gakimint.Schema.{Key, Keyset, MintConfiguration}
   import Ecto.Query
 
@@ -90,7 +90,7 @@ defmodule Gakimint.Mint do
 
   defp derive_mint_key(seed) do
     private_key = :crypto.hash(:sha256, seed)
-    {private_key, public_key} = Crypto.generate_keypair(private_key)
+    {private_key, public_key} = BDHKE.generate_keypair(private_key)
     {private_key, public_key}
   end
 
