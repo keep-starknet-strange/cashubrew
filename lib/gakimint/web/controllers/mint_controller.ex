@@ -1,11 +1,12 @@
 defmodule Gakimint.Web.MintController do
   use Gakimint.Web, :controller
+  alias Gakimint.Mint
   alias Gakimint.Web.{Keys, KeysetResponse}
 
   def info(conn, _params) do
     info = %{
       name: "Gakimint Cashu Mint",
-      pubkey: "",
+      pubkey: Base.encode16(Mint.get_pubkey(), case: :lower),
       version: "Gakimint/0.1.0",
       description: "An Elixir implementation of Cashu Mint",
       description_long: "A Cashu Mint implementation in Elixir.",
@@ -66,11 +67,11 @@ defmodule Gakimint.Web.MintController do
   end
 
   def keys(conn, _params) do
-    keysets = Gakimint.Mint.get_active_keysets()
+    keysets = Mint.get_active_keysets()
 
     keysets_responses =
       Enum.map(keysets, fn keyset ->
-        keys = Gakimint.Mint.get_keys_for_keyset(keyset.id)
+        keys = Mint.get_keys_for_keyset(keyset.id)
 
         keys_list =
           Enum.map(keys, fn key -> {key.amount, Base.encode16(key.public_key, case: :lower)} end)
