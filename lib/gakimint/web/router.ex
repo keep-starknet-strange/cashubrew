@@ -20,7 +20,8 @@ defmodule Gakimint.Web.Router do
 
     get("/v1/info", MintController, :info)
     get("/v1/keys", MintController, :keys)
-    # Add other routes as needed
+    get("/v1/keys/:keyset_id", MintController, :keys_for_keyset)
+    get("/v1/keysets", MintController, :keysets)
   end
 
   if Mix.env() == :dev do

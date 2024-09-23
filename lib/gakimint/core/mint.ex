@@ -12,6 +12,7 @@ defmodule Gakimint.Mint do
   @keyset_generation_derivation_path "m/0'/0'/0'"
   @mint_pubkey_key "mint_pubkey"
   @mint_privkey_key "mint_privkey"
+  @default_input_fee_ppk 0
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
@@ -51,7 +52,9 @@ defmodule Gakimint.Mint do
   defp load_or_create_keysets(seed) do
     case Repo.all(Keyset) do
       [] ->
-        keyset = Keyset.generate("sat", seed, @keyset_generation_derivation_path)
+        keyset =
+          Keyset.generate("sat", seed, @keyset_generation_derivation_path, @default_input_fee_ppk)
+
         [keyset]
 
       existing ->
@@ -125,5 +128,13 @@ defmodule Gakimint.Mint do
 
   def get_active_keysets do
     Repo.all(from(k in Keyset, where: k.active == true))
+  end
+
+  def get_all_keysets do
+    Repo.all(Keyset)
+  end
+
+  def get_keyset(keyset_id) do
+    Repo.get(Keyset, keyset_id)
   end
 end

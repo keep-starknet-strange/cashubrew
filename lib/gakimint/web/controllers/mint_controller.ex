@@ -66,6 +66,26 @@ defmodule Gakimint.Web.MintController do
     json(conn, info)
   end
 
+  def keysets(conn, _params) do
+    keysets = Mint.get_all_keysets()
+
+    keysets_responses =
+      Enum.map(keysets, fn keyset ->
+        %{
+          id: keyset.id,
+          unit: keyset.unit,
+          active: keyset.active,
+          input_fee_ppk: keyset.input_fee_ppk || 0
+        }
+      end)
+
+    response = %{
+      keysets: keysets_responses
+    }
+
+    json(conn, response)
+  end
+
   def keys(conn, _params) do
     keysets = Mint.get_active_keysets()
 
@@ -88,5 +108,34 @@ defmodule Gakimint.Web.MintController do
     }
 
     json(conn, response)
+  end
+
+  def keys_for_keyset(conn, %{"keyset_id" => keyset_id}) do
+    keyset = Mint.get_keyset(keyset_id)
+
+    if keyset do
+      keys = Mint.get_keys_for_keyset(keyset_id)
+
+      keys_list =
+        Enum.map(keys, fn key ->
+          {key.amount, Base.encode16(key.public_key, case: :lower)}
+        end)
+
+      keyset_response = %KeysetResponse{
+        id: keyset.id,
+        unit: keyset.unit,
+        keys: %Keys{pairs: keys_list}
+      }
+
+      response = %{
+        keysets: [keyset_response]
+      }
+
+      json(conn, response)
+    else
+      conn
+      |> put_status(:not_found)
+      |> json(%{error: "Keyset not found"})
+    end
   end
 end

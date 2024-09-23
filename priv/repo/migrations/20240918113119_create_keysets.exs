@@ -4,11 +4,9 @@ defmodule Gakimint.Repo.Migrations.CreateKeysets do
   def change do
     create table(:keysets, primary_key: false) do
       add :id, :string, primary_key: true
-      add :private_keys, :map
-      add :public_keys, :map
       add :active, :boolean, default: true
       add :unit, :string
-
+      add :input_fee_ppk, :integer
       timestamps()
     end
   end

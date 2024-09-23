@@ -13,24 +13,32 @@ defmodule Gakimint.Schema.Keyset do
   schema "keysets" do
     field(:active, :boolean, default: true)
     field(:unit, :string)
-
+    field(:input_fee_ppk, :integer)
     timestamps()
   end
 
   def changeset(keyset, attrs) do
     keyset
-    |> cast(attrs, [:id, :active, :unit])
+    |> cast(attrs, [:id, :active, :unit, :input_fee_ppk])
     |> validate_required([:id, :unit])
   end
 
-  def generate(unit \\ "sat", seed, derivation_path \\ "m/0'/0'/0'") do
+  @spec generate(
+          binary()
+          | maybe_improper_list(
+              binary() | maybe_improper_list(any(), binary() | []) | char(),
+              binary() | []
+            )
+        ) :: any()
+  def generate(unit \\ "sat", seed, derivation_path \\ "m/0'/0'/0'", input_fee_ppk \\ 0) do
     keys = generate_keys(seed, derivation_path)
     id = derive_keyset_id(keys)
 
     keyset = %__MODULE__{
       id: id,
       active: true,
-      unit: unit
+      unit: unit,
+      input_fee_ppk: input_fee_ppk
     }
 
     {:ok, keyset} = Repo.insert(keyset)
