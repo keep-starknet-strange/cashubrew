@@ -69,6 +69,31 @@ mix phx.server
   - Migrate: `mix ecto.migrate`
   - Reset: `mix ecto.reset`
 
+### 🧪 Testing Magic
+
+- **Run All Tests**: `mix test`
+- **Mock the Database**:
+  To use a mock database for testing, set the `MOCK_REPO` environment variable:
+
+```bash
+MOCK_REPO=true mix test
+```
+
+- **Test Coverage**:
+  Unveil the secrets of your test coverage:
+
+```bash
+MIX_ENV=test mix coveralls
+```
+
+For a detailed HTML report, cast this spell:
+
+```bash
+MIX_ENV=test mix coveralls.html
+```
+
+The mystical report will appear in `cover/excoveralls.html`.
+
 ### 🔍 Code Quality and Security
 
 Ensure your code is top-notch with these magical incantations:

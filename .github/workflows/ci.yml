@@ -44,7 +44,18 @@ jobs:
       - name: Run tests
         run: mix test
         env:
-          MIX_ENV: dev
+          MIX_ENV: test
+
+      - name: Run test coverage
+        run: mix coveralls.json
+        env:
+          MIX_ENV: test
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: cover/excoveralls.json
 
       - name: Check formatting
         run: mix format --check-formatted
