@@ -2,6 +2,7 @@ defmodule Gakimint.Web.MintController do
   use Gakimint.Web, :controller
   alias Gakimint.Mint
   alias Gakimint.Web.{Keys, KeysetResponse}
+  alias Gakimint.Cashu.{BlindedMessage, BlindSignature, Proof}
 
   def info(conn, _params) do
     info = %{
@@ -140,5 +141,88 @@ defmodule Gakimint.Web.MintController do
       |> put_status(:not_found)
       |> json(%{error: "Keyset not found"})
     end
+  end
+
+  def swap(conn, %{"inputs" => inputs, "outputs" => outputs}) do
+    repo = Application.get_env(:gakimint, :repo)
+
+    with {:ok, proofs} <- validate_proofs(inputs),
+         {:ok, blinded_messages} <- validate_blinded_messages(outputs),
+         :ok <- validate_amounts(proofs, blinded_messages),
+         {:ok, signatures} <- perform_swap(repo, proofs, blinded_messages) do
+      json(conn, %{signatures: signatures})
+    else
+      {:error, reason} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(%{error: reason})
+    end
+  end
+
+  defp validate_proofs(inputs) do
+    proofs = Enum.map(inputs, &struct(Proof, &1))
+    {:ok, proofs}
+  end
+
+  defp validate_blinded_messages(outputs) do
+    blinded_messages = Enum.map(outputs, &struct(BlindedMessage, &1))
+    {:ok, blinded_messages}
+  end
+
+  defp validate_amounts(proofs, blinded_messages) do
+    input_sum = Enum.reduce(proofs, 0, &(&1.amount + &2))
+    output_sum = Enum.reduce(blinded_messages, 0, &(&1.amount + &2))
+
+    if input_sum == output_sum do
+      :ok
+    else
+      {:error, "Input and output amounts do not match"}
+    end
+  end
+
+  defp perform_swap(repo, proofs, blinded_messages) do
+    Ecto.Multi.new()
+    |> Ecto.Multi.run(:verify_proofs, fn _, _ ->
+      verify_proofs(repo, proofs)
+    end)
+    |> Ecto.Multi.run(:invalidate_proofs, fn _, _ ->
+      invalidate_proofs(repo, proofs)
+    end)
+    |> Ecto.Multi.run(:sign_outputs, fn _, _ ->
+      sign_outputs(repo, blinded_messages)
+    end)
+    |> repo.transaction()
+    |> case do
+      {:ok, %{sign_outputs: signatures}} -> {:ok, signatures}
+      {:error, _, reason, _} -> {:error, reason}
+    end
+  end
+
+  defp verify_proofs(_repo, proofs) do
+    # Implement proof verification logic
+    # This should check if the proofs are valid and not already spent
+    {:ok, proofs}
+  end
+
+  defp invalidate_proofs(_repo, _proofs) do
+    # Implement proof invalidation logic
+    # This should mark the proofs as spent in the database
+    :ok
+  end
+
+  defp sign_outputs(_repo, blinded_messages) do
+    # Implement output signing logic
+    # This should create new BlindSignatures for the blinded messages
+    signatures =
+      Enum.map(blinded_messages, fn bm ->
+        %BlindSignature{
+          amount: bm.amount,
+          id: bm.id,
+          # Replace with actual signature logic
+          C_: "dummy_signature"
+        }
+      end)
+
+    {:ok, signatures}
   end
 end
