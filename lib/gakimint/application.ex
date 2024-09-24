@@ -2,13 +2,15 @@ defmodule Gakimint.Application do
   @moduledoc false
   use Application
   alias Gakimint.Web.Endpoint
+  alias Gakimint.Lightning.MockLightningNetworkService
 
   @impl true
   def start(_type, _args) do
     children = [
       Gakimint.Web.Telemetry,
       {Phoenix.PubSub, name: Gakimint.PubSub},
-      Endpoint
+      Endpoint,
+      MockLightningNetworkService
     ]
 
     # Conditionally add the appropriate repo to the children list
