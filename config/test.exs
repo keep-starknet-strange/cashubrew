@@ -25,5 +25,5 @@ else
     pool: Ecto.Adapters.SQL.Sandbox,
     pool_size: 10
 
-  config :gakimint, :repo, Gakimint.MockRepo
+  config :gakimint, :repo, Gakimint.Repo
 end
