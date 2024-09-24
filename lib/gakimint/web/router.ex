@@ -18,11 +18,21 @@ defmodule Gakimint.Web.Router do
   scope "/api", Gakimint.Web do
     pipe_through(:api)
 
-    get("/v1/info", MintController, :info)
+    # NUT-01 & NUT-02
     get("/v1/keys", MintController, :keys)
     get("/v1/keys/:keyset_id", MintController, :keys_for_keyset)
     get("/v1/keysets", MintController, :keysets)
+
+    # NUT-03
     post("/v1/swap", MintController, :swap)
+
+    # NUT-04
+    post("/v1/mint/quote/bolt11", MintController, :create_mint_quote)
+    get("/v1/mint/quote/bolt11/:quote_id", MintController, :get_mint_quote)
+    post("/v1/mint/bolt11", MintController, :mint_tokens)
+
+    # NUT-06
+    get("/v1/info", MintController, :info)
   end
 
   if Mix.env() == :dev do

@@ -3,6 +3,7 @@ defmodule Gakimint.Web.MintController do
   alias Gakimint.Mint
   alias Gakimint.Web.{Keys, KeysetResponse}
   alias Gakimint.Cashu.{BlindedMessage, BlindSignature, Proof}
+  alias Gakimint.Schema.MintQuote
 
   def info(conn, _params) do
     info = %{
@@ -225,4 +226,60 @@ defmodule Gakimint.Web.MintController do
 
     {:ok, signatures}
   end
+
+  def create_mint_quote(conn, %{"amount" => amount, "unit" => "sat"} = params) do
+    description = Map.get(params, "description")
+
+    case Mint.create_mint_quote(amount, description) do
+      {:ok, quote} ->
+        conn
+        |> put_status(:created)
+        |> json(%{
+          quote: quote.id,
+          request: quote.payment_request,
+          state: "UNPAID",
+          expiry: quote.expiry
+        })
+
+      {:error, reason} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(%{error: reason})
+    end
+  end
+
+  def get_mint_quote(conn, %{"quote_id" => quote_id}) do
+    case Mint.get_mint_quote(quote_id) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "Quote not found"})
+
+      quote ->
+        json(conn, %{
+          quote: quote.id,
+          request: quote.payment_request,
+          state: quote.state,
+          expiry: quote.expiry
+        })
+    end
+  end
+
+  def mint_tokens(conn, %{"quote" => quote_id, "outputs" => outputs}) do
+    with {:ok, quote} <- Mint.get_mint_quote(quote_id),
+         :ok <- validate_quote_state(quote),
+         {:ok, blinded_messages} <- validate_blinded_messages(outputs),
+         :ok <- validate_amounts(quote.amount, blinded_messages),
+         {:ok, signatures} <- Mint.mint_tokens(quote, blinded_messages) do
+      json(conn, %{signatures: signatures})
+    else
+      {:error, reason} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(%{error: reason})
+    end
+  end
+
+  defp validate_quote_state(%MintQuote{state: "PAID"}), do: :ok
+  defp validate_quote_state(_), do: {:error, "Quote is not in PAID state"}
 end
