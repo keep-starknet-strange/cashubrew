@@ -16,20 +16,24 @@ defmodule Mix.Tasks.Bench do
     secret_msg = "test_message"
     {r, _r_pub} = BDHKE.generate_keypair(<<1::256>>)
 
-    # Run the BDHKE benchmark
-    Benchee.run(
-      %{
-        "BDHKE End-to-End Flow" => fn ->
-          run_bdhke_flow(a, a_pub, secret_msg, r)
-        end
-      },
-      formatters: [
-        Benchee.Formatters.HTML,
-        Benchee.Formatters.Console
-      ],
-      time: 10,
-      memory_time: 2
-    )
+    if Code.ensure_loaded?(Benchee) do
+      # Run the BDHKE benchmark
+      Benchee.run(
+        %{
+          "BDHKE End-to-End Flow" => fn ->
+            run_bdhke_flow(a, a_pub, secret_msg, r)
+          end
+        },
+        formatters: [
+          Benchee.Formatters.HTML,
+          Benchee.Formatters.Console
+        ],
+        time: 10,
+        memory_time: 2
+      )
+    else
+      IO.puts("Benchee is not available. Make sure you're running in the :dev environment.")
+    end
   end
 
   def run_bdhke_flow(a, a_pub, secret_msg, r) do
