@@ -1,8 +1,8 @@
 defmodule Gakimint.Application do
   @moduledoc false
   use Application
-  alias Gakimint.Web.Endpoint
   alias Gakimint.Lightning.MockLightningNetworkService
+  alias Gakimint.Web.Endpoint
 
   @impl true
   def start(_type, _args) do
