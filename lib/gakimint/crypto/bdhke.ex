@@ -1,6 +1,12 @@
 defmodule Gakimint.Crypto.BDHKE do
   @moduledoc """
   Cryptographic functions for the Gakimint mint, including BDHKE implementation.
+  Check [NUT-00](https://cashubtc.github.io/nuts/00/) for more information.
+  Protocol summary:
+  - Alice (user) blinds the message and sends it to Bob (mint).
+  - Bob signs the blinded message.
+  - Alice unblinds the signature.
+  - Carol (user) verifies the signature.
   """
   require Logger
 
@@ -56,19 +62,26 @@ defmodule Gakimint.Crypto.BDHKE do
   defp hash_to_curve_loop(_, _), do: raise("No valid point found")
 
   @doc """
-  Alice's step 1: Blind the message
+  Alice's step 1: Blind the message.
+  Alice is the sending user.
+  Alice picks secret x and computes Y = hash_to_curve(x).
+  Alice sends to Bob: B_ = Y + rG with r being a random blinding factor (blinding).
+  This operation is called blinding.
   """
   def step1_alice(secret_msg, blinding_factor \\ nil) do
     y = hash_to_curve(secret_msg)
     r = blinding_factor || generate_keypair() |> elem(0)
     {:ok, r_pub} = ExSecp256k1.create_public_key(r)
     {:ok, r_pub_compressed} = ExSecp256k1.public_key_compress(r_pub)
+    # B_ = Y + rG
     {:ok, b_prime} = Secp256k1Utils.point_add(y, r_pub_compressed)
     {b_prime, r}
   end
 
   @doc """
-  Bob's step 2: Sign the blinded message
+  Bob's step 2: Sign the blinded message.
+  Bob is the mint.
+  This operation is called signing.
   """
   def step2_bob(b_prime, a) do
     with {:ok, c_prime} <- Secp256k1Utils.point_mul(b_prime, a),
@@ -81,7 +94,9 @@ defmodule Gakimint.Crypto.BDHKE do
   end
 
   @doc """
-  Alice's step 3: Unblind the signature
+  Alice's step 3: Unblind the signature.
+  Alice can calculate the unblinded key as C_ - rK = kY + krG - krG = kY = C.
+  This operation is called unblinding.
   """
   def step3_alice(c_prime, r, a_pub) do
     with {:ok, r_a_pub} <- Secp256k1Utils.point_mul(a_pub, r),
@@ -93,7 +108,9 @@ defmodule Gakimint.Crypto.BDHKE do
   end
 
   @doc """
-  Verify the signature
+  Verify the signature.
+  Carol is the receiving user.
+  This operation is called verification.
   """
   def verify(a, c, secret_msg) do
     y = hash_to_curve(secret_msg)

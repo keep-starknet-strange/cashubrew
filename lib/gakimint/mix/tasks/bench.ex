@@ -4,15 +4,17 @@ defmodule Mix.Tasks.Bench do
   """
   use Mix.Task
 
+  alias Gakimint.Crypto.BDHKE
+
   @shortdoc "Runs the BDHKE benchmark"
 
   def run(_args) do
     Mix.Task.run("app.start")
 
     # Setup before benchmark
-    {a, a_pub} = Gakimint.Crypto.generate_keypair(<<1::256>>)
+    {a, a_pub} = BDHKE.generate_keypair(<<1::256>>)
     secret_msg = "test_message"
-    {r, _r_pub} = Gakimint.Crypto.generate_keypair(<<1::256>>)
+    {r, _r_pub} = BDHKE.generate_keypair(<<1::256>>)
 
     # Run the BDHKE benchmark
     Benchee.run(
@@ -32,16 +34,16 @@ defmodule Mix.Tasks.Bench do
 
   def run_bdhke_flow(a, a_pub, secret_msg, r) do
     # STEP 1: Alice blinds the message
-    {b_prime, _} = Gakimint.Crypto.step1_alice(secret_msg, r)
+    {b_prime, _} = BDHKE.step1_alice(secret_msg, r)
 
     # STEP 2: Bob signs the blinded message
-    {c_prime, e, s} = Gakimint.Crypto.step2_bob(b_prime, a)
+    {c_prime, _, _} = BDHKE.step2_bob(b_prime, a)
 
     # STEP 3: Alice unblinds the signature
-    c = Gakimint.Crypto.step3_alice(c_prime, r, a_pub)
+    c = BDHKE.step3_alice(c_prime, r, a_pub)
 
     # CAROL VERIFY: Carol verifies the unblinded signature
-    carol_verification = Gakimint.Crypto.carol_verify_dleq(secret_msg, r, c, e, s, a_pub)
+    carol_verification = BDHKE.verify(a, c, secret_msg)
 
     if carol_verification do
       :ok
