@@ -8,7 +8,14 @@ defmodule Gakimint.MixProject do
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      aliases: aliases()
+      aliases: aliases(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ]
     ]
   end
 
@@ -43,7 +50,8 @@ defmodule Gakimint.MixProject do
       {:cbor, "~> 1.0.0"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
-      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false}
+      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
+      {:excoveralls, "~> 0.18", only: :test}
     ]
   end
 
@@ -52,7 +60,17 @@ defmodule Gakimint.MixProject do
       setup: ["deps.get", "ecto.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
+      test: [
+        &setup_test_environment/1,
+        "test"
+      ]
     ]
+  end
+
+  defp setup_test_environment(_) do
+    if System.get_env("MOCK_DB") != "true" do
+      Mix.Task.run("ecto.create", ["--quiet"])
+      Mix.Task.run("ecto.migrate", ["--quiet"])
+    end
   end
 end

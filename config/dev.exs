@@ -39,4 +39,6 @@ config :gakimint, Gakimint.Repo,
   port: 5432,
   pool_size: 10
 
+config :gakimint, :repo, Gakimint.Repo
+
 config :gakimint, ecto_repos: [Gakimint.Repo]

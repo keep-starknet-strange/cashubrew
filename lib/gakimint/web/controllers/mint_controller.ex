@@ -67,7 +67,8 @@ defmodule Gakimint.Web.MintController do
   end
 
   def keysets(conn, _params) do
-    keysets = Mint.get_all_keysets()
+    repo = Application.get_env(:gakimint, :repo)
+    keysets = Mint.get_all_keysets(repo)
 
     keysets_responses =
       Enum.map(keysets, fn keyset ->
@@ -87,11 +88,12 @@ defmodule Gakimint.Web.MintController do
   end
 
   def keys(conn, _params) do
-    keysets = Mint.get_active_keysets()
+    repo = Application.get_env(:gakimint, :repo)
+    keysets = Mint.get_active_keysets(repo)
 
     keysets_responses =
       Enum.map(keysets, fn keyset ->
-        keys = Mint.get_keys_for_keyset(keyset.id)
+        keys = Mint.get_keys_for_keyset(repo, keyset.id)
 
         keys_list =
           Enum.map(keys, fn key -> {key.amount, Base.encode16(key.public_key, case: :lower)} end)
@@ -111,10 +113,11 @@ defmodule Gakimint.Web.MintController do
   end
 
   def keys_for_keyset(conn, %{"keyset_id" => keyset_id}) do
-    keyset = Mint.get_keyset(keyset_id)
+    repo = Application.get_env(:gakimint, :repo)
+    keyset = Mint.get_keyset(repo, keyset_id)
 
     if keyset do
-      keys = Mint.get_keys_for_keyset(keyset_id)
+      keys = Mint.get_keys_for_keyset(repo, keyset_id)
 
       keys_list =
         Enum.map(keys, fn key ->

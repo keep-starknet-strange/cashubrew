@@ -4,7 +4,7 @@ defmodule Gakimint.Schema.Keyset do
   """
   use Ecto.Schema
   import Ecto.Changeset
-  alias Gakimint.{Crypto.BDHKE, Repo, Schema}
+  alias Gakimint.{Crypto.BDHKE, Schema}
 
   import Bitwise
   @max_order 64
@@ -23,13 +23,6 @@ defmodule Gakimint.Schema.Keyset do
     |> validate_required([:id, :unit])
   end
 
-  @spec generate(
-          binary()
-          | maybe_improper_list(
-              binary() | maybe_improper_list(any(), binary() | []) | char(),
-              binary() | []
-            )
-        ) :: any()
   def generate(unit \\ "sat", seed, derivation_path \\ "m/0'/0'/0'", input_fee_ppk \\ 0) do
     keys = generate_keys(seed, derivation_path)
     id = derive_keyset_id(keys)
@@ -41,18 +34,34 @@ defmodule Gakimint.Schema.Keyset do
       input_fee_ppk: input_fee_ppk
     }
 
-    {:ok, keyset} = Repo.insert(keyset)
+    repo = Application.get_env(:gakimint, :repo)
 
-    # Insert keys into the database
+    case repo.insert(keyset) do
+      {:ok, keyset} ->
+        insert_keys(repo, keys, id)
+        keyset
+
+      {:error, changeset} ->
+        raise "Failed to insert keyset: #{inspect(changeset.errors)}"
+    end
+  end
+
+  defp insert_keys(repo, keys, keyset_id) do
     Enum.each(keys, fn key ->
-      key = Map.put(key, :keyset_id, id)
-
-      %Schema.Key{}
-      |> Schema.Key.changeset(key)
-      |> Repo.insert!()
+      key
+      |> Map.put(:keyset_id, keyset_id)
+      |> insert_key(repo)
     end)
+  end
 
-    keyset
+  defp insert_key(key, repo) do
+    %Schema.Key{}
+    |> Schema.Key.changeset(key)
+    |> repo.insert()
+    |> case do
+      {:ok, _} -> :ok
+      {:error, changeset} -> raise "Failed to insert key: #{inspect(changeset.errors)}"
+    end
   end
 
   @doc """
@@ -68,30 +77,22 @@ defmodule Gakimint.Schema.Keyset do
     - A map containing amounts mapped to their corresponding private and public keys.
   """
   def generate_keys(seed, derivation_path \\ "m/0'/0'/0'") do
-    # Encode the seed as utf-8 hex
     encoded_seed =
       seed
       |> :unicode.characters_to_binary(:utf8)
       |> Base.encode16(case: :lower)
 
-    # Generate the master key from the seed
     {master_private_key, master_chain_code} = BlockKeys.CKD.master_keys(encoded_seed)
-    # Generate the master extended private key
     root_key = BlockKeys.CKD.master_private_key({master_private_key, master_chain_code})
 
-    # Generate keys for amounts 2^i where i ranges from 0 to @max_order - 1
     Enum.map(0..(@max_order - 1), fn i ->
       amount = 1 <<< i
-      # Child path is the derivation path concatenated with the index
       child_path = "#{derivation_path}/#{i}"
       child_key = BlockKeys.CKD.derive(root_key, child_path)
 
-      # Get the private key
       private_key = BlockKeys.Encoding.decode_extended_key(child_key)
-      # Remove the leading zero byte from the private key
       private_key_bytes = :binary.part(private_key.key, 1, 32)
 
-      # Get the public key
       {_, public_key} = BDHKE.generate_keypair(private_key_bytes)
 
       %{
@@ -102,21 +103,21 @@ defmodule Gakimint.Schema.Keyset do
     end)
   end
 
-  @spec derive_keyset_id(any()) :: <<_::16, _::_*8>>
+  @spec derive_keyset_id([map()]) :: <<_::16, _::_*8>>
   @doc """
   Derives a keyset ID from a set of public keys.
 
   ## Parameters
 
-    - keys: A map of amounts to public keys.
+    - keys: A list of maps containing public keys.
 
   ## Returns
 
     - A string representing the keyset ID.
   """
   def derive_keyset_id(keys) do
-    sorted_keys = Enum.sort_by(keys, fn key -> key.amount end)
-    pubkeys_concat = Enum.map(sorted_keys, fn key -> key.public_key end) |> IO.iodata_to_binary()
+    sorted_keys = Enum.sort_by(keys, & &1.amount)
+    pubkeys_concat = Enum.map(sorted_keys, & &1.public_key) |> IO.iodata_to_binary()
 
     "00" <>
       (:crypto.hash(:sha256, pubkeys_concat) |> Base.encode16(case: :lower) |> binary_part(0, 14))

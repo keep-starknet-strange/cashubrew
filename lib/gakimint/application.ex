@@ -7,11 +7,20 @@ defmodule Gakimint.Application do
   def start(_type, _args) do
     children = [
       Gakimint.Web.Telemetry,
-      Gakimint.Repo,
       {Phoenix.PubSub, name: Gakimint.PubSub},
-      Endpoint,
-      Gakimint.Mint
+      Endpoint
     ]
+
+    # Conditionally add the appropriate repo to the children list
+    children =
+      case Application.get_env(:gakimint, :repo) do
+        Gakimint.MockRepo -> [Gakimint.MockRepo | children]
+        Gakimint.Repo -> [Gakimint.Repo | children]
+        _ -> children
+      end
+
+    # Always add Gakimint.Mint after the repo
+    children = children ++ [Gakimint.Mint]
 
     opts = [strategy: :one_for_one, name: Gakimint.Supervisor]
     Supervisor.start_link(children, opts)
