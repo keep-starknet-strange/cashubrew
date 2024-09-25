@@ -4,6 +4,7 @@ defmodule Gakimint.Mint do
   """
 
   use GenServer
+  alias Gakimint.Cashu.BlindSignature
   alias Gakimint.Crypto.BDHKE
   alias Gakimint.Lightning.MockLightningNetworkService
   alias Gakimint.Schema.{Key, Keyset, MintConfiguration, MintQuote}
@@ -166,40 +167,60 @@ defmodule Gakimint.Mint do
     end
   end
 
-  def handle_call({:mint_tokens, quote, blinded_messages}, _from, state) do
+  def handle_call({:mint_tokens, quote_id, blinded_messages}, _from, state) do
     repo = Application.get_env(:gakimint, :repo)
+    # Get quote from database
+    quote = repo.get(MintQuote, quote_id)
 
-    result =
-      Ecto.Multi.new()
-      |> Ecto.Multi.run(:verify_quote, fn _, _ ->
-        case MockLightningNetworkService.check_payment(quote.payment_request) do
-          {:ok, :paid} -> {:ok, quote}
-          _ -> {:error, :payment_not_received}
-        end
-      end)
-      |> Ecto.Multi.update(:update_quote, fn %{verify_quote: quote} ->
-        Ecto.Changeset.change(quote, state: "ISSUED")
-      end)
-      |> Ecto.Multi.run(:sign_outputs, fn _, _ ->
-        sign_outputs(blinded_messages, state.mint_privkey)
-      end)
-      |> repo.transaction()
+    # Return error if quote does not exist
+    if quote do
+      result =
+        Ecto.Multi.new()
+        |> Ecto.Multi.run(:verify_quote, fn _, _ ->
+          # Implement actual Lightning payment verification
+          # For now, we mock the payment as if it's been received
+          {:ok, quote}
+        end)
+        |> Ecto.Multi.update(:update_quote, fn %{verify_quote: quote} ->
+          Ecto.Changeset.change(quote, state: "ISSUED")
+        end)
+        |> Ecto.Multi.run(:sign_outputs, fn _, _ ->
+          sign_outputs(repo, blinded_messages)
+        end)
+        |> repo.transaction()
 
-    case result do
-      {:ok, %{sign_outputs: signatures}} ->
-        {:reply, {:ok, signatures}, state}
+      case result do
+        {:ok, %{sign_outputs: signatures}} ->
+          {:reply, {:ok, signatures}, state}
 
-      {:error, _, reason, _} ->
-        {:reply, {:error, reason}, state}
+        {:error, _, reason, _} ->
+          {:reply, {:error, reason}, state}
+      end
+    else
+      {:reply, {:error, :not_found}, state}
     end
   end
 
-  defp sign_outputs(blinded_messages, privkey) do
+  defp sign_outputs(repo, blinded_messages) do
     signatures =
       Enum.map(blinded_messages, fn bm ->
-        {c_prime, _, _} = BDHKE.step2_bob(nil, privkey)
-        # {c_prime, _, _} = BDHKE.step2_bob(bm.B_, privkey)
-        %{amount: bm.amount, id: bm.id, C_: c_prime}
+        # Get key from database
+        amount_key = get_key_for_amount(repo, bm.id, bm.amount)
+        privkey_hex = amount_key.private_key
+        IO.inspect(privkey_hex, label: "privkey_hex")
+        privkey = Base.encode16(privkey_hex, case: :lower)
+        IO.inspect(privkey, label: "privkey")
+        IO.inspect(bm, label: "bm")
+        IO.inspect(bm."B_", label: "B_")
+        # Bob (mint) signs the blinded message
+        {c_prime, _e, _s} = BDHKE.step2_bob(bm."B_", privkey_hex)
+        IO.inspect(c_prime, label: "c_prime")
+
+        %BlindSignature{
+          amount: bm.amount,
+          id: bm.id,
+          C_: Base.encode16(c_prime, case: :lower)
+        }
       end)
 
     {:ok, signatures}
@@ -218,6 +239,10 @@ defmodule Gakimint.Mint do
         order_by: [asc: k.amount]
       )
     )
+  end
+
+  def get_key_for_amount(repo, keyset_id, amount) do
+    repo.get_by(Key, keyset_id: keyset_id, amount: amount)
   end
 
   def get_pubkey do

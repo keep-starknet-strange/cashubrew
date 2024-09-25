@@ -84,6 +84,9 @@ defmodule Gakimint.Crypto.BDHKE do
   This operation is called signing.
   """
   def step2_bob(b_prime, a) do
+    IO.inspect(b_prime, label: "b_prime")
+    IO.inspect(a, label: "a")
+
     with {:ok, c_prime} <- Secp256k1Utils.point_mul(b_prime, a),
          {e, s} <- step2_bob_dleq(b_prime, a) do
       {c_prime, e, s}
