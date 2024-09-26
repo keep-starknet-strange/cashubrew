@@ -7,6 +7,8 @@
 
 > 💡 Gakimint: Where Elixir meets Cashu, creating a symphony of secure, scalable, and lightning-fast ecash transactions!
 
+> ⚠️ Disclaimer: This is a proof of concept and is not ready for production use.
+
 ## 📚 Learn about Cashu
 
 Before diving into Gakimint, it's essential to understand Cashu.
