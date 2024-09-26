@@ -260,12 +260,24 @@ We're always looking for fellow wizards to join our quest. Check out our [contri
 
 Cashubrew is released under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
----
+## Contributors ✨
 
-<p align="center">
-  Made with ❤️ by <a href="https://github.com/AbdelStark">@AbdelStark</a>
-</p>
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
-<p align="center">
-  <a href="https://github.com/AbdelStark/cashubrew/stargazers">⭐ Star us on GitHub!</a>
-</p>
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/AbdelStark"><img src="https://avatars.githubusercontent.com/u/45264458?v=4?s=100" width="100px;" alt="A₿del ∞/21M"/><br /><sub><b>A₿del ∞/21M</b></sub></a><br /><a href="https://github.com/keep-starknet-strange/cashubrew/commits?author=AbdelStark" title="Code">💻</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
