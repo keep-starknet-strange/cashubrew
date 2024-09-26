@@ -12,7 +12,7 @@ Before you begin:
 
 ## 🍴 Forking the Repository
 
-1. Head over to the [Cashubrew repository](https://github.com/AbdelStark/cashubrew) on GitHub
+1. Head over to the [Cashubrew repository](https://github.com/keep-starknet-strange/cashubrew) on GitHub
 2. Click the "Fork" button in the upper right corner
 3. Voilà! You now have your own copy of the repository
 
@@ -28,7 +28,7 @@ cd cashubrew
 1. Add the original repository as a remote called "upstream":
 
 ```bash
-git remote add upstream https://github.com/AbdelStark/cashubrew.git
+git remote add upstream https://github.com/keep-starknet-strange/cashubrew.git
 ```
 
 1. Install dependencies:
@@ -86,13 +86,13 @@ git push origin your-feature-name
 
 ## 🐛 Reporting Bugs
 
-1. Ensure the bug was not already reported by searching on GitHub under [Issues](https://github.com/AbdelStark/cashubrew/issues)
-2. If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/AbdelStark/cashubrew/issues/new)
+1. Ensure the bug was not already reported by searching on GitHub under [Issues](https://github.com/keep-starknet-strange/cashubrew/issues)
+2. If you're unable to find an open issue addressing the problem, [open a new one](https://github.com/keep-starknet-strange/cashubrew/issues/new)
 
 ## 💡 Suggesting Enhancements
 
-1. Check the [Issues](https://github.com/AbdelStark/cashubrew/issues) page to see if the enhancement has already been suggested
-2. If not, [create a new issue](https://github.com/AbdelStark/cashubrew/issues/new), clearly describing the enhancement and its potential benefits
+1. Check the [Issues](https://github.com/keep-starknet-strange/cashubrew/issues) page to see if the enhancement has already been suggested
+2. If not, [create a new issue](https://github.com/keep-starknet-strange/cashubrew/issues/new), clearly describing the enhancement and its potential benefits
 
 ## 📜 Commit Message Guidelines
 
