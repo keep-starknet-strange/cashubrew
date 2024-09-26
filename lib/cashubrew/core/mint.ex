@@ -7,7 +7,11 @@ defmodule Cashubrew.Mint do
   alias Cashubrew.Cashu.BlindSignature
   alias Cashubrew.Crypto.BDHKE
   alias Cashubrew.Lightning.MockLightningNetworkService
+<<<<<<< HEAD
   alias Cashubrew.Schema.{Key, Keyset, MintConfiguration, MintQuote, MeltQuote, MeltTokens}
+=======
+  alias Cashubrew.Schema.{Key, Keyset, MintConfiguration, MintQuote}
+>>>>>>> main
 
   import Ecto.Query
 
