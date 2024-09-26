@@ -1,6 +1,6 @@
-defmodule Gakimint.Cashu.Types do
+defmodule Gakimint.Cashu.BlindedMessage do
   @moduledoc """
-  Defines the core data types used in the Cashu protocol.
+  Represents a BlindedMessage in the Cashu protocol.
   """
 
   @derive Jason.Encoder
