@@ -10,8 +10,8 @@ defmodule Cashubrew.Crypto.BDHKE do
   """
   require Logger
 
-  alias ExSecp256k1
   alias Cashubrew.Crypto.Secp256k1Utils
+  alias ExSecp256k1
 
   # Cashu parameters
   @domain_separator "Secp256k1_HashToCurve_Cashu_"

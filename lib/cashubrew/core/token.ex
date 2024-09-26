@@ -2,8 +2,8 @@ defmodule Cashubrew.Cashu.Token do
   @moduledoc """
   Handles the serialization and deserialization of Cashu tokens.
   """
-  alias CBOR
   alias Cashubrew.Cashu.Proof
+  alias CBOR
 
   @type v3_token :: %{
           token: [%{mint: String.t(), proofs: [Proof.t()]}],
