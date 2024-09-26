@@ -21,4 +21,5 @@ defmodule Cashubrew.Schema.MeltTokens do
     |> cast(attrs, [:request, :unit, :amount, :fee_reserve, :expiry, :request_lookup_id])
     |> validate_required([:request, :unit, :amount, :fee_reserve, :expiry, :request_lookup_id])
   end
+
 end

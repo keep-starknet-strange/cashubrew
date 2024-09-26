@@ -244,8 +244,8 @@ defmodule Cashubrew.Web.MintController do
         conn
         |> put_status(:created)
         |> json(%{
-          quote: quote.id,
-          request: quote.payment_request,
+          quote: quote.request,
+          request: quote.request,
           state: "UNPAID",
           expiry: quote.expiry
         })

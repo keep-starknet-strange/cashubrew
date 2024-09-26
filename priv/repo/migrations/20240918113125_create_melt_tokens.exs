@@ -2,7 +2,7 @@ defmodule Gakimint.Repo.Migrations.CreateMeltQuoteResponse do
   use Ecto.Migration
 
   def change do
-    create table(:melt_quote_response) do
+    create table(:melt_tokens) do
       add :request, :string, null: false
       add :unit, :string, null: false
       add :amount, :integer, null: false
