@@ -81,12 +81,12 @@ defmodule Gakimint.Wallet.CLI do
         # Split the amount into powers of two
         amounts = split_amount(amount)
         secrets = Enum.map(amounts, fn _ -> :crypto.strong_rand_bytes(32) end)
-        rs = Enum.map(amounts, fn _ -> :crypto.strong_rand_bytes(32) end)
+        rs = Enum.map(amounts, fn _ -> BDHKE.generate_keypair() end)
 
         blinded_messages =
           Enum.zip([amounts, secrets, rs])
-          |> Enum.map(fn {amt, secret, r} ->
-            {b_prime, _r} = BDHKE.step1_alice(secret, r)
+          |> Enum.map(fn {amt, secret, {r_priv, _r_pub}} ->
+            {b_prime, _r} = BDHKE.step1_alice(secret, r_priv)
 
             %BlindedMessage{
               amount: amt,

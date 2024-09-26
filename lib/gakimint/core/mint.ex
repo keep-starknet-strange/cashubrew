@@ -206,15 +206,10 @@ defmodule Gakimint.Mint do
       Enum.map(blinded_messages, fn bm ->
         # Get key from database
         amount_key = get_key_for_amount(repo, bm.id, bm.amount)
-        privkey_hex = amount_key.private_key
-        IO.inspect(privkey_hex, label: "privkey_hex")
-        privkey = Base.encode16(privkey_hex, case: :lower)
-        IO.inspect(privkey, label: "privkey")
-        IO.inspect(bm, label: "bm")
-        IO.inspect(bm."B_", label: "B_")
+        privkey = amount_key.private_key
         # Bob (mint) signs the blinded message
-        {c_prime, _e, _s} = BDHKE.step2_bob(bm."B_", privkey_hex)
-        IO.inspect(c_prime, label: "c_prime")
+        b_prime = Base.decode16!(bm."B_", case: :lower)
+        {c_prime, _e, _s} = BDHKE.step2_bob(b_prime, privkey)
 
         %BlindSignature{
           amount: bm.amount,

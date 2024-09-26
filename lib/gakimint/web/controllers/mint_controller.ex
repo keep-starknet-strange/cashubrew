@@ -1,8 +1,8 @@
 defmodule Gakimint.Web.MintController do
   use Gakimint.Web, :controller
+  alias Gakimint.Cashu.BlindedMessage
   alias Gakimint.Mint
   alias Gakimint.Web.{Keys, KeysetResponse}
-  alias Gakimint.Cashu.BlindedMessage
 
   def info(conn, _params) do
     info = %{
