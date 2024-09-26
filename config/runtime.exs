@@ -8,11 +8,11 @@ if config_env() == :prod do
       For example: ecto://USER:PASS@HOST/DATABASE
       """
 
-  config :gakimint, Gakimint.Repo,
+  config :cashubrew, Cashubrew.Repo,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
-  config :gakimint, :repo, Gakimint.Repo
+  config :cashubrew, :repo, Cashubrew.Repo
 
   secret_key_base =
     System.get_env("SECRET_KEY_BASE") ||
@@ -21,7 +21,7 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  config :gakimint, Gakimint.Web.Endpoint,
+  config :cashubrew, Cashubrew.Web.Endpoint,
     http: [
       port: String.to_integer(System.get_env("PORT") || "4000"),
       transport_options: [socket_opts: [:inet6]]

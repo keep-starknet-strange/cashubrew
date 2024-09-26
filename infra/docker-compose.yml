@@ -3,9 +3,9 @@ version: "3.8"
 services:
   postgres:
     image: postgres:13
-    container_name: gakimint_postgres
+    container_name: cashubrew_postgres
     environment:
-      POSTGRES_DB: gakimint_dev
+      POSTGRES_DB: cashubrew_dev
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -15,7 +15,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: gakimint_pgadmin
+    container_name: cashubrew_pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin

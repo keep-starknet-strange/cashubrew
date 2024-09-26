@@ -1,18 +1,18 @@
 import Config
 
-config :gakimint,
-  ecto_repos: [Gakimint.Repo],
+config :cashubrew,
+  ecto_repos: [Cashubrew.Repo],
   generators: [binary_id: true]
 
 # Configures the endpoint
-config :gakimint, Gakimint.Web.Endpoint,
+config :cashubrew, Cashubrew.Web.Endpoint,
   url: [host: "localhost"],
   render_errors: [
-    formats: [json: Gakimint.Web.ErrorJSON],
+    formats: [json: Cashubrew.Web.ErrorJSON],
     layout: false
   ],
-  pubsub_server: Gakimint.PubSub,
-  live_view: [signing_salt: "gakimint_live_view_signing_salt"]
+  pubsub_server: Cashubrew.PubSub,
+  live_view: [signing_salt: "cashubrew_live_view_signing_salt"]
 
 # Configures Elixir's Logger
 config :logger, :console,

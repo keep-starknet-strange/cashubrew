@@ -1,6 +1,6 @@
-defmodule Gakimint.Cashu.TokenTest do
+defmodule Cashubrew.Cashu.TokenTest do
   use ExUnit.Case, async: true
-  alias Gakimint.Cashu.TokenV4
+  alias Cashubrew.Cashu.TokenV4
 
   describe "V4 Token" do
     @tag :v4_token

@@ -1,4 +1,4 @@
-defmodule Gakimint.Repo.Migrations.CreateKeysets do
+defmodule Cashubrew.Repo.Migrations.CreateKeysets do
   use Ecto.Migration
 
   def change do

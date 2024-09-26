@@ -1,4 +1,4 @@
-defmodule Gakimint.Repo.Migrations.CreatePayment do
+defmodule Cashubrew.Repo.Migrations.CreatePayment do
   use Ecto.Migration
 
   def change do
