@@ -43,17 +43,17 @@ RUN chown nobody:nobody /app
 
 USER nobody:nobody
 
-COPY --from=build --chown=nobody:nobody /app/_build/prod/rel/gakimint ./
+COPY --from=build --chown=nobody:nobody /app/_build/prod/rel/cashubrew ./
 
 ENV HOME=/app
 ENV MIX_ENV=prod
 
 # Set default environment variables
 ENV PORT=4000
-ENV DATABASE_URL=ecto://postgres:postgres@localhost/gakimint_prod
+ENV DATABASE_URL=ecto://postgres:postgres@localhost/cashubrew_prod
 ENV SECRET_KEY_BASE=changeme
 
 # Expose the port the app runs on
 EXPOSE 4000
 
-CMD ["bin/gakimint", "start"]
+CMD ["bin/cashubrew", "start"]

@@ -1,4 +1,4 @@
-defmodule Gakimint.Repo.Migrations.CreateMintQuote do
+defmodule Cashubrew.Repo.Migrations.CreateMintQuote do
   use Ecto.Migration
 
   def change do

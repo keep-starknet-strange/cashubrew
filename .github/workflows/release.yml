@@ -24,7 +24,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: yourdockerhubusername/gakimint
+          images: yourdockerhubusername/cashubrew
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}

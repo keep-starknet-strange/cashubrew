@@ -4,8 +4,8 @@ defmodule BDHKETest do
   """
   use ExUnit.Case
   require Logger
-  alias Gakimint.Crypto.BDHKE
-  alias Gakimint.Crypto.Secp256k1Utils
+  alias Cashubrew.Crypto.BDHKE
+  alias Cashubrew.Crypto.Secp256k1Utils
 
   test "end-to-end BDHKE test" do
     Logger.info("\nStarting end-to-end test for Blind Diffie-Hellman Key Exchange (BDHKE)")

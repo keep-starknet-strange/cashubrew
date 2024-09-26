@@ -1,17 +1,17 @@
-# 🌟 Gakimint: Cashu Mints with Elixir Magic ✨
+# 🌟 Cashubrew: Cashu Mints with Elixir Magic ✨
 
-<a href="https://github.com/AbdelStark/gakimint/actions/workflows/ci.yml"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/AbdelStark/gakimint/ci.yml?style=for-the-badge" height=30></a>
+<a href="https://github.com/keep-starknet-strange/cashubrew/actions/workflows/ci.yml"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/AbdelStark/cashubrew/ci.yml?style=for-the-badge" height=30></a>
 <a href="https://elixir-lang.org/"> <img alt="Elixir" src="https://img.shields.io/badge/elixir-%234B275F.svg?style=for-the-badge&logo=elixir&logoColor=white" height=30></a>
 <a href="https://bitcoin.org/"> <img alt="Bitcoin" src="https://img.shields.io/badge/Bitcoin-000?style=for-the-badge&logo=bitcoin&logoColor=white" height=30></a>
 <a href="https://lightning.network/"><img src="https://img.shields.io/badge/Ligthning Network-000.svg?&style=for-the-badge&logo=data:image/svg%2bxml;base64%2CPD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI%2FPg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIEZpcmV3b3JrcyAxMCwgRXhwb3J0IFNWRyBFeHRlbnNpb24gYnkgQWFyb24gQmVhbGwgKGh0dHA6Ly9maXJld29ya3MuYWJlYWxsLmNvbSkgLiBWZXJzaW9uOiAwLjYuMSAgLS0%2BDQo8IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPg0KPHN2ZyBpZD0iYml0Y29pbl9saWdodG5pbmdfaWNvbi5mdy1QYWdlJTIwMSIgdmlld0JveD0iMCAwIDI4MCAyODAiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiNmZmZmZmYwMCIgdmVyc2lvbj0iMS4xIg0KCXhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHhtbDpzcGFjZT0icHJlc2VydmUiDQoJeD0iMHB4IiB5PSIwcHgiIHdpZHRoPSIyODBweCIgaGVpZ2h0PSIyODBweCINCj4NCgk8cGF0aCBpZD0iRWxsaXBzZSIgZD0iTSA3IDE0MC41IEMgNyA2Ni43NjkgNjYuNzY5IDcgMTQwLjUgNyBDIDIxNC4yMzEgNyAyNzQgNjYuNzY5IDI3NCAxNDAuNSBDIDI3NCAyMTQuMjMxIDIxNC4yMzEgMjc0IDE0MC41IDI3NCBDIDY2Ljc2OSAyNzQgNyAyMTQuMjMxIDcgMTQwLjUgWiIgZmlsbD0iI2Y3OTMxYSIvPg0KCTxwYXRoIGQ9Ik0gMTYxLjE5NDMgNTEuNSBDIDE1My4yMzQ5IDcyLjE2MDcgMTQ1LjI3NTYgOTQuNDEwNyAxMzUuNzI0NCAxMTYuNjYwNyBDIDEzNS43MjQ0IDExNi42NjA3IDEzNS43MjQ0IDExOS44MzkzIDEzOC45MDgxIDExOS44MzkzIEwgMjA0LjE3NDcgMTE5LjgzOTMgQyAyMDQuMTc0NyAxMTkuODM5MyAyMDQuMTc0NyAxMjEuNDI4NiAyMDUuNzY2NyAxMjMuMDE3OSBMIDExMC4yNTQ1IDIyOS41IEMgMTA4LjY2MjYgMjI3LjkxMDcgMTA4LjY2MjYgMjI2LjMyMTQgMTA4LjY2MjYgMjI0LjczMjEgTCAxNDIuMDkxOSAxNTMuMjE0MyBMIDE0Mi4wOTE5IDE0Ni44NTcxIEwgNzUuMjMzMyAxNDYuODU3MSBMIDc1LjIzMzMgMTQwLjUgTCAxNTYuNDE4NyA1MS41IEwgMTYxLjE5NDMgNTEuNSBaIiBmaWxsPSIjZmZmZmZmIi8%2BDQo8L3N2Zz4%3D" alt="Bitcoin Lightning" height="30"></a>
 
-> 💡 Gakimint: Where Elixir meets Cashu, creating a symphony of secure, scalable, and lightning-fast ecash transactions!
+> 💡 Cashubrew: Where Elixir meets Cashu, creating a symphony of secure, scalable, and lightning-fast ecash transactions!
 
 > ⚠️ Disclaimer: This is a proof of concept and is not ready for production use.
 
 ## 📚 Learn about Cashu
 
-Before diving into Gakimint, it's essential to understand Cashu.
+Before diving into Cashubrew, it's essential to understand Cashu.
 
 Cashu is a free and open-source Chaumian ecash protocol built for [Bitcoin](https://bitcoin.org/bitcoin.pdf).
 
@@ -23,17 +23,17 @@ To learn more about Cashu:
 - 🔍 [Cashu Documentation](https://docs.cashu.space/): Comprehensive guide to understanding and implementing Cashu.
 - 🎨 [Cashu Visual Explainer](https://lconf.gandlaf.com/): An interactive visual guide to help you grasp Cashu concepts.
 
-Understanding Cashu will help you appreciate the magic behind Gakimint and contribute more effectively to the project!
+Understanding Cashu will help you appreciate the magic behind Cashubrew and contribute more effectively to the project!
 
 ## 🚀 Quick Start
 
-Embark on your Gakimint journey with these simple steps:
+Embark on your Cashubrew journey with these simple steps:
 
 1. **Clone the Treasure Map**
 
    ```bash
-   git clone https://github.com/AbdelStark/gakimint.git
-   cd gakimint
+   git clone https://github.com/keep-starknet-strange/cashubrew.git
+   cd cashubrew
    ```
 
 2. **Summon the Dependencies**
@@ -44,7 +44,12 @@ Embark on your Gakimint journey with these simple steps:
 
 3. **Prepare the Vault (Database)**
 
-   - Ensure PostgreSQL is running (Use our magic spell: `docker-compose -f infra/docker-compose.yml up -d`)
+   - Start the PostgreSQL database using Docker Compose (optional, you can connect to an existing database if you already have one):
+
+     ```bash
+     docker-compose -f infra/docker-compose.yml up -d
+     ```
+
    - Adjust the incantation in `config/dev.exs` if needed
    - Create and migrate your vault:
 
@@ -54,7 +59,7 @@ Embark on your Gakimint journey with these simple steps:
 
 ## 🎭 Running the Show
 
-Launch your Gakimint server with a single command:
+Launch your Cashubrew server with a single command:
 
 ```bash
 mix phx.server
@@ -62,9 +67,31 @@ mix phx.server
 
 🌈 Voilà! Your mint is now live at `http://localhost:4000`.
 
+## 🧙‍♂️ Wallet CLI Magic
+
+Interact with your Cashubrew instance using the Wallet CLI:
+
+1. **Mint Tokens**
+
+   To mint 42 tokens:
+
+   ```bash
+   mix run -e 'Cashubrew.Wallet.CLI.main(["mint", "42"])'
+   ```
+
+2. **Check Balance**
+
+   To view your current balance:
+
+   ```bash
+   mix run -e 'Cashubrew.Wallet.CLI.main(["balance"])'
+   ```
+
+These commands allow you to interact with your Cashubrew instance directly from the command line, making it easy to test and manage your ecash transactions.
+
 ## 🔮 Conjuring the Release Binary
 
-Harness the full power of Gakimint by creating a production-ready release binary:
+Harness the full power of Cashubrew by creating a production-ready release binary:
 
 1. **Craft the Magical Artifact**
 
@@ -78,12 +105,12 @@ Harness the full power of Gakimint by creating a production-ready release binary
 
 2. **Unleash the Magic**
 
-   To bring your Gakimint release to life, chant the following:
+   To bring your Cashubrew release to life, chant the following:
 
    ```bash
    SECRET_KEY_BASE=$(mix phx.gen.secret) \
-   DATABASE_URL="ecto://postgres:postgres@localhost/gakimint_dev" \
-   _build/prod/rel/gakimint/bin/gakimint start
+   DATABASE_URL="ecto://postgres:postgres@localhost/cashubrew_dev" \
+   _build/prod/rel/cashubrew/bin/cashubrew start
    ```
 
    Adjust the `DATABASE_URL` as needed for your mystical realm.
@@ -92,7 +119,7 @@ Harness the full power of Gakimint by creating a production-ready release binary
 
 3. **Customizing Your Magical Realm**
 
-   Fine-tune your Gakimint instance by adjusting these mystic variables:
+   Fine-tune your Cashubrew instance by adjusting these mystic variables:
    - `SECRET_KEY_BASE`: The secret key for your realm. Generate a new one for each deployment.
    - `DATABASE_URL`: The sacred text to connect to your data vault.
    - `PORT`: The gateway through which users will access your mint (default: 4000).
@@ -101,12 +128,12 @@ Harness the full power of Gakimint by creating a production-ready release binary
 
    ```bash
    SECRET_KEY_BASE=$(mix phx.gen.secret) \
-   DATABASE_URL="ecto://username:password@localhost/gakimint_prod" \
+   DATABASE_URL="ecto://username:password@localhost/cashubrew_prod" \
    PORT=8080 \
-   _build/prod/rel/gakimint/bin/gakimint start
+   _build/prod/rel/cashubrew/bin/cashubrew start
    ```
 
-May your Gakimint instance thrive and bring forth a new era of magical transactions! 🌟
+May your Cashubrew instance thrive and bring forth a new era of magical transactions! 🌟
 
 ## 🛠️ Developer's Toolkit
 
@@ -154,25 +181,25 @@ Run these spells regularly to keep your code base clean and secure!
 
 ## 🐳 Docker Deployment
 
-Sail the high seas with Gakimint in a Docker container:
+Sail the high seas with Cashubrew in a Docker container:
 
 1. **Build your ship**:
 
    ```bash
-   docker build -t gakimint:latest .
+   docker build -t cashubrew:latest .
    ```
 
 2. **Set sail**:
 
    ```bash
    docker run \
-     --name gakimint \
+     --name cashubrew \
      --network host \
-     -e DATABASE_URL="ecto://postgres:postgres@localhost/gakimint_dev" \
+     -e DATABASE_URL="ecto://postgres:postgres@localhost/cashubrew_dev" \
      -e SECRET_KEY_BASE=$(mix phx.gen.secret) \
      -e PORT=4000 \
      -e MIX_ENV=prod \
-     gakimint:latest
+     cashubrew:latest
    ```
 
    Adjust the `DATABASE_URL` and other environment variables as needed for your voyage.
@@ -225,20 +252,32 @@ Here's a table of the currently supported optional NUTs:
 | [NUT-16](https://cashubtc.github.io/nuts/16/) | Animated QR codes                 |           |
 | [NUT-17](https://cashubtc.github.io/nuts/17/) | WebSocket subscriptions           |           |
 
-## 🤝 Join the Gakimint Community
+## 🤝 Join the Cashubrew Community
 
 We're always looking for fellow wizards to join our quest. Check out our [contribution guidelines](docs/CONTRIBUTING.md) and let's make magic together!
 
 ## 📜 License
 
-Gakimint is released under the MIT License. See the [LICENSE](LICENSE) file for more details.
+Cashubrew is released under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
----
+## Contributors ✨
 
-<p align="center">
-  Made with ❤️ by <a href="https://github.com/AbdelStark">@AbdelStark</a>
-</p>
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
-<p align="center">
-  <a href="https://github.com/AbdelStark/gakimint/stargazers">⭐ Star us on GitHub!</a>
-</p>
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/keep-starknet-strange"><img src="https://avatars.githubusercontent.com/u/45264458?v=4?s=100" width="100px;" alt="A₿del ∞/21M"/><br /><sub><b>A₿del ∞/21M</b></sub></a><br /><a href="https://github.com/keep-starknet-strange/cashubrew/commits?author=AbdelStark" title="Code">💻</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
