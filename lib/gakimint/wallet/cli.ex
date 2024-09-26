@@ -9,6 +9,8 @@ defmodule Gakimint.Wallet.CLI do
 
   @mint_url "http://localhost:4000/api/v1"
   @data_dir "./_build/.gakimint/data"
+  @proof_file "proofs.json"
+  @wallet_file "wallet.json"
 
   def main(args) do
     case args do
@@ -27,6 +29,10 @@ defmodule Gakimint.Wallet.CLI do
   end
 
   defp mint_tokens(amount) do
+    IO.puts("Minting tokens...")
+    wallet = load_or_create_wallet()
+    IO.puts("Wallet: #{inspect(wallet)}")
+
     # Step 1: Request a mint quote
     case request_mint_quote(amount) do
       {:ok, quote} ->
@@ -37,7 +43,7 @@ defmodule Gakimint.Wallet.CLI do
             case send_mint_request(quote["quote"], blinded_messages) do
               {:ok, signatures} ->
                 # Step 4: Unblind signatures to obtain proofs
-                proofs = unblind_signatures(signatures, secrets, rs)
+                proofs = unblind_signatures(wallet, signatures, secrets, rs)
 
                 # Step 5: Store proofs
                 store_proofs(proofs)
@@ -75,10 +81,8 @@ defmodule Gakimint.Wallet.CLI do
   end
 
   defp generate_blinded_messages(amount) do
-    # Get the keyset ID from the mint
     case get_active_keyset_id() do
       {:ok, keyset_id} ->
-        # Split the amount into powers of two
         amounts = split_amount(amount)
         secrets = Enum.map(amounts, fn _ -> :crypto.strong_rand_bytes(32) end)
         rs = Enum.map(amounts, fn _ -> BDHKE.generate_keypair() end)
@@ -155,16 +159,21 @@ defmodule Gakimint.Wallet.CLI do
     end
   end
 
-  defp unblind_signatures(signatures, secrets, rs) do
-    case get_mint_pubkey() do
-      {:ok, mint_pubkey} ->
-        a_pub = Base.decode16!(mint_pubkey, case: :lower)
+  defp unblind_signatures(wallet, signatures, secrets, rs) do
+    case wallet do
+      %{public_key: nil} ->
+        IO.puts("Error: Wallet public key is nil. Generating a new wallet.")
+        new_wallet = generate_wallet()
+        unblind_signatures(new_wallet, signatures, secrets, rs)
+
+      %{public_key: public_key} ->
+        a_pub = Base.decode16!(public_key, case: :lower)
 
         proofs =
           Enum.zip([signatures, secrets, rs])
-          |> Enum.map(fn {signature, secret, r} ->
+          |> Enum.map(fn {signature, secret, {r_priv, _r_pub}} ->
             c_prime = Base.decode16!(signature["C_"], case: :lower)
-            c = BDHKE.step3_alice(c_prime, r, a_pub)
+            c = BDHKE.step3_alice(c_prime, r_priv, a_pub)
 
             %Proof{
               amount: signature["amount"],
@@ -175,11 +184,57 @@ defmodule Gakimint.Wallet.CLI do
           end)
 
         proofs
-
-      {:error, reason} ->
-        IO.puts("Error fetching mint public key: #{reason}")
-        []
     end
+  end
+
+  defmodule Wallet do
+    @moduledoc """
+    Struct representing a wallet with private and public keys.
+    """
+    @derive Jason.Encoder
+    defstruct [:private_key, :public_key]
+  end
+
+  defp load_or_create_wallet do
+    case load_wallet() do
+      nil ->
+        generate_wallet()
+
+      wallet ->
+        case struct(Wallet, wallet) do
+          %Wallet{private_key: nil} -> generate_wallet()
+          %Wallet{public_key: nil} -> generate_wallet()
+          valid_wallet -> valid_wallet
+        end
+    end
+  end
+
+  defp generate_wallet do
+    {private_key, public_key} = BDHKE.generate_keypair()
+
+    wallet = %Wallet{
+      private_key: Base.encode16(private_key, case: :lower),
+      public_key: Base.encode16(public_key, case: :lower)
+    }
+
+    store_wallet(wallet)
+    wallet
+  end
+
+  defp load_wallet do
+    case File.read("#{@data_dir}/#{@wallet_file}") do
+      {:ok, content} ->
+        Jason.decode!(content)
+
+      {:error, _} ->
+        nil
+    end
+  end
+
+  defp store_wallet(wallet) do
+    # Ensure the data directory exists
+    File.mkdir_p!(@data_dir)
+    File.write!("#{@data_dir}/#{@wallet_file}", Jason.encode!(wallet))
   end
 
   defp store_proofs(proofs) do
@@ -187,7 +242,7 @@ defmodule Gakimint.Wallet.CLI do
     File.mkdir_p!(@data_dir)
     existing_proofs = load_proofs()
     all_proofs = existing_proofs ++ proofs
-    File.write!("#{@data_dir}/proofs.json", Jason.encode!(all_proofs))
+    File.write!("#{@data_dir}/#{@proof_file}", Jason.encode!(all_proofs))
   end
 
   defp show_balance do
@@ -201,36 +256,25 @@ defmodule Gakimint.Wallet.CLI do
 
     IO.puts("Your balance:")
 
-    Enum.each(balance, fn {amount, count} ->
-      IO.puts("  Amount: #{amount}, Count: #{count}")
-    end)
+    total_balance =
+      Enum.reduce(balance, 0, fn {amount, count}, acc ->
+        IO.puts("  Amount: #{amount}, Count: #{count}")
+        acc + amount * count
+      end)
+
+    IO.puts("\nTotal balance: #{total_balance}")
   end
 
   defp load_proofs do
-    case File.read("#{@data_dir}/proofs.json") do
+    case File.read("#{@data_dir}/#{@proof_file}") do
       {:ok, content} ->
-        Jason.decode!(content, as: [%Proof{}])
+        Jason.decode!(content)
+        |> Enum.map(fn proof ->
+          struct(Proof, Map.new(proof, fn {k, v} -> {String.to_atom(k), v} end))
+        end)
 
       {:error, _} ->
         []
-    end
-  end
-
-  defp get_mint_pubkey do
-    url = "#{@mint_url}/info"
-    headers = [{"Content-Type", "application/json"}]
-
-    case HTTPoison.get(url, headers) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: response_body}} ->
-        response = Jason.decode!(response_body)
-        pubkey = response["pubkey"]
-        {:ok, pubkey}
-
-      {:ok, %HTTPoison.Response{status_code: status_code, body: response_body}} ->
-        {:error, "HTTP Error #{status_code}: #{response_body}"}
-
-      {:error, %HTTPoison.Error{reason: reason}} ->
-        {:error, "HTTP Error: #{inspect(reason)}"}
     end
   end
 
