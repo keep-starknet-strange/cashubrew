@@ -44,7 +44,12 @@ Embark on your Gakimint journey with these simple steps:
 
 3. **Prepare the Vault (Database)**
 
-   - Ensure PostgreSQL is running (Use our magic spell: `docker-compose -f infra/docker-compose.yml up -d`)
+   - Start the PostgreSQL database using Docker Compose (optional, you can connect to an existing database if you already have one):
+
+     ```bash
+     docker-compose -f infra/docker-compose.yml up -d
+     ```
+
    - Adjust the incantation in `config/dev.exs` if needed
    - Create and migrate your vault:
 
@@ -61,6 +66,28 @@ mix phx.server
 ```
 
 🌈 Voilà! Your mint is now live at `http://localhost:4000`.
+
+## 🧙‍♂️ Wallet CLI Magic
+
+Interact with your Gakimint instance using the Wallet CLI:
+
+1. **Mint Tokens**
+
+   To mint 42 tokens:
+
+   ```bash
+   mix run -e 'Gakimint.Wallet.CLI.main(["mint", "42"])'
+   ```
+
+2. **Check Balance**
+
+   To view your current balance:
+
+   ```bash
+   mix run -e 'Gakimint.Wallet.CLI.main(["balance"])'
+   ```
+
+These commands allow you to interact with your Gakimint instance directly from the command line, making it easy to test and manage your ecash transactions.
 
 ## 🔮 Conjuring the Release Binary
 
