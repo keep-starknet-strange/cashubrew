@@ -7,7 +7,7 @@ defmodule Gakimint.Mint do
   alias Gakimint.Cashu.BlindSignature
   alias Gakimint.Crypto.BDHKE
   alias Gakimint.Lightning.MockLightningNetworkService
-  alias Gakimint.Schema.{Key, Keyset, MintConfiguration, MintQuote}
+  alias Gakimint.Schema.{Key, Keyset, MintConfiguration, MintQuote, MeltQuote, MeltTokens}
 
   import Ecto.Query
 
@@ -221,6 +221,59 @@ defmodule Gakimint.Mint do
     {:ok, signatures}
   end
 
+  def handle_call({:create_melt_quote, request, unit}, _from, state) do
+    repo = Application.get_env(:gakimint, :repo)
+
+    # # Check LN invoice and info
+    {:ok,invoice} = Bitcoinex.LightningNetwork.decode_invoice(request)
+
+    # To call the function and print the hash:
+    {:ok, request} = RandomHash.generate_hash()
+
+    # Used amount
+    amount = Map.get(invoice, :amount_msat, 1000)  # If :amount exists, returns its value; otherwise returns 1000
+
+    # TODO Add fee reserve
+    fee_reserve=0
+
+    # Create and Saved melt quote
+    expiry = :os.system_time(:second) + 3600
+
+    attrs = %{
+      request: request, # quote_id
+      unit: unit,
+      amount: amount,
+      fee_reserve: fee_reserve,
+      expiry: expiry,
+      request_lookup_id: request,
+    }
+
+    case repo.insert(MeltQuote.changeset(%MeltQuote{}, attrs)) do
+      {:ok, melt_quote} ->
+        {:reply, {:ok, melt_quote}, state}
+
+      {:error, changeset} ->
+        {:reply, {:error, changeset}, state}
+    end
+
+  end
+
+  def handle_call({:create_melt_tokens, quote_id, inputs}, _from, state) do
+    repo = Application.get_env(:gakimint, :repo)
+
+    # TODO
+
+    # Verify quote_id
+
+    # Check proofs
+
+    # Verify proof spent
+
+    # Check total amount
+
+
+  end
+
   # Public API
 
   def get_keysets do
@@ -266,5 +319,13 @@ defmodule Gakimint.Mint do
 
   def mint_tokens(quote, blinded_messages) do
     GenServer.call(__MODULE__, {:mint_tokens, quote, blinded_messages})
+  end
+
+  def create_melt_quote(request, unit) do
+    GenServer.call(__MODULE__, {:create_melt_quote, request, unit})
+  end
+
+  def create_melt_tokens(quote_id, inputs) do
+    GenServer.call(__MODULE__, {:create_melt_tokens, quote_id, inputs})
   end
 end

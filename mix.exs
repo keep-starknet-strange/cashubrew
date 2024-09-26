@@ -53,7 +53,8 @@ defmodule Gakimint.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       {:telemetry_metrics, "~> 0.6"},
-      {:telemetry_poller, "~> 1.0"}
+      {:telemetry_poller, "~> 1.0"},
+      {:bitcoinex, "~> 0.1.7"}
     ]
   end
 
