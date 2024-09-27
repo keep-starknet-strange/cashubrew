@@ -15,7 +15,7 @@
 
 > ⚠️ Disclaimer: This is a proof of concept and is not ready for production use.
 
-[Why Elixir ?](https://whyelixirlang.com/)
+[Why Elixir ?](https://whyelixirlang.com/) - [Learn Elixir](https://elixir-lang.org/learning.html)
 
 ## 📚 Learn about Cashu
 
