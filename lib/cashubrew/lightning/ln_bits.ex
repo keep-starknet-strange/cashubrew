@@ -1,6 +1,7 @@
 defmodule Cashubrew.LNBits.Api do
   Dotenv.load()
 
+  # TODO Fix NIL value here
   @api_endpoint System.get_env("LN_BITS_API_ENDPOINT")
   @api_key System.get_env("LN_BITS_API_KEY")
 
@@ -31,17 +32,11 @@ defmodule Cashubrew.LNBits.Api do
       {"Content-Type", "application/json"}
     ]
 
-    IO.puts("path: #{inspect(path)}")
-
-
     body = Jason.encode!(attributes)  # Convert Elixir map to JSON string
     full_url = "#{api_base_url}#{path}"
-    IO.puts("full_url: #{inspect(full_url)}")
-    IO.puts("body: #{inspect(body)}")
-    IO.puts("api_base_url: #{inspect(api_base_url)}")
 
     case HTTPoison.post(full_url, body, headers) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: response_body}} ->
+      {:ok, %HTTPoison.Response{status_code: 201, body: response_body}} ->
         {:ok, response_body}
 
       {:ok, %HTTPoison.Response{status_code: status_code, body: error_body}} ->

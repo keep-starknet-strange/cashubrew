@@ -8,6 +8,7 @@ defmodule Cashubrew.Mint do
   alias Cashubrew.Cashu.BlindSignature
   alias Cashubrew.Crypto.BDHKE
   alias Cashubrew.Lightning.MockLightningNetworkService
+  alias Cashubrew.Lightning.LightningNetworkService
   alias Cashubrew.Schema.{Key, Keyset, MintConfiguration, MintQuote, MeltQuote, MeltTokens}
 
   import Ecto.Query
@@ -124,18 +125,20 @@ defmodule Cashubrew.Mint do
   def handle_call({:create_mint_quote, amount, description}, _from, state) do
     repo = Application.get_env(:cashubrew, :repo)
 
-    case MockLightningNetworkService.create_invoice(amount, description) do
+    case Cashubrew.Lightning.LightningNetworkService.create_invoice(amount, description) do
       {:ok, payment_request, _payment_hash} ->
         # 1 hour expiry
         expiry = :os.system_time(:second) + 3600
 
         attrs = %{
           amount: amount,
-          payment_request: payment_request,
+          payment_request: payment_request, # TODO fix string issue
           expiry: expiry,
-          description: description
+          description: description,
+          # payment_hash: _payment_hash,
         }
 
+        # TODO fix 255 len text in DB
         case repo.insert(MintQuote.changeset(%MintQuote{}, attrs)) do
           {:ok, quote} ->
             {:reply, {:ok, quote}, state}

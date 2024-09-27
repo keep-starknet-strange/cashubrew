@@ -18,8 +18,6 @@ defmodule Cashubrew.Test.Mint do
         amount: amount_input,
         unit_input: unit_input,
       }
-
-
       request = Map.get(mint, :payment_request)
       assert String.starts_with?(request, "ln")
 
