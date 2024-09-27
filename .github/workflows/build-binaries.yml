@@ -1,0 +1,89 @@
+name: Build and Release Binaries
+
+on:
+  push:
+    tags:
+      - "v*.*.*" # Triggers on version tag pushes like v1.0.0
+
+jobs:
+  build:
+    name: Build Binaries
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: x86_64
+          - os: macos-latest
+            platform: macos
+            arch: x86_64
+          - os: windows-latest
+            platform: windows
+            arch: x86_64
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Set up Elixir and Erlang/OTP
+      - name: Set Up Elixir (Ubuntu and Windows)
+        if: runner.os != 'macOS'
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.17.2"
+          otp-version: "26"
+
+      - name: Install Elixir and Erlang (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew update
+          brew install elixir@1.14
+
+      - name: Install Dependencies
+        run: mix deps.get
+
+      - name: Build Release
+        env:
+          MIX_ENV: prod
+        run: mix release
+
+      - name: Prepare Artifact (Linux and macOS)
+        if: runner.os != 'Windows'
+        run: |
+          tar czvf cashubrew-${{ matrix.platform }}-${{ matrix.arch }}-${{ github.ref_name }}.tar.gz -C _build/prod/rel/cashubrew .
+      - name: Prepare Artifact (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "_build\prod\rel\cashubrew\*" -DestinationPath "cashubrew-${{ matrix.platform }}-${{ matrix.arch }}-${{ github.ref_name }}.zip"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cashubrew-${{ matrix.platform }}-${{ matrix.arch }}-${{ github.ref_name }}
+          path: |
+            cashubrew-${{ matrix.platform }}-${{ matrix.arch }}-${{ github.ref_name }}.tar.gz
+            cashubrew-${{ matrix.platform }}-${{ matrix.arch }}-${{ github.ref_name }}.zip
+
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: ./artifacts
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./artifacts/*
+          draft: false
+          prerelease: false
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
