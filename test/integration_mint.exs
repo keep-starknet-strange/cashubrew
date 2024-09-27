@@ -1,9 +1,8 @@
 defmodule Cashubrew.Test.Mint do
   use ExUnit.Case, async: true
-  alias Cashubrew.Schema
-  alias Cashubrew.Web.MintController
   alias Cashubrew.Mint
   alias Cashubrew.Query.MeltTokens
+  alias Cashubrew.Schema
 
   describe "Mint" do
     @tag :mint_quote
@@ -46,7 +45,6 @@ defmodule Cashubrew.Test.Mint do
       unit = Map.get(melt_quote, :unit)
       assert unit == "sat"
 
-      # TODO verify DB and Check if it's saved
       melt = MeltTokens.get_melt_by_quote_id!(request)
 
       if melt != nil do

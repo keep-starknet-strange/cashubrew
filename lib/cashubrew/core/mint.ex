@@ -4,12 +4,13 @@ defmodule Cashubrew.Mint do
   """
 
   use GenServer
-  alias Cashubrew.Query.MeltTokens
   alias Cashubrew.Cashu.BlindSignature
   alias Cashubrew.Crypto.BDHKE
-  alias Cashubrew.Lightning.MockLightningNetworkService
   alias Cashubrew.Lightning.LightningNetworkService
-  alias Cashubrew.Schema.{Key, Keyset, MintConfiguration, MintQuote, MeltQuote, MeltTokens}
+  alias Cashubrew.Lightning.MockLightningNetworkService
+  alias Cashubrew.LNBitsApi
+  alias Cashubrew.Query.MeltTokens
+  alias Cashubrew.Schema.{Key, Keyset, MeltQuote, MeltTokens, MintConfiguration, MintQuote}
 
   import Ecto.Query
 
@@ -125,21 +126,19 @@ defmodule Cashubrew.Mint do
   def handle_call({:create_mint_quote, amount, description}, _from, state) do
     repo = Application.get_env(:cashubrew, :repo)
 
-    case Cashubrew.Lightning.LightningNetworkService.create_invoice(amount, description) do
+    case LightningNetworkService.create_invoice(amount, description) do
       {:ok, payment_request, _payment_hash} ->
         # 1 hour expiry
         expiry = :os.system_time(:second) + 3600
 
         attrs = %{
           amount: amount,
-          # TODO fix string issue
           payment_request: payment_request,
           expiry: expiry,
           description: description
           # payment_hash: _payment_hash,
         }
 
-        # TODO fix 255 len text in DB
         case repo.insert(MintQuote.changeset(%MintQuote{}, attrs)) do
           {:ok, quote} ->
             {:reply, {:ok, quote}, state}
@@ -235,7 +234,7 @@ defmodule Cashubrew.Mint do
     # Used amount
     # If :amount exists, returns its value; otherwise returns 1000
     amount = Map.get(invoice, :amount_msat, 1000)
-    # TODO Add fee reserve
+
     fee_reserve = 0
     # Create and Saved melt quote
     expiry = :os.system_time(:second) + 3600
@@ -250,7 +249,7 @@ defmodule Cashubrew.Mint do
       request_lookup_id: request
     }
 
-    case repo.insert(Cashubrew.Schema.MeltQuote.changeset(%Cashubrew.Schema.MeltQuote{}, attrs)) do
+    case repo.insert(MeltQuote.changeset(%MeltQuote{}, attrs)) do
       {:ok, melt_quote} ->
         {:reply, {:ok, melt_quote}, state}
 
@@ -276,7 +275,6 @@ defmodule Cashubrew.Mint do
 
     # Verify proof spent
 
-    # TODO Add fee reserve
     fee_reserve = 0
     # Create and Saved melt quote
 

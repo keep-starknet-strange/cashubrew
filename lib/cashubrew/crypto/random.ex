@@ -1,9 +1,12 @@
 defmodule RandomHash do
+  @moduledoc """
+  Random Hash module
+  """
   # Import the necessary modules
   require Logger
   alias :crypto, as: Crypto
 
-  def generate_hash() do
+  def generate_hash do
     # Step 1: Generate a random 32-byte binary
     random_bytes = :crypto.strong_rand_bytes(32)
 

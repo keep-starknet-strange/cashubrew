@@ -1,8 +1,8 @@
 defmodule Cashubrew.Application do
   @moduledoc false
   use Application
-  alias Cashubrew.Lightning.MockLightningNetworkService
   alias Cashubrew.Lightning.LightningNetworkService
+  alias Cashubrew.Lightning.MockLightningNetworkService
   alias Cashubrew.Web.Endpoint
 
   @impl true

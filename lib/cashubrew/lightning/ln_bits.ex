@@ -1,7 +1,9 @@
-defmodule Cashubrew.LNBits.Api do
+defmodule Cashubrew.LNBitsApi do
+  @moduledoc """
+  LN BITS Api Network Services.
+  """
   Dotenv.load()
 
-  # TODO Fix NIL value here
   @api_endpoint System.get_env("LN_BITS_API_ENDPOINT")
   @api_key System.get_env("LN_BITS_API_KEY")
 

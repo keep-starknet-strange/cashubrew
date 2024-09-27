@@ -1,4 +1,7 @@
 defmodule Cashubrew.Query.MeltTokens do
+  @moduledoc """
+    Query Melt Tokens
+  """
   import Ecto.Query, warn: false
   alias Cashubrew.Repo
   alias Cashubrew.Schema.MeltTokens

@@ -3,6 +3,7 @@ defmodule Cashubrew.Lightning.LightningNetworkService do
   Lightning Network Services.
   """
   use GenServer
+  alias Cashubrew.LNBitsApi
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
@@ -21,7 +22,6 @@ defmodule Cashubrew.Lightning.LightningNetworkService do
   end
 
   def handle_call({:create_invoice, amount, _description}, _from, state) do
-    # TODO use NUT setting + permit others unit after
     unit_input = "sat"
 
     attributes = %{
@@ -30,7 +30,7 @@ defmodule Cashubrew.Lightning.LightningNetworkService do
       unit_input: unit_input
     }
 
-    case Cashubrew.LNBits.Api.post_data("api/v1/payments", attributes) do
+    case LNBitsApi.post_data("api/v1/payments", attributes) do
       {:ok, response_body} ->
         IO.puts("Success create in: #{response_body}")
 
