@@ -26,8 +26,17 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set Up Elixir
+      # Set up Elixir and Erlang/OTP
+      - name: Set Up Elixir (Ubuntu and Windows)
+        if: runner.os != 'macOS'
         uses: erlef/setup-beam@v1
+        with:
+          elixir-version: "1.17.2"
+          otp-version: "26"
+
+      - name: Set Up Elixir (macOS)
+        if: runner.os == 'macOS'
+        uses: actions/setup-elixir@v1
         with:
           elixir-version: "1.17.2"
           otp-version: "26"
@@ -40,12 +49,12 @@ jobs:
           MIX_ENV: prod
         run: mix release
 
-      - name: Prepare Artifact
-        if: ${{ runner.os != 'Windows' }}
+      - name: Prepare Artifact (Linux and macOS)
+        if: runner.os != 'Windows'
         run: |
           tar czvf cashubrew-${{ matrix.platform }}-${{ matrix.arch }}-${{ github.ref_name }}.tar.gz -C _build/prod/rel/cashubrew .
       - name: Prepare Artifact (Windows)
-        if: ${{ runner.os == 'Windows' }}
+        if: runner.os == 'Windows'
         shell: pwsh
         run: |
           Compress-Archive -Path "_build\prod\rel\cashubrew\*" -DestinationPath "cashubrew-${{ matrix.platform }}-${{ matrix.arch }}-${{ github.ref_name }}.zip"
