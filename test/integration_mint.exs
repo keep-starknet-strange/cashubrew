@@ -10,8 +10,16 @@ defmodule Cashubrew.Test.Mint do
 
     test "Mint quote" do
       description_input="lfg"
+      unit_input="sat"
       amount_input=1
       {:ok, mint}= Mint.create_mint_quote(amount_input, description_input)
+      attributes = %{
+        out: "false",
+        amount: amount_input,
+        unit_input: unit_input,
+      }
+
+
       request = Map.get(mint, :payment_request)
       assert String.starts_with?(request, "ln")
 

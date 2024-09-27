@@ -54,7 +54,8 @@ defmodule Cashubrew.MixProject do
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
-      {:bitcoinex, "~> 0.1.7"}
+      {:bitcoinex, "~> 0.1.7"},
+      {:dotenv, "~> 3.0.0"}
     ]
   end
 
