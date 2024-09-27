@@ -21,15 +21,16 @@ defmodule Cashubrew.Lightning.LightningNetworkService do
   end
 
   def handle_call({:create_invoice, amount, _description}, _from, state) do
+    # TODO use NUT setting + permit others unit after
+    unit_input = "sat"
 
-    unit_input="sat" # TODO use NUT setting + permit others unit after
     attributes = %{
       out: "false",
       amount: amount,
-      unit_input: unit_input,
+      unit_input: unit_input
     }
 
-    case Cashubrew.LNBits.Api.post_data("api/v1/payments",attributes) do
+    case Cashubrew.LNBits.Api.post_data("api/v1/payments", attributes) do
       {:ok, response_body} ->
         IO.puts("Success create in: #{response_body}")
 
@@ -41,8 +42,6 @@ defmodule Cashubrew.Lightning.LightningNetworkService do
       {:error, reason} ->
         IO.puts("Error: #{reason}")
     end
-
-
   end
 
   def handle_call({:check_payment, payment_hash}, _from, state) do
@@ -52,5 +51,4 @@ defmodule Cashubrew.Lightning.LightningNetworkService do
       %{paid: false} -> {:reply, {:ok, :unpaid}, state}
     end
   end
-
 end

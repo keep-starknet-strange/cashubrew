@@ -18,6 +18,4 @@ defmodule Cashubrew.LightningLib do
 
   def handle_call({:decode_invoice, invoice}, _from, state) do
   end
-
-
 end

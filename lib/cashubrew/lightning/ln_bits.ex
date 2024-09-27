@@ -6,8 +6,8 @@ defmodule Cashubrew.LNBits.Api do
   @api_key System.get_env("LN_BITS_API_KEY")
 
   def fetch_data(path, attributes) do
-    api_base_url=System.get_env("LN_BITS_API_ENDPOINT")
-    api_key=System.get_env("LN_BITS_API_KEY")
+    api_base_url = System.get_env("LN_BITS_API_ENDPOINT")
+    api_key = System.get_env("LN_BITS_API_KEY")
     headers = [{"X-Api-Key", "#{api_key}"}]
     full_url = "#{api_base_url}#{path}"
 
@@ -25,14 +25,16 @@ defmodule Cashubrew.LNBits.Api do
 
   # Function to send a POST request with a JSON body
   def post_data(path, attributes) do
-    api_base_url=System.get_env("LN_BITS_API_ENDPOINT")
-    api_key=System.get_env("LN_BITS_API_KEY")
+    api_base_url = System.get_env("LN_BITS_API_ENDPOINT")
+    api_key = System.get_env("LN_BITS_API_KEY")
+
     headers = [
       {"X-Api-Key", "#{api_key}"},
       {"Content-Type", "application/json"}
     ]
 
-    body = Jason.encode!(attributes)  # Convert Elixir map to JSON string
+    # Convert Elixir map to JSON string
+    body = Jason.encode!(attributes)
     full_url = "#{api_base_url}#{path}"
 
     case HTTPoison.post(full_url, body, headers) do

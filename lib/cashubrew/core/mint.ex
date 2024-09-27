@@ -132,9 +132,10 @@ defmodule Cashubrew.Mint do
 
         attrs = %{
           amount: amount,
-          payment_request: payment_request, # TODO fix string issue
+          # TODO fix string issue
+          payment_request: payment_request,
           expiry: expiry,
-          description: description,
+          description: description
           # payment_hash: _payment_hash,
         }
 
@@ -228,26 +229,31 @@ defmodule Cashubrew.Mint do
   def handle_call({:create_melt_quote, request, unit}, _from, state) do
     repo = Application.get_env(:cashubrew, :repo)
     # # Check LN invoice and info
-    {:ok,invoice} = Bitcoinex.LightningNetwork.decode_invoice(request)
+    {:ok, invoice} = Bitcoinex.LightningNetwork.decode_invoice(request)
     # To call the function and print the hash:
     {:ok, request} = RandomHash.generate_hash()
     # Used amount
-    amount = Map.get(invoice, :amount_msat, 1000)  # If :amount exists, returns its value; otherwise returns 1000
+    # If :amount exists, returns its value; otherwise returns 1000
+    amount = Map.get(invoice, :amount_msat, 1000)
     # TODO Add fee reserve
-    fee_reserve=0
+    fee_reserve = 0
     # Create and Saved melt quote
     expiry = :os.system_time(:second) + 3600
+
     attrs = %{
-      request: request, # quote_id
+      # quote_id
+      request: request,
       unit: unit,
       amount: amount,
       fee_reserve: fee_reserve,
       expiry: expiry,
-      request_lookup_id: request,
+      request_lookup_id: request
     }
+
     case repo.insert(Cashubrew.Schema.MeltQuote.changeset(%Cashubrew.Schema.MeltQuote{}, attrs)) do
       {:ok, melt_quote} ->
         {:reply, {:ok, melt_quote}, state}
+
       {:error, changeset} ->
         {:reply, {:error, changeset}, state}
     end
@@ -259,31 +265,29 @@ defmodule Cashubrew.Mint do
     # TODO
     # Verify quote_id
 
-    {:ok, melt_find}=Cashubrew.Query.MeltTokens.get_melt_by_quote_id!(quote_id)
+    {:ok, melt_find} = Cashubrew.Query.MeltTokens.get_melt_by_quote_id!(quote_id)
     IO.puts("melt_find: #{melt_find}")
-
 
     # Check if quote is already paid or not
 
     # Check total amount
 
-
     # Check proofs
 
     # Verify proof spent
 
-
     # TODO Add fee reserve
-    fee_reserve=0
+    fee_reserve = 0
     # Create and Saved melt quote
 
     attrs = %{
-      request: quote_id, # quote_id
+      # quote_id
+      request: quote_id,
       unit: quote_id,
       amount: 0,
       fee_reserve: 0,
       expiry: 0,
-      request_lookup_id: quote_id,
+      request_lookup_id: quote_id
     }
 
     expiry = :os.system_time(:second) + 3600
@@ -291,6 +295,7 @@ defmodule Cashubrew.Mint do
     case repo.insert(MeltTokens.changeset(%MeltTokens{}, attrs)) do
       {:ok, melt_quote} ->
         {:reply, {:ok, melt_quote}, state}
+
       {:error, changeset} ->
         {:reply, {:error, changeset}, state}
     end

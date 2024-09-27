@@ -12,7 +12,7 @@ defmodule Cashubrew.Application do
       {Phoenix.PubSub, name: Cashubrew.PubSub},
       Endpoint,
       MockLightningNetworkService,
-      LightningNetworkService,
+      LightningNetworkService
     ]
 
     # Conditionally add the appropriate repo to the children list

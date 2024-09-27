@@ -8,7 +8,8 @@ defmodule Cashubrew.Schema.MeltQuote do
   schema "melt_quote" do
     field(:request, :string)
     field(:unit, :string)
-    field(:amount, :integer)  # Make sure to use the correct field name
+    # Make sure to use the correct field name
+    field(:amount, :integer)
     field(:fee_reserve, :integer)
     field(:expiry, :integer)
     field(:request_lookup_id, :string)

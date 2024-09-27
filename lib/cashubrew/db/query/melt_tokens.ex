@@ -10,11 +10,13 @@ defmodule Cashubrew.Query.MeltTokens do
 
   # Fetch a quote by id
   def get_melt_by_quote_id!(quote_id) do
-    query = from u in MeltTokens,
-    where: u.request == ^quote_id,
-    select: u
+    query =
+      from(u in MeltTokens,
+        where: u.request == ^quote_id,
+        select: u
+      )
 
-    Repo.one(query)  # Return a single user (or nil if no match)
+    # Return a single user (or nil if no match)
+    Repo.one(query)
   end
-
 end

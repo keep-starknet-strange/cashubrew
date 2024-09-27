@@ -256,5 +256,4 @@ defmodule Cashubrew.Web.MintController do
         |> json(%{error: reason})
     end
   end
-
 end
