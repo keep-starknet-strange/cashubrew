@@ -1,4 +1,4 @@
-defmodule Gakimint.Repo.Migrations.CreateMeltQuoteResponse do
+defmodule Cashubrew.Repo.Migrations.CreateMeltQuoteResponse do
   use Ecto.Migration
 
   def change do

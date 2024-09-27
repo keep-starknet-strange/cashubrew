@@ -253,21 +253,12 @@ defmodule Cashubrew.Mint do
   def handle_call({:create_melt_tokens, quote_id, inputs}, _from, state) do
     repo = Application.get_env(:cashubrew, :repo)
 
-    attrs = %{
-      request: quote_id, # quote_id
-      unit: quote_id,
-      amount: 0,
-      fee_reserve: 0,
-      expiry: 0,
-      request_lookup_id: quote_id,
-    }
-    {:reply, {:ok, attrs}, state}
-
     # TODO
     # Verify quote_id
 
     {:ok, melt_find}=Cashubrew.Query.MeltTokens.get_melt_by_quote_id!(quote_id)
     IO.puts("melt_find: #{melt_find}")
+
 
     # Check if quote is already paid or not
 
@@ -276,16 +267,22 @@ defmodule Cashubrew.Mint do
 
     # Check proofs
 
-    # melt_tokens_response=Cashubrew.Query.MeltTokens.list_melt_tokens()
-    # IO.puts("melt_tokens: #{melt_tokens_response}")
-
-
     # Verify proof spent
 
 
     # TODO Add fee reserve
     fee_reserve=0
     # Create and Saved melt quote
+
+    attrs = %{
+      request: quote_id, # quote_id
+      unit: quote_id,
+      amount: 0,
+      fee_reserve: 0,
+      expiry: 0,
+      request_lookup_id: quote_id,
+    }
+
     expiry = :os.system_time(:second) + 3600
 
     case repo.insert(MeltTokens.changeset(%MeltTokens{}, attrs)) do
