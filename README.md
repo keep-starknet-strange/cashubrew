@@ -15,6 +15,8 @@
 
 > ⚠️ Disclaimer: This is a proof of concept and is not ready for production use.
 
+[Why Elixir ?](https://whyelixirlang.com/)
+
 ## 📚 Learn about Cashu
 
 Before diving into Cashubrew, it's essential to understand Cashu.
