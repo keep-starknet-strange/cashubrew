@@ -34,12 +34,11 @@ jobs:
           elixir-version: "1.17.2"
           otp-version: "26"
 
-      - name: Set Up Elixir (macOS)
+      - name: Install Elixir and Erlang (macOS)
         if: runner.os == 'macOS'
-        uses: actions/setup-elixir@v1
-        with:
-          elixir-version: "1.17.2"
-          otp-version: "26"
+        run: |
+          brew update
+          brew install elixir@1.14
 
       - name: Install Dependencies
         run: mix deps.get
