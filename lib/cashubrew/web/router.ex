@@ -31,6 +31,10 @@ defmodule Cashubrew.Web.Router do
     get("/v1/mint/quote/bolt11/:quote_id", MintController, :get_mint_quote)
     post("/v1/mint/bolt11", MintController, :mint_tokens)
 
+    # NUT-05
+    post("/v1/melt/quote/bolt11", MintController, :melt_quote)
+    post("/v1/melt/bolt11", MintController, :melt_tokens)
+
     # NUT-06
     get("/v1/info", MintController, :info)
   end

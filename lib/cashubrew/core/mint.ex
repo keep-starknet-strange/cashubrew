@@ -6,8 +6,11 @@ defmodule Cashubrew.Mint do
   use GenServer
   alias Cashubrew.Cashu.BlindSignature
   alias Cashubrew.Crypto.BDHKE
+  alias Cashubrew.Lightning.LightningNetworkService
   alias Cashubrew.Lightning.MockLightningNetworkService
-  alias Cashubrew.Schema.{Key, Keyset, MintConfiguration, MintQuote}
+  alias Cashubrew.LNBitsApi
+  alias Cashubrew.Query.MeltTokens
+  alias Cashubrew.Schema.{Key, Keyset, MeltQuote, MeltTokens, MintConfiguration, MintQuote}
 
   import Ecto.Query
 
@@ -123,7 +126,7 @@ defmodule Cashubrew.Mint do
   def handle_call({:create_mint_quote, amount, description}, _from, state) do
     repo = Application.get_env(:cashubrew, :repo)
 
-    case MockLightningNetworkService.create_invoice(amount, description) do
+    case LightningNetworkService.create_invoice(amount, description) do
       {:ok, payment_request, _payment_hash} ->
         # 1 hour expiry
         expiry = :os.system_time(:second) + 3600
@@ -133,6 +136,7 @@ defmodule Cashubrew.Mint do
           payment_request: payment_request,
           expiry: expiry,
           description: description
+          # payment_hash: _payment_hash,
         }
 
         case repo.insert(MintQuote.changeset(%MintQuote{}, attrs)) do
@@ -221,6 +225,80 @@ defmodule Cashubrew.Mint do
     {:ok, signatures}
   end
 
+  def handle_call({:create_melt_quote, request, unit}, _from, state) do
+    repo = Application.get_env(:cashubrew, :repo)
+    # # Check LN invoice and info
+    {:ok, invoice} = Bitcoinex.LightningNetwork.decode_invoice(request)
+    # To call the function and print the hash:
+    {:ok, request} = RandomHash.generate_hash()
+    # Used amount
+    # If :amount exists, returns its value; otherwise returns 1000
+    amount = Map.get(invoice, :amount_msat, 1000)
+
+    fee_reserve = 0
+    # Create and Saved melt quote
+    expiry = :os.system_time(:second) + 3600
+
+    attrs = %{
+      # quote_id
+      request: request,
+      unit: unit,
+      amount: amount,
+      fee_reserve: fee_reserve,
+      expiry: expiry,
+      request_lookup_id: request
+    }
+
+    case repo.insert(MeltQuote.changeset(%MeltQuote{}, attrs)) do
+      {:ok, melt_quote} ->
+        {:reply, {:ok, melt_quote}, state}
+
+      {:error, changeset} ->
+        {:reply, {:error, changeset}, state}
+    end
+  end
+
+  def handle_call({:create_melt_tokens, quote_id, inputs}, _from, state) do
+    repo = Application.get_env(:cashubrew, :repo)
+
+    # TODO
+    # Verify quote_id
+
+    {:ok, melt_find} = Cashubrew.Query.MeltTokens.get_melt_by_quote_id!(quote_id)
+    IO.puts("melt_find: #{melt_find}")
+
+    # Check if quote is already paid or not
+
+    # Check total amount
+
+    # Check proofs
+
+    # Verify proof spent
+
+    fee_reserve = 0
+    # Create and Saved melt quote
+
+    attrs = %{
+      # quote_id
+      request: quote_id,
+      unit: quote_id,
+      amount: 0,
+      fee_reserve: 0,
+      expiry: 0,
+      request_lookup_id: quote_id
+    }
+
+    expiry = :os.system_time(:second) + 3600
+
+    case repo.insert(MeltTokens.changeset(%MeltTokens{}, attrs)) do
+      {:ok, melt_quote} ->
+        {:reply, {:ok, melt_quote}, state}
+
+      {:error, changeset} ->
+        {:reply, {:error, changeset}, state}
+    end
+  end
+
   # Public API
 
   def get_keysets do
@@ -266,5 +344,13 @@ defmodule Cashubrew.Mint do
 
   def mint_tokens(quote, blinded_messages) do
     GenServer.call(__MODULE__, {:mint_tokens, quote, blinded_messages})
+  end
+
+  def create_melt_quote(request, unit) do
+    GenServer.call(__MODULE__, {:create_melt_quote, request, unit})
+  end
+
+  def create_melt_tokens(quote_id, inputs) do
+    GenServer.call(__MODULE__, {:create_melt_tokens, quote_id, inputs})
   end
 end

@@ -216,4 +216,44 @@ defmodule Cashubrew.Web.MintController do
         end
     end
   end
+
+  def melt_quote(conn, %{"request" => request, "unit" => unit}) do
+    case Mint.create_melt_quote(request, unit) do
+      {:ok, quote} ->
+        conn
+        |> put_status(:created)
+        |> json(%{
+          request: quote.request,
+          quote: quote.id,
+          amount: quote.amount,
+          fee_reserve: quote.fee_reserve,
+          state: "UNPAID",
+          expiry: quote.expiry
+        })
+
+      {:error, reason} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(%{error: reason})
+    end
+  end
+
+  def melt_tokens(conn, %{"quote_id" => quote_id, "inputs" => inputs}) do
+    case Mint.create_melt_tokens(quote_id, inputs) do
+      {:ok, quote} ->
+        conn
+        |> put_status(:created)
+        |> json(%{
+          quote: quote.request,
+          request: quote.request,
+          state: "UNPAID",
+          expiry: quote.expiry
+        })
+
+      {:error, reason} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(%{error: reason})
+    end
+  end
 end

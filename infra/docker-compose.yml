@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   postgres:
-    image: postgres:13
+    image: postgres:17
     container_name: cashubrew_postgres
     environment:
       POSTGRES_DB: cashubrew_dev

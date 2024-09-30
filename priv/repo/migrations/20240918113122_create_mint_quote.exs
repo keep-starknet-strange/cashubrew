@@ -4,12 +4,19 @@ defmodule Cashubrew.Repo.Migrations.CreateMintQuote do
   def change do
     create table(:mint_quotes) do
       add :amount, :integer, null: false
-      add :payment_request, :string, null: false
+      add :payment_request, :text, null: false
       add :state, :string, default: "UNPAID", null: false
       add :expiry, :integer, null: false
       add :description, :string
+      add :payment_hash, :string
 
       timestamps()
     end
   end
+
+  # def change do
+  #   alter table(:mint_quotes) do
+  #     modify :payment_request, :text, null: false
+  #   end
+  # end
 end

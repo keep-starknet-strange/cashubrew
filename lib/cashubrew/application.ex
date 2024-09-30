@@ -1,6 +1,7 @@
 defmodule Cashubrew.Application do
   @moduledoc false
   use Application
+  alias Cashubrew.Lightning.LightningNetworkService
   alias Cashubrew.Lightning.MockLightningNetworkService
   alias Cashubrew.Web.Endpoint
 
@@ -10,7 +11,8 @@ defmodule Cashubrew.Application do
       Cashubrew.Web.Telemetry,
       {Phoenix.PubSub, name: Cashubrew.PubSub},
       Endpoint,
-      MockLightningNetworkService
+      MockLightningNetworkService,
+      LightningNetworkService
     ]
 
     # Conditionally add the appropriate repo to the children list

@@ -32,3 +32,5 @@ cashubrew-*.tar
 priv/static/
 
 benchmarks/output
+
+.env
