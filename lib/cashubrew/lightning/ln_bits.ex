@@ -4,15 +4,11 @@ defmodule Cashubrew.LNBitsApi do
   """
   Dotenv.load()
 
-  @api_endpoint System.get_env("LN_BITS_API_ENDPOINT")
-  @api_key System.get_env("LN_BITS_API_KEY")
-
   def fetch_data(path, attributes) do
     api_base_url = System.get_env("LN_BITS_API_ENDPOINT")
     api_key = System.get_env("LN_BITS_API_KEY")
     headers = [{"X-Api-Key", "#{api_key}"}]
     full_url = "#{api_base_url}#{path}"
-
     case HTTPoison.get(full_url, headers) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         {:ok, body}

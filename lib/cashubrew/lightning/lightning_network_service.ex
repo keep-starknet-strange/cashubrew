@@ -21,16 +21,25 @@ defmodule Cashubrew.Lightning.LightningNetworkService do
     GenServer.call(__MODULE__, {:check_payment, payment_hash})
   end
 
-  def handle_call({:create_invoice, amount, _description}, _from, state) do
-    unit_input = "sat"
+  def handle_call({:create_invoice, amount, description}, _from, state) do
+
+    amount =
+      case Integer.parse(amount) do
+        {int, _} -> int
+        :error -> amount # If parsing fails, assume it's already an integer
+      end
 
     attributes = %{
-      out: "false",
-      amount: amount,
-      unit_input: unit_input
+      out: false,          # out: false means it is an incoming payment request
+      amount: amount,      # amount in satoshis
+      memo: description,          # description/memo for the invoice
+      # unit_input: unit_input,
+      # expiry: 0,
+      # internal: false,
+      # webhook: "",
     }
 
-    case LNBitsApi.post_data("api/v1/payments", attributes) do
+    case LNBitsApi.post_data("/api/v1/payments", attributes) do
       {:ok, response_body} ->
         IO.puts("Success create in: #{response_body}")
 
