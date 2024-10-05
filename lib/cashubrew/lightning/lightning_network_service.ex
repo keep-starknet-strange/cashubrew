@@ -22,17 +22,20 @@ defmodule Cashubrew.Lightning.LightningNetworkService do
   end
 
   def handle_call({:create_invoice, amount, description}, _from, state) do
-
     amount =
       case Integer.parse(amount) do
         {int, _} -> int
-        :error -> amount # If parsing fails, assume it's already an integer
+        # If parsing fails, assume it's already an integer
+        :error -> amount
       end
 
     attributes = %{
-      out: false,          # out: false means it is an incoming payment request
-      amount: amount,      # amount in satoshis
-      memo: description,          # description/memo for the invoice
+      # out: false means it is an incoming payment request
+      out: false,
+      # amount in satoshis
+      amount: amount,
+      # description/memo for the invoice
+      memo: description
       # unit_input: unit_input,
       # expiry: 0,
       # internal: false,

@@ -126,6 +126,7 @@ defmodule Cashubrew.Mint do
   def handle_call({:create_mint_quote, amount, description}, _from, state) do
     repo = Application.get_env(:cashubrew, :repo)
     use_mock_env_ln = System.get_env("use_mock_env_ln")
+    IO.puts("use_mock_env_ln #{use_mock_env_ln}")
 
     result =
       if use_mock_env_ln == "true" do
@@ -152,7 +153,6 @@ defmodule Cashubrew.Mint do
       {:error, reason} ->
         {:reply, {:error, reason}, state}
     end
-
   end
 
   # Helper function to insert the quote into the database
