@@ -165,9 +165,9 @@ defmodule Cashubrew.Web.MintController do
   end
 
   def create_mint_quote(conn, %{"amount" => amount, "unit" => "sat"} = params) do
-    description = Map.get(params, "description")
+    unit = Map.get(params, "unit")
 
-    case Mint.create_mint_quote(amount, description) do
+    case Mint.create_mint_quote(amount, unit) do
       {:ok, quote} ->
         conn
         |> put_status(:created)

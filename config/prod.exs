@@ -21,3 +21,10 @@ config :cashubrew, Cashubrew.Web.Endpoint, secret_key_base: System.get_env("SECR
 
 # Do not print debug messages in production
 config :logger, level: :info
+
+# Use mock ln if MOCK_LN environment variable is set to "true"
+if System.get_env("MOCK_LN") == "true" do
+  config :cashubrew, :ln, Cashubrew.Lightning.MockLightningNetworkService
+else
+  config :cashubrew, :ln, Cashubrew.Lightning.LightningNetworkService
+end

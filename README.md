@@ -73,6 +73,16 @@ Launch your Cashubrew server with a single command:
 mix phx.server
 ```
 
+## Environnement vars for the backend
+
+Create an .env to setup your LN_BITS or Mock LN mode
+```
+LN_BITS_API_ENDPOINT=https://your-lnbits-node
+LN_BITS_API_KEY=ADMIN_API_KEY
+MOCK_LN=true
+
+``` 
+
 🌈 Voilà! Your mint is now live at `http://localhost:4000`.
 
 ## 🧙‍♂️ Wallet CLI Magic

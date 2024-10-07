@@ -6,9 +6,6 @@ defmodule Cashubrew.Mint do
   use GenServer
   alias Cashubrew.Cashu.BlindSignature
   alias Cashubrew.Crypto.BDHKE
-  alias Cashubrew.Lightning.LightningNetworkService
-  alias Cashubrew.Lightning.MockLightningNetworkService
-  alias Cashubrew.LNBitsApi
   alias Cashubrew.Query.MeltTokens
   alias Cashubrew.Schema.{Key, Keyset, MeltQuote, MeltTokens, MintConfiguration, MintQuote}
 
@@ -125,9 +122,14 @@ defmodule Cashubrew.Mint do
 
   def handle_call({:create_mint_quote, amount, description}, _from, state) do
     repo = Application.get_env(:cashubrew, :repo)
+    ln = Application.get_env(:cashubrew, :ln)
 
-    case LightningNetworkService.create_invoice(amount, description) do
-      {:ok, payment_request, _payment_hash} ->
+    IO.inspect(System.get_env("MOCK_LN"), label: "MOCK_LN")
+    IO.inspect(Application.get_env(:cashubrew, :ln), label: "Configured LN Module")
+    result = ln.create_invoice(amount, description)
+
+    case result do
+      {:ok, payment_request, payment_hash} ->
         # 1 hour expiry
         expiry = :os.system_time(:second) + 3600
 
@@ -135,20 +137,25 @@ defmodule Cashubrew.Mint do
           amount: amount,
           payment_request: payment_request,
           expiry: expiry,
-          description: description
-          # payment_hash: _payment_hash,
+          description: description,
+          payment_hash: payment_hash
         }
 
-        case repo.insert(MintQuote.changeset(%MintQuote{}, attrs)) do
-          {:ok, quote} ->
-            {:reply, {:ok, quote}, state}
-
-          {:error, changeset} ->
-            {:reply, {:error, changeset}, state}
-        end
+        insert_quote(repo, attrs, state)
 
       {:error, reason} ->
         {:reply, {:error, reason}, state}
+    end
+  end
+
+  # Helper function to insert the quote into the database
+  defp insert_quote(repo, attrs, state) do
+    case repo.insert(MintQuote.changeset(%MintQuote{}, attrs)) do
+      {:ok, quote} ->
+        {:reply, {:ok, quote}, state}
+
+      {:error, changeset} ->
+        {:reply, {:error, changeset}, state}
     end
   end
 
@@ -258,10 +265,11 @@ defmodule Cashubrew.Mint do
     end
   end
 
+  # TODO
   def handle_call({:create_melt_tokens, quote_id, inputs}, _from, state) do
     repo = Application.get_env(:cashubrew, :repo)
+    IO.puts("inputs: #{inputs}")
 
-    # TODO
     # Verify quote_id
 
     {:ok, melt_find} = Cashubrew.Query.MeltTokens.get_melt_by_quote_id!(quote_id)
@@ -277,18 +285,17 @@ defmodule Cashubrew.Mint do
 
     fee_reserve = 0
     # Create and Saved melt quote
+    expiry = :os.system_time(:second) + 3600
 
     attrs = %{
       # quote_id
       request: quote_id,
       unit: quote_id,
       amount: 0,
-      fee_reserve: 0,
-      expiry: 0,
+      fee_reserve: fee_reserve,
+      expiry: expiry,
       request_lookup_id: quote_id
     }
-
-    expiry = :os.system_time(:second) + 3600
 
     case repo.insert(MeltTokens.changeset(%MeltTokens{}, attrs)) do
       {:ok, melt_quote} ->
