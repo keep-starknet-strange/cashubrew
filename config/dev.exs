@@ -42,3 +42,10 @@ config :cashubrew, Cashubrew.Repo,
 config :cashubrew, :repo, Cashubrew.Repo
 
 config :cashubrew, ecto_repos: [Cashubrew.Repo]
+
+# Use mock repo if MOCK_LN environment variable is set to "true"
+if System.get_env("MOCK_LN") == "true" do
+  config :cashubrew, :ln, Cashubrew.Lightning.MockLightningNetworkService
+else
+  config :cashubrew, :ln, Cashubrew.Lightning.LightningNetworkService
+end

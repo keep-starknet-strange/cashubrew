@@ -79,7 +79,7 @@ Create an .env to setup your LN_BITS or Mock LN mode
 ```
 LN_BITS_API_ENDPOINT=https://your-lnbits-node
 LN_BITS_API_KEY=ADMIN_API_KEY
-use_mock_env_ln=true
+MOCK_LN=true
 
 ``` 
 

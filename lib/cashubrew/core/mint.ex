@@ -6,9 +6,6 @@ defmodule Cashubrew.Mint do
   use GenServer
   alias Cashubrew.Cashu.BlindSignature
   alias Cashubrew.Crypto.BDHKE
-  alias Cashubrew.Lightning.LightningNetworkService
-  alias Cashubrew.Lightning.MockLightningNetworkService
-  alias Cashubrew.LNBitsApi
   alias Cashubrew.Query.MeltTokens
   alias Cashubrew.Schema.{Key, Keyset, MeltQuote, MeltTokens, MintConfiguration, MintQuote}
 
@@ -125,15 +122,11 @@ defmodule Cashubrew.Mint do
 
   def handle_call({:create_mint_quote, amount, description}, _from, state) do
     repo = Application.get_env(:cashubrew, :repo)
-    use_mock_env_ln = System.get_env("use_mock_env_ln")
-    IO.puts("use_mock_env_ln #{use_mock_env_ln}")
+    ln = Application.get_env(:cashubrew, :ln)
 
-    result =
-      if use_mock_env_ln == "true" do
-        MockLightningNetworkService.create_invoice(amount, description)
-      else
-        LightningNetworkService.create_invoice(amount, description)
-      end
+    IO.inspect(System.get_env("MOCK_LN"), label: "MOCK_LN")
+    IO.inspect(Application.get_env(:cashubrew, :ln), label: "Configured LN Module")
+    result = ln.create_invoice(amount, description)
 
     case result do
       {:ok, payment_request, payment_hash} ->
