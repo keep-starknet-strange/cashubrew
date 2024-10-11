@@ -2,10 +2,12 @@ defmodule Cashubrew.Web.MintController do
   use Cashubrew.Web, :controller
   alias Cashubrew.Cashu.BlindedMessage
   alias Cashubrew.Mint
+  alias Cashubrew.Nuts.Nut06
   alias Cashubrew.Web.{Keys, KeysetResponse}
 
   def info(conn, _params) do
-    Cashubrew.Nuts.Nut06.Info.info(conn)
+    info = Nut06.Info.info()
+    json(conn, info)
   end
 
   def keysets(conn, _params) do

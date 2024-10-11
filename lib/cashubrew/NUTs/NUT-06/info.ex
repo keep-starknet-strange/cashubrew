@@ -1,5 +1,8 @@
 defmodule Cashubrew.Nuts.Nut06.Info do
-  use Cashubrew.Web, :controller
+  @moduledoc """
+  Implementation and structs of the NUT-06
+  """
+  alias Cashubrew.Mint
 
   defstruct [
     :name,
@@ -15,11 +18,14 @@ defmodule Cashubrew.Nuts.Nut06.Info do
   ]
 
   defmodule Contact do
+    @moduledoc """
+    A Contact info
+    """
     @enforce_keys [:method, :info]
     defstruct [:method, :info]
   end
 
-  def info(conn) do
+  def info do
     info = %__MODULE__{
       name: "Cashubrew Cashu Mint",
       pubkey: Base.encode16(Mint.get_pubkey(), case: :lower),
@@ -79,6 +85,6 @@ defmodule Cashubrew.Nuts.Nut06.Info do
       motd: nil
     }
 
-    json(conn, info)
+    info
   end
 end
