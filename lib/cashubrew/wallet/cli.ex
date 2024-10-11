@@ -8,9 +8,17 @@ defmodule Cashubrew.Wallet.CLI do
   alias Cashubrew.Wallet
   require Logger
 
-  @mint_url "http://localhost:4000/api/v1"
-  @data_dir "./_build/.cashubrew/data"
-  @proof_file "proofs.json"
+  defp mint_url do
+    "http://localhost:4000/api/v1"
+  end
+
+  defp data_dir do
+    "./_build/.cashubrew/data"
+  end
+
+  defp proof_file do
+    "proofs.json"
+  end
 
   def main(args) do
     case args do
@@ -50,7 +58,7 @@ defmodule Cashubrew.Wallet.CLI do
   end
 
   defp request_mint_quote(amount) do
-    url = "#{@mint_url}/mint/quote/bolt11"
+    url = "#{mint_url()}/mint/quote/bolt11"
     headers = [{"Content-Type", "application/json"}]
     body = Jason.encode!(%{"amount" => amount, "unit" => "sat"})
 
@@ -89,7 +97,7 @@ defmodule Cashubrew.Wallet.CLI do
   end
 
   defp get_active_keyset_id do
-    url = "#{@mint_url}/keysets"
+    url = "#{mint_url()}/keysets"
     headers = [{"Content-Type", "application/json"}]
 
     with {:ok, %HTTPoison.Response{status_code: 200, body: response_body}} <-
@@ -110,7 +118,7 @@ defmodule Cashubrew.Wallet.CLI do
   end
 
   defp send_mint_request(quote_id, blinded_messages) do
-    url = "#{@mint_url}/mint/bolt11"
+    url = "#{mint_url()}/mint/bolt11"
     headers = [{"Content-Type", "application/json"}]
 
     outputs =
@@ -155,10 +163,10 @@ defmodule Cashubrew.Wallet.CLI do
   end
 
   defp store_proofs(proofs) do
-    File.mkdir_p!(@data_dir)
+    File.mkdir_p!(data_dir())
     existing_proofs = load_proofs()
     all_proofs = existing_proofs ++ proofs
-    File.write!("#{@data_dir}/#{@proof_file}", Jason.encode!(all_proofs))
+    File.write!("#{data_dir()}/#{proof_file()}", Jason.encode!(all_proofs))
   end
 
   defp show_balance do
@@ -182,7 +190,7 @@ defmodule Cashubrew.Wallet.CLI do
   end
 
   defp load_proofs do
-    case File.read("#{@data_dir}/#{@proof_file}") do
+    case File.read("#{data_dir()}/#{proof_file()}") do
       {:ok, content} ->
         Jason.decode!(content)
         |> Enum.map(fn proof ->

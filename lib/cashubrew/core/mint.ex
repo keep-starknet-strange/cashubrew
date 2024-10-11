@@ -8,17 +8,30 @@ defmodule Cashubrew.Mint do
   alias Cashubrew.Crypto.BDHKE
   alias Cashubrew.Lightning.LightningNetworkService
   alias Cashubrew.Lightning.MockLightningNetworkService
-  alias Cashubrew.LNBitsApi
   alias Cashubrew.Query.MeltTokens
   alias Cashubrew.Schema.{Key, Keyset, MeltQuote, MeltTokens, MintConfiguration, MintQuote}
 
   import Ecto.Query
 
-  @keyset_generation_seed_key "keyset_generation_seed"
-  @keyset_generation_derivation_path "m/0'/0'/0'"
-  @mint_pubkey_key "mint_pubkey"
-  @mint_privkey_key "mint_privkey"
-  @default_input_fee_ppk 0
+  defp keyset_generation_seed_key do
+    "keyset_generation_seed"
+  end
+
+  defp keyset_generation_derivation_path do
+    "m/0'/0'/0'"
+  end
+
+  defp mint_pubkey_key do
+    "mint_pubkey"
+  end
+
+  defp mint_privkey_key do
+    "mint_privkey"
+  end
+
+  defp default_input_fee_ppk do
+    0
+  end
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
@@ -44,14 +57,14 @@ defmodule Cashubrew.Mint do
   end
 
   defp get_or_create_seed(repo) do
-    case repo.get_by(MintConfiguration, key: @keyset_generation_seed_key) do
+    case repo.get_by(MintConfiguration, key: keyset_generation_seed_key()) do
       nil ->
         seed =
           System.get_env("KEYSET_GENERATION_SEED") ||
             :crypto.strong_rand_bytes(32) |> Base.encode16(case: :lower)
 
         case %MintConfiguration{}
-             |> MintConfiguration.changeset(%{key: @keyset_generation_seed_key, value: seed})
+             |> MintConfiguration.changeset(%{key: keyset_generation_seed_key(), value: seed})
              |> repo.insert() do
           {:ok, config} ->
             config.value
@@ -69,7 +82,12 @@ defmodule Cashubrew.Mint do
     case repo.all(Keyset) do
       [] ->
         keyset =
-          Keyset.generate("sat", seed, @keyset_generation_derivation_path, @default_input_fee_ppk)
+          Keyset.generate(
+            "sat",
+            seed,
+            keyset_generation_derivation_path(),
+            default_input_fee_ppk()
+          )
 
         [keyset]
 
@@ -79,21 +97,21 @@ defmodule Cashubrew.Mint do
   end
 
   defp get_or_create_mint_key(repo, seed) do
-    case {repo.get_by(MintConfiguration, key: @mint_pubkey_key),
-          repo.get_by(MintConfiguration, key: @mint_privkey_key)} do
+    case {repo.get_by(MintConfiguration, key: mint_pubkey_key()),
+          repo.get_by(MintConfiguration, key: mint_privkey_key())} do
       {nil, nil} ->
         {privkey, pubkey} = derive_mint_key(seed)
 
         %MintConfiguration{}
         |> MintConfiguration.changeset(%{
-          key: @mint_pubkey_key,
+          key: mint_pubkey_key(),
           value: Base.encode16(pubkey, case: :lower)
         })
         |> repo.insert!()
 
         %MintConfiguration{}
         |> MintConfiguration.changeset(%{
-          key: @mint_privkey_key,
+          key: mint_privkey_key(),
           value: Base.encode16(privkey, case: :lower)
         })
         |> repo.insert!()
