@@ -378,7 +378,7 @@ defmodule Cashubrew.Mint do
     GenServer.call(__MODULE__, {:create_melt_tokens, quote_id, inputs})
   end
 
-  def swap(mint_genserver, request) do
-    GenServer.call(mint_genserver, {:swap, request})
+  def swap(request) do
+    GenServer.call(__MODULE__, {:swap, request})
   end
 end

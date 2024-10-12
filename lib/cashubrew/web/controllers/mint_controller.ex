@@ -1,6 +1,8 @@
 defmodule Cashubrew.Web.MintController do
   use Cashubrew.Web, :controller
   alias Cashubrew.Cashu.BlindedMessage
+  alias Cashubrew.Cashu.Proof
+  alias Cashubrew.PostSwapRequest
   alias Cashubrew.Mint
   alias Cashubrew.Nuts.Nut06
   alias Cashubrew.Web.{Keys, KeysetResponse}
@@ -86,8 +88,18 @@ defmodule Cashubrew.Web.MintController do
     end
   end
 
-  def swap(_conn, _params) do
-    {:error, "Not implemented yet"}
+  def swap(conn, %{"inputs" => inputs, "outputs" => outputs}) do
+    inputs = parse_proofs(inputs)
+    outputs = validate_blinded_messages(outputs)
+    post_swap_request = PostSwapRequest.new(inputs, outputs)
+
+    case Mint.swap(post_swap_request) do
+      {:ok, blind_signatures} ->
+        json(conn, %{signatures: blind_signatures})
+
+      {:error, reason} ->
+        conn |> put_status(:bad_request) |> json(%{error: reason})
+    end
   end
 
   defp validate_blinded_messages(outputs) do
@@ -104,6 +116,19 @@ defmodule Cashubrew.Web.MintController do
       amount: Map.fetch!(output, "amount"),
       id: Map.fetch!(output, "id"),
       B_: Map.fetch!(output, "B_")
+    }
+  end
+
+  defp parse_proofs(json_proofs) do
+    Enum.map(json_proofs, &parse_proof/1)
+  end
+
+  defp parse_proof(json_proof) do
+    %Proof{
+      amount: Map.fetch!(json_proof, "amount"),
+      id: Map.fetch!(json_proof, "id"),
+      secret: Map.fetch!(json_proof, "secret"),
+      C: Map.fetch!(json_proof, "C")
     }
   end
 
