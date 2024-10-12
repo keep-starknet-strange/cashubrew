@@ -16,8 +16,8 @@ defmodule Cashubrew.Cashu.BlindedMessage do
   Creates a new BlindedMessage struct.
   """
   @spec new_blinded_message(non_neg_integer(), String.t(), String.t()) :: t()
-  def new_blinded_message(amount, id, B_) do
-    %__MODULE__{amount: amount, id: id, B_: B_}
+  def new_blinded_message(amount, id, b_) do
+    %__MODULE__{amount: amount, id: id, B_: b_}
   end
 end
 
@@ -39,8 +39,8 @@ defmodule Cashubrew.Cashu.BlindSignature do
   Creates a new BlindSignature struct.
   """
   @spec new(non_neg_integer(), String.t(), String.t()) :: t()
-  def new(amount, id, C_) do
-    %__MODULE__{amount: amount, id: id, C_: C_}
+  def new(amount, id, c_) do
+    %__MODULE__{amount: amount, id: id, C_: c_}
   end
 end
 
@@ -63,7 +63,7 @@ defmodule Cashubrew.Cashu.Proof do
   Creates a new Proof struct.
   """
   @spec new(non_neg_integer(), String.t(), String.t(), String.t()) :: t()
-  def new(amount, id, secret, C) do
-    %__MODULE__{amount: amount, id: id, secret: secret, C: C}
+  def new(amount, id, secret, c) do
+    %__MODULE__{amount: amount, id: id, secret: secret, C: c}
   end
 end

@@ -11,6 +11,7 @@ defmodule Cashubrew.Mint do
   alias Cashubrew.LNBitsApi
   alias Cashubrew.Query.MeltTokens
   alias Cashubrew.Schema.{Key, Keyset, MeltQuote, MeltTokens, MintConfiguration, MintQuote}
+  alias Cashubrew.PostSwapRequest
 
   import Ecto.Query
 
@@ -205,26 +206,6 @@ defmodule Cashubrew.Mint do
     end
   end
 
-  defp sign_outputs(repo, blinded_messages) do
-    signatures =
-      Enum.map(blinded_messages, fn bm ->
-        # Get key from database
-        amount_key = get_key_for_amount(repo, bm.id, bm.amount)
-        privkey = amount_key.private_key
-        # Bob (mint) signs the blinded message
-        b_prime = Base.decode16!(bm."B_", case: :lower)
-        {c_prime, _e, _s} = BDHKE.step2_bob(b_prime, privkey)
-
-        %BlindSignature{
-          amount: bm.amount,
-          id: bm.id,
-          C_: Base.encode16(c_prime, case: :lower)
-        }
-      end)
-
-    {:ok, signatures}
-  end
-
   def handle_call({:create_melt_quote, request, unit}, _from, state) do
     repo = Application.get_env(:cashubrew, :repo)
     # # Check LN invoice and info
@@ -299,6 +280,49 @@ defmodule Cashubrew.Mint do
     end
   end
 
+  def handle_call({:swap, %PostSwapRequest{inputs: proofs, outputs: outputs}}, _from, state) do
+    repo = Application.get_env(:cashubrew, :repo)
+
+    all_proofs_valid? =
+      proofs
+      |> Enum.map(fn proof ->
+        key = get_key_for_amount(repo, proof.id, proof.amount)
+        verify_proof(proof, key)
+      end)
+      |> Enum.all?()
+
+    if all_proofs_valid? do
+      {:ok, blind_signatures} = sign_outputs(repo, outputs)
+      {:reply, {:ok, blind_signatures}, state}
+    else
+      {:reply, {:error, :invalid_proofs}, state}
+    end
+  end
+
+  defp verify_proof(proof, key) do
+    BDHKE.verify(key.private_key, proof."C", proof.secret)
+  end
+
+  defp sign_outputs(repo, blinded_messages) do
+    signatures =
+      Enum.map(blinded_messages, fn bm ->
+        # Get key from database
+        amount_key = get_key_for_amount(repo, bm.id, bm.amount)
+        privkey = amount_key.private_key
+        # Bob (mint) signs the blinded message
+        b_prime = Base.decode16!(bm."B_", case: :lower)
+        {c_prime, _e, _s} = BDHKE.step2_bob(b_prime, privkey)
+
+        %BlindSignature{
+          amount: bm.amount,
+          id: bm.id,
+          C_: Base.encode16(c_prime, case: :lower)
+        }
+      end)
+
+    {:ok, signatures}
+  end
+
   # Public API
 
   def get_keysets do
@@ -352,5 +376,9 @@ defmodule Cashubrew.Mint do
 
   def create_melt_tokens(quote_id, inputs) do
     GenServer.call(__MODULE__, {:create_melt_tokens, quote_id, inputs})
+  end
+
+  def swap(mint_genserver, request) do
+    GenServer.call(mint_genserver, {:swap, request})
   end
 end
