@@ -3,6 +3,7 @@ defmodule Cashubrew.Web.MintController do
   alias Cashubrew.Mint
   alias Cashubrew.Nuts.Nut00
   alias Cashubrew.Nuts.Nut01
+  alias Cashubrew.Nuts.Nut02
   alias Cashubrew.Nuts.Nut06
 
   def info(conn, _params) do
@@ -14,19 +15,7 @@ defmodule Cashubrew.Web.MintController do
     repo = Application.get_env(:cashubrew, :repo)
     keysets = Mint.get_all_keysets(repo)
 
-    keysets_responses =
-      Enum.map(keysets, fn keyset ->
-        %{
-          id: keyset.id,
-          unit: keyset.unit,
-          active: keyset.active,
-          input_fee_ppk: keyset.input_fee_ppk || 0
-        }
-      end)
-
-    response = %{
-      keysets: keysets_responses
-    }
+    response = Nut02.Serde.GetKeysetsResponse.from_keysets(keysets)
 
     json(conn, response)
   end
@@ -59,6 +48,8 @@ defmodule Cashubrew.Web.MintController do
 
       json(conn, response)
     else
+      # TODO: use proper error
+      # https://cashubtc.github.io/nuts/00/#errors
       conn
       |> put_status(:not_found)
       |> json(%{error: "Keyset not found"})
@@ -92,6 +83,8 @@ defmodule Cashubrew.Web.MintController do
           expiry: quote.expiry
         })
 
+      # TODO: use proper error
+      # https://cashubtc.github.io/nuts/00/#errors
       {:error, reason} ->
         conn
         |> put_status(:bad_request)
@@ -123,6 +116,8 @@ defmodule Cashubrew.Web.MintController do
           {:ok, signatures} ->
             json(conn, %{signatures: signatures})
 
+          # TODO: use proper error
+          # https://cashubtc.github.io/nuts/00/#errors
           {:error, reason} ->
             conn
             |> put_status(:bad_request)

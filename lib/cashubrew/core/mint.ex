@@ -7,11 +7,13 @@ defmodule Cashubrew.Mint do
   alias Cashubrew.Lightning.LightningNetworkService
   alias Cashubrew.Lightning.MockLightningNetworkService
   alias Cashubrew.Nuts.Nut00.{BDHKE, BlindSignature}
+  alias Cashubrew.Nuts.Nut02
   alias Cashubrew.Query.MeltTokens
+
+  alias Cashubrew.Schema
 
   alias Cashubrew.Schema.{
     Key,
-    Keyset,
     MeltQuote,
     MeltTokens,
     MintConfiguration,
@@ -87,13 +89,14 @@ defmodule Cashubrew.Mint do
   end
 
   defp load_or_create_keysets(repo, seed) do
-    case repo.all(Keyset) do
+    case repo.all(Schema.Keyset) do
       [] ->
+        keys = Nut02.Keyset.generate_keys(seed, keyset_generation_derivation_path())
+
         keyset =
-          Keyset.generate(
+          Schema.Keyset.register_keyset(
+            keys,
             "sat",
-            seed,
-            keyset_generation_derivation_path(),
             default_input_fee_ppk()
           )
 

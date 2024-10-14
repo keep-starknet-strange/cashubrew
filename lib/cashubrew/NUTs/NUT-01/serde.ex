@@ -1,6 +1,6 @@
 defmodule Cashubrew.Nuts.Nut01.Serde.GetKeysResponse do
   @moduledoc """
-  The body of the get keys rest request
+  The body of the get keys rest response
   """
   @enforce_keys [:keysets]
   defstruct [:keysets]

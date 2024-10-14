@@ -1,13 +1,16 @@
-defmodule Cashubrew.Nuts.Nut01.Keyset do
+defmodule Cashubrew.Nuts.Nut02.Keyset do
   @moduledoc """
   Contains the logic required for the Mint to generate keys and keysets
   """
   alias Cashubrew.Nuts.Nut00.BDHKE
-
   import Bitwise
 
   defp max_order do
     64
+  end
+
+  defp keyset_id_version do
+    <<0>>
   end
 
   @doc """
@@ -22,7 +25,7 @@ defmodule Cashubrew.Nuts.Nut01.Keyset do
 
     - A map containing amounts mapped to their corresponding private and public keys.
   """
-  def generate_keys(seed, derivation_path \\ "m/0'/0'/0'") do
+  def generate_keys(seed, derivation_path) do
     encoded_seed =
       seed
       |> :unicode.characters_to_binary(:utf8)
@@ -65,7 +68,10 @@ defmodule Cashubrew.Nuts.Nut01.Keyset do
     sorted_keys = Enum.sort_by(keys, & &1.amount)
     pubkeys_concat = Enum.map(sorted_keys, & &1.public_key) |> IO.iodata_to_binary()
 
-    "00" <>
+    keyset_id_version() <>
       (:crypto.hash(:sha256, pubkeys_concat) |> Base.encode16(case: :lower) |> binary_part(0, 14))
   end
 end
+
+# TODO: add logic for wallet to handle fees
+# https://cashubtc.github.io/nuts/02/#fees
