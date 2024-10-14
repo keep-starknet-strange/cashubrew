@@ -19,6 +19,14 @@ defmodule Cashubrew.Nuts.Nut00.BlindedMessage do
   def new_blinded_message(amount, id, B_) do
     %__MODULE__{amount: amount, id: id, B_: B_}
   end
+
+  def from_map(map) do
+    %__MODULE__{
+      amount: Map.fetch!(map, "amount"),
+      id: Map.fetch!(map, "id"),
+      B_: Map.fetch!(map, "B_")
+    }
+  end
 end
 
 defmodule Cashubrew.Nuts.Nut00.BlindSignature do
