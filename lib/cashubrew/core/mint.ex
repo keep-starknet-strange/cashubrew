@@ -9,7 +9,16 @@ defmodule Cashubrew.Mint do
   alias Cashubrew.Lightning.LightningNetworkService
   alias Cashubrew.Lightning.MockLightningNetworkService
   alias Cashubrew.Query.MeltTokens
-  alias Cashubrew.Schema.{Key, Keyset, MeltQuote, MeltTokens, MintConfiguration, MintQuote}
+
+  alias Cashubrew.Schema.{
+    Key,
+    Keyset,
+    MeltQuote,
+    MeltTokens,
+    MintConfiguration,
+    MintQuote,
+    UsedProof
+  }
 
   import Ecto.Query
 
@@ -206,13 +215,13 @@ defmodule Cashubrew.Mint do
         |> Ecto.Multi.update(:update_quote, fn %{verify_quote: quote} ->
           Ecto.Changeset.change(quote, state: "ISSUED")
         end)
-        |> Ecto.Multi.run(:sign_outputs, fn _, _ ->
-          sign_outputs(repo, blinded_messages)
+        |> Ecto.Multi.run(:create_blinded_signatures, fn _, _ ->
+          create_blinded_signatures(repo, blinded_messages)
         end)
         |> repo.transaction()
 
       case result do
-        {:ok, %{sign_outputs: signatures}} ->
+        {:ok, %{create_blinded_signatures: signatures}} ->
           {:reply, {:ok, signatures}, state}
 
         {:error, _, reason, _} ->
@@ -223,7 +232,12 @@ defmodule Cashubrew.Mint do
     end
   end
 
-  defp sign_outputs(repo, blinded_messages) do
+  def create_blinded_signatures(blinded_messages) do
+    repo = Application.get_env(:cashubrew, :repo)
+    create_blinded_signatures(repo, blinded_messages)
+  end
+
+  defp create_blinded_signatures(repo, blinded_messages) do
     signatures =
       Enum.map(blinded_messages, fn bm ->
         # Get key from database
@@ -276,7 +290,7 @@ defmodule Cashubrew.Mint do
     end
   end
 
-  def handle_call({:create_melt_tokens, quote_id, inputs}, _from, state) do
+  def handle_call({:create_melt_tokens, quote_id, _inputs}, _from, state) do
     repo = Application.get_env(:cashubrew, :repo)
 
     # TODO
@@ -370,5 +384,24 @@ defmodule Cashubrew.Mint do
 
   def create_melt_tokens(quote_id, inputs) do
     GenServer.call(__MODULE__, {:create_melt_tokens, quote_id, inputs})
+  end
+
+  def check_proofs_are_used?(proofs) do
+    repo = Application.get_env(:cashubrew, :repo)
+
+    # Todo: do it at the database level for better perf
+    used_proofs = repo.all(UsedProof)
+    Enum.any?(used_proofs, fn p -> p in proofs end)
+  end
+
+  def register_used_proofs(proofs) do
+    repo = Application.get_env(:cashubrew, :repo)
+
+    used_proofs =
+      Enum.each(proofs, fn p ->
+        %UsedProof{keyset_id: p.id, amount: p.amount, secret: p.secret, c: p."C"}
+      end)
+
+    repo.insert_all(UsedProof, used_proofs)
   end
 end
