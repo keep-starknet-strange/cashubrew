@@ -3,7 +3,7 @@ defmodule Cashubrew.Wallet do
   Handles wallet-related operations for the Cashubrew CLI.
   """
 
-  alias Cashubrew.Crypto.BDHKE
+  alias Cashubrew.Nuts.Nut00.BDHKE
 
   defp data_dir do
     "./_build/.cashubrew/data"

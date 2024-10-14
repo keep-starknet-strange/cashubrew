@@ -4,7 +4,7 @@ defmodule BDHKETest do
   """
   use ExUnit.Case
   require Logger
-  alias Cashubrew.Crypto.BDHKE
+  alias Cashubrew.Nuts.Nut00.BDHKE
   alias Cashubrew.Crypto.Secp256k1Utils
 
   test "end-to-end BDHKE test" do

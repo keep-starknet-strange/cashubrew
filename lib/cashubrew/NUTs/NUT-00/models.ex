@@ -1,4 +1,4 @@
-defmodule Cashubrew.Cashu.BlindedMessage do
+defmodule Cashubrew.Nuts.Nut00.BlindedMessage do
   @moduledoc """
   Represents a BlindedMessage in the Cashu protocol.
   """
@@ -21,7 +21,7 @@ defmodule Cashubrew.Cashu.BlindedMessage do
   end
 end
 
-defmodule Cashubrew.Cashu.BlindSignature do
+defmodule Cashubrew.Nuts.Nut00.BlindSignature do
   @moduledoc """
   Represents a BlindSignature in the Cashu protocol.
   """
@@ -44,7 +44,7 @@ defmodule Cashubrew.Cashu.BlindSignature do
   end
 end
 
-defmodule Cashubrew.Cashu.Proof do
+defmodule Cashubrew.Nuts.Nut00.Proof do
   @moduledoc """
   Represents a Proof in the Cashu protocol.
   """

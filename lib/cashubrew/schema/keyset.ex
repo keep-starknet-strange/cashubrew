@@ -4,7 +4,8 @@ defmodule Cashubrew.Schema.Keyset do
   """
   use Ecto.Schema
   import Ecto.Changeset
-  alias Cashubrew.{Crypto.BDHKE, Schema}
+  alias Cashubrew.Schema
+  alias Cashubrew.Nuts.Nut00.BDHKE
 
   import Bitwise
 
