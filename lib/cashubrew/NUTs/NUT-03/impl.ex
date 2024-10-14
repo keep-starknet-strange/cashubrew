@@ -1,26 +1,13 @@
-defmodule Cashubrew.Nuts.Nut03.Swap do
+defmodule Cashubrew.Nuts.Nut03.Impl do
+  alias Cashubrew.Nuts.Nut00
+
   @moduledoc """
   Implementation and structs of the NUT-03
   """
   alias Cashubrew.Mint
 
-  defmodule PostSwapRequest do
-    @moduledoc """
-    The body of the post swap rest request
-    """
-    @enforce_keys [:inputs, :outputs]
-    defstruct [:inputs, :outputs]
-  end
-
-  defmodule PostSwapResponse do
-    @moduledoc """
-    The body of the post swap rest response
-    """
-    @enforce_keys [:signatures]
-    defstruct [:signatures]
-  end
-
-  def swap(%PostSwapRequest{inputs: proofs, outputs: blinded_messages}) do
+  @spec swap!(Nut00.Proof, Nut00.BlindedMessage) :: Nut00.BlindSignature
+  def swap!(proofs, blinded_messages) do
     if Mint.check_proofs_are_used?(proofs) do
       raise "SwapProofIsAlreadyUsed"
     end
@@ -45,7 +32,7 @@ defmodule Cashubrew.Nuts.Nut03.Swap do
 
     Mint.register_used_proofs(proofs)
 
-    %PostSwapResponse{signatures: signatures}
+    signatures
   end
 end
 

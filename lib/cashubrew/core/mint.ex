@@ -357,15 +357,15 @@ defmodule Cashubrew.Mint do
   end
 
   def get_active_keysets(repo) do
-    repo.all(from(k in Keyset, where: k.active == true))
+    repo.all(from(k in Schema.Keyset, where: k.active == true))
   end
 
   def get_all_keysets(repo) do
-    repo.all(Keyset)
+    repo.all(Schema.Keyset)
   end
 
   def get_keyset(repo, keyset_id) do
-    repo.get(Keyset, keyset_id)
+    repo.get(Schema.Keyset, keyset_id)
   end
 
   def create_mint_quote(amount, description) do
@@ -388,17 +388,13 @@ defmodule Cashubrew.Mint do
     GenServer.call(__MODULE__, {:create_melt_tokens, quote_id, inputs})
   end
 
-  def check_proofs_are_used?(proofs) do
-    repo = Application.get_env(:cashubrew, :repo)
-
+  def check_proofs_are_used?(repo, proofs) do
     # Todo: do it at the database level for better perf
     used_proofs = repo.all(UsedProof)
     Enum.any?(used_proofs, fn p -> p in proofs end)
   end
 
-  def register_used_proofs(proofs) do
-    repo = Application.get_env(:cashubrew, :repo)
-
+  def register_used_proofs(repo, proofs) do
     used_proofs =
       Enum.each(proofs, fn p ->
         %UsedProof{keyset_id: p.id, amount: p.amount, secret: p.secret, c: p."C"}

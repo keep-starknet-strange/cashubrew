@@ -3,6 +3,7 @@ defmodule Cashubrew.Web.Router do
   import Phoenix.LiveDashboard.Router
   alias Cashubrew.Nuts.Nut01
   alias Cashubrew.Nuts.Nut02
+  alias Cashubrew.Nuts.Nut03
 
   pipeline :browser do
     plug(:accepts, ["html"])
@@ -26,7 +27,7 @@ defmodule Cashubrew.Web.Router do
     get(Nut02.Routes.v1_keyset(), MintController, :keysets)
 
     # NUT-03
-    post("/v1/swap", MintController, :swap)
+    post(Nut03.Routes.v1_swap(), MintController, :swap)
 
     # NUT-04
     post("/v1/mint/quote/bolt11", MintController, :create_mint_quote)
