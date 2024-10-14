@@ -4,10 +4,9 @@ defmodule Cashubrew.Mint do
   """
 
   use GenServer
-  alias Cashubrew.Nuts.Nut00.BlindSignature
-  alias Cashubrew.Nuts.Nut00.BDHKE
   alias Cashubrew.Lightning.LightningNetworkService
   alias Cashubrew.Lightning.MockLightningNetworkService
+  alias Cashubrew.Nuts.Nut00.{BDHKE, BlindSignature}
   alias Cashubrew.Query.MeltTokens
 
   alias Cashubrew.Schema.{

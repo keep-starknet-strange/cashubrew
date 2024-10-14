@@ -3,7 +3,7 @@ defmodule Cashubrew.Wallet.CLI do
   A simple CLI wallet for interacting with the Cashubrew mint.
   """
 
-  alias Cashubrew.Nuts.Nut00.{BlindedMessage, Proof, BDHKE}
+  alias Cashubrew.Nuts.Nut00.{BDHKE, BlindedMessage, Proof}
   alias Cashubrew.Wallet
   require Logger
 
