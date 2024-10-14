@@ -31,4 +31,3 @@ defmodule Cashubrew.Nuts.Nut02.Serde.GetKeysetsResponse do
     }
   end
 end
-
