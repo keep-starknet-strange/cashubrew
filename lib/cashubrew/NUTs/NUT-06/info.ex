@@ -2,6 +2,7 @@ defmodule Cashubrew.Nuts.Nut06.Info do
   @moduledoc """
   Implementation and structs of the NUT-06
   """
+  alias Cashubrew.Nuts.Nut00
   alias Cashubrew.Mint
 
   defstruct [
@@ -44,43 +45,10 @@ defmodule Cashubrew.Nuts.Nut06.Info do
       ],
       time: System.os_time(:second),
       nuts: %{
-        "4": %{
-          methods: [
-            %{
-              method: "bolt11",
-              unit: "sat",
-              min_amount: 0,
-              max_amount: 10_000
-            }
-          ],
-          disabled: false
-        },
-        "5": %{
-          methods: [
-            %{
-              method: "bolt11",
-              unit: "sat",
-              min_amount: 100,
-              max_amount: 10_000
-            }
-          ],
-          disabled: false
-        },
-        "7": %{
-          supported: false
-        },
-        "8": %{
-          supported: false
-        },
-        "9": %{
-          supported: false
-        },
-        "10": %{
-          supported: false
-        },
-        "12": %{
-          supported: false
-        }
+        "0": Nut00.Info.info(),
+        "1": Nut01.Info.info(),
+        "2": Nut02.Info.info(),
+        "3": Nut03.Info.info()
       },
       motd: nil
     }

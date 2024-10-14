@@ -4,6 +4,7 @@ defmodule Cashubrew.Web.MintController do
   alias Cashubrew.Nuts.Nut00
   alias Cashubrew.Nuts.Nut01
   alias Cashubrew.Nuts.Nut02
+  alias Cashubrew.Nuts.Nut03
   alias Cashubrew.Nuts.Nut06
 
   def info(conn, _params) do
@@ -21,15 +22,7 @@ defmodule Cashubrew.Web.MintController do
   end
 
   def keys(conn, _params) do
-    repo = Application.get_env(:cashubrew, :repo)
-    keysets = Mint.get_active_keysets(repo)
-
-    keysets_with_keys =
-      Enum.map(keysets, fn keyset ->
-        keys = Mint.get_keys_for_keyset(repo, keyset.id)
-
-        %{id: keyset.id, unit: keyset.unit, keys: keys}
-      end)
+    keysets_with_keys = Nut01.Impl.active_keysets_with_keys()
 
     response = Nut01.Serde.GetKeysResponse.from_keysets(keysets_with_keys)
 
@@ -37,14 +30,11 @@ defmodule Cashubrew.Web.MintController do
   end
 
   def keys_for_keyset(conn, %{"keyset_id" => keyset_id}) do
-    repo = Application.get_env(:cashubrew, :repo)
-    keyset = Mint.get_keyset(repo, keyset_id)
+    keyset_with_keys = Nut01.Impl.keys_for_keyset_id(keyset_id)
 
-    if keyset do
-      keys = Mint.get_keys_for_keyset(repo, keyset_id)
-
+    if keyset_with_keys do
       response =
-        Nut01.Serde.GetKeysResponse.from_keysets([%{id: keyset.id, unit: keyset.unit, keys: keys}])
+        Nut01.Serde.GetKeysResponse.from_keysets([keyset_with_keys])
 
       json(conn, response)
     else
@@ -56,8 +46,10 @@ defmodule Cashubrew.Web.MintController do
     end
   end
 
-  def swap(_conn, _params) do
-    {:error, "Not implemented yet"}
+  def swap(conn, %Nut03.Serde.PostSwapRequest{inputs: proofs, outputs: blinded_messages}) do
+    signatures = Nut03.Impl.swap!(proofs, blinded_messages)
+
+    json(conn, %Nut03.Serde.PostSwapResponse{signatures: signatures})
   end
 
   defp validate_blinded_messages(outputs) do
