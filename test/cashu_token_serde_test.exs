@@ -1,6 +1,6 @@
 defmodule Cashubrew.Cashu.TokenTest do
   use ExUnit.Case, async: true
-  alias Cashubrew.Cashu.TokenV4
+  alias Cashubrew.Nuts.Nut00.TokenV4
 
   describe "V4 Token" do
     @tag :v4_token

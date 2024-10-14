@@ -1,4 +1,4 @@
-defmodule Cashubrew.Crypto.BDHKE do
+defmodule Cashubrew.Nuts.Nut00.BDHKE do
   @moduledoc """
   Cryptographic functions for the Cashubrew mint, including BDHKE implementation.
   Check [NUT-00](https://cashubtc.github.io/nuts/00/) for more information.

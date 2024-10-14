@@ -1,7 +1,7 @@
 defmodule Cashubrew.Web.MintController do
   use Cashubrew.Web, :controller
-  alias Cashubrew.Cashu.BlindedMessage
   alias Cashubrew.Mint
+  alias Cashubrew.Nuts.Nut00.BlindedMessage
   alias Cashubrew.Nuts.Nut06
   alias Cashubrew.Web.{Keys, KeysetResponse}
 

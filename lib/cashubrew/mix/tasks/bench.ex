@@ -4,7 +4,7 @@ defmodule Mix.Tasks.Bench do
   """
   use Mix.Task
 
-  alias Cashubrew.Crypto.BDHKE
+  alias Cashubrew.Nuts.Nut00.BDHKE
 
   @shortdoc "Runs the BDHKE benchmark"
 

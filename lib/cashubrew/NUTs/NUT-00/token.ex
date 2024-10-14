@@ -1,4 +1,4 @@
-defmodule Cashubrew.Cashu.Token do
+defmodule Cashubrew.Nuts.Nut00.Token do
   @moduledoc """
   Handles the serialization and deserialization of Cashu tokens.
   """
@@ -41,7 +41,7 @@ defmodule Cashubrew.Cashu.Token do
   def deserialize_v3(_), do: {:error, "Invalid token format"}
 end
 
-defmodule Cashubrew.Cashu.TokenV4 do
+defmodule Cashubrew.Nuts.Nut00.TokenV4 do
   @moduledoc """
   Handles the serialization and deserialization of Cashu V4 tokens.
   """
