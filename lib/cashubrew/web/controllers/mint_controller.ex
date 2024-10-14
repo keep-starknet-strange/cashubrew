@@ -1,9 +1,10 @@
 defmodule Cashubrew.Web.MintController do
   use Cashubrew.Web, :controller
   alias Cashubrew.Mint
-  alias Cashubrew.Nuts.Nut00.BlindedMessage
+  alias Cashubrew.Nuts.Nut00
+  alias Cashubrew.Nuts.Nut01
+  alias Cashubrew.Nuts.Nut02
   alias Cashubrew.Nuts.Nut06
-  alias Cashubrew.Web.{Keys, KeysetResponse}
 
   def info(conn, _params) do
     info = Nut06.Info.info()
@@ -14,19 +15,7 @@ defmodule Cashubrew.Web.MintController do
     repo = Application.get_env(:cashubrew, :repo)
     keysets = Mint.get_all_keysets(repo)
 
-    keysets_responses =
-      Enum.map(keysets, fn keyset ->
-        %{
-          id: keyset.id,
-          unit: keyset.unit,
-          active: keyset.active,
-          input_fee_ppk: keyset.input_fee_ppk || 0
-        }
-      end)
-
-    response = %{
-      keysets: keysets_responses
-    }
+    response = Nut02.Serde.GetKeysetsResponse.from_keysets(keysets)
 
     json(conn, response)
   end
@@ -35,23 +24,14 @@ defmodule Cashubrew.Web.MintController do
     repo = Application.get_env(:cashubrew, :repo)
     keysets = Mint.get_active_keysets(repo)
 
-    keysets_responses =
+    keysets_with_keys =
       Enum.map(keysets, fn keyset ->
         keys = Mint.get_keys_for_keyset(repo, keyset.id)
 
-        keys_list =
-          Enum.map(keys, fn key -> {key.amount, Base.encode16(key.public_key, case: :lower)} end)
-
-        %KeysetResponse{
-          id: keyset.id,
-          unit: keyset.unit,
-          keys: %Keys{pairs: keys_list}
-        }
+        %{id: keyset.id, unit: keyset.unit, keys: keys}
       end)
 
-    response = %{
-      keysets: keysets_responses
-    }
+    response = Nut01.Serde.GetKeysResponse.from_keysets(keysets_with_keys)
 
     json(conn, response)
   end
@@ -63,23 +43,13 @@ defmodule Cashubrew.Web.MintController do
     if keyset do
       keys = Mint.get_keys_for_keyset(repo, keyset_id)
 
-      keys_list =
-        Enum.map(keys, fn key ->
-          {key.amount, Base.encode16(key.public_key, case: :lower)}
-        end)
-
-      keyset_response = %KeysetResponse{
-        id: keyset.id,
-        unit: keyset.unit,
-        keys: %Keys{pairs: keys_list}
-      }
-
-      response = %{
-        keysets: [keyset_response]
-      }
+      response =
+        Nut01.Serde.GetKeysResponse.from_keysets([%{id: keyset.id, unit: keyset.unit, keys: keys}])
 
       json(conn, response)
     else
+      # TODO: use proper error
+      # https://cashubtc.github.io/nuts/00/#errors
       conn
       |> put_status(:not_found)
       |> json(%{error: "Keyset not found"})
@@ -93,18 +63,10 @@ defmodule Cashubrew.Web.MintController do
   defp validate_blinded_messages(outputs) do
     blinded_messages =
       Enum.map(outputs, fn output ->
-        convert_to_blinded_message(output)
+        Nut00.BlindedMessage.from_map(output)
       end)
 
     {:ok, blinded_messages}
-  end
-
-  defp convert_to_blinded_message(output) do
-    %BlindedMessage{
-      amount: Map.fetch!(output, "amount"),
-      id: Map.fetch!(output, "id"),
-      B_: Map.fetch!(output, "B_")
-    }
   end
 
   def create_mint_quote(conn, %{"amount" => amount, "unit" => "sat"} = params) do
@@ -121,6 +83,8 @@ defmodule Cashubrew.Web.MintController do
           expiry: quote.expiry
         })
 
+      # TODO: use proper error
+      # https://cashubtc.github.io/nuts/00/#errors
       {:error, reason} ->
         conn
         |> put_status(:bad_request)
@@ -152,6 +116,8 @@ defmodule Cashubrew.Web.MintController do
           {:ok, signatures} ->
             json(conn, %{signatures: signatures})
 
+          # TODO: use proper error
+          # https://cashubtc.github.io/nuts/00/#errors
           {:error, reason} ->
             conn
             |> put_status(:bad_request)

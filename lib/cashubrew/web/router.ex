@@ -1,6 +1,8 @@
 defmodule Cashubrew.Web.Router do
   use Cashubrew.Web, :router
   import Phoenix.LiveDashboard.Router
+  alias Cashubrew.Nuts.Nut01
+  alias Cashubrew.Nuts.Nut02
 
   pipeline :browser do
     plug(:accepts, ["html"])
@@ -19,9 +21,9 @@ defmodule Cashubrew.Web.Router do
     pipe_through(:api)
 
     # NUT-01 & NUT-02
-    get("/v1/keys", MintController, :keys)
-    get("/v1/keys/:keyset_id", MintController, :keys_for_keyset)
-    get("/v1/keysets", MintController, :keysets)
+    get(Nut01.Routes.v1_keys(), MintController, :keys)
+    get(Nut02.Routes.v1_keys_for_keyset_id(), MintController, :keys_for_keyset)
+    get(Nut02.Routes.v1_keyset(), MintController, :keysets)
 
     # NUT-03
     post("/v1/swap", MintController, :swap)
