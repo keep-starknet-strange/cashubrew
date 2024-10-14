@@ -14,10 +14,14 @@ defmodule Cashubrew.Crypto.BDHKE do
   alias ExSecp256k1
 
   # Cashu parameters
-  @domain_separator "Secp256k1_HashToCurve_Cashu_"
+  defp domain_separator do
+    "Secp256k1_HashToCurve_Cashu_"
+  end
 
   # secp256k1 parameters
-  @secp256k1_n 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
+  defp secp256k1_n do
+    0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
+  end
 
   @doc """
   Generate a new keypair.
@@ -47,7 +51,7 @@ defmodule Cashubrew.Crypto.BDHKE do
   /// never happen in practice).
   """
   def hash_to_curve(message) do
-    msg_hash = :crypto.hash(:sha256, @domain_separator <> message)
+    msg_hash = :crypto.hash(:sha256, domain_separator() <> message)
     hash_to_curve_loop(msg_hash, 0)
   end
 
@@ -143,8 +147,8 @@ defmodule Cashubrew.Crypto.BDHKE do
 
     e = hash_e(r1_compressed, r2, a_pub_compressed, c_prime)
     e_scalar = :binary.decode_unsigned(e)
-    a_times_e = Secp256k1Utils.mod_mul(:binary.decode_unsigned(a), e_scalar, @secp256k1_n)
-    s = Secp256k1Utils.mod_add(:binary.decode_unsigned(p), a_times_e, @secp256k1_n)
+    a_times_e = Secp256k1Utils.mod_mul(:binary.decode_unsigned(a), e_scalar, secp256k1_n())
+    s = Secp256k1Utils.mod_add(:binary.decode_unsigned(p), a_times_e, secp256k1_n())
     s_bin = :binary.encode_unsigned(s) |> Secp256k1Utils.pad_left(32)
     {e, s_bin}
   end

@@ -7,7 +7,10 @@ defmodule Cashubrew.Schema.Keyset do
   alias Cashubrew.{Crypto.BDHKE, Schema}
 
   import Bitwise
-  @max_order 64
+
+  defp max_order do
+    64
+  end
 
   @primary_key {:id, :string, autogenerate: false}
   schema "keysets" do
@@ -85,7 +88,7 @@ defmodule Cashubrew.Schema.Keyset do
     {master_private_key, master_chain_code} = BlockKeys.CKD.master_keys(encoded_seed)
     root_key = BlockKeys.CKD.master_private_key({master_private_key, master_chain_code})
 
-    Enum.map(0..(@max_order - 1), fn i ->
+    Enum.map(0..(max_order() - 1), fn i ->
       amount = 1 <<< i
       child_path = "#{derivation_path}/#{i}"
       child_key = BlockKeys.CKD.derive(root_key, child_path)

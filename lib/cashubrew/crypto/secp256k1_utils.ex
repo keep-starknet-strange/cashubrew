@@ -5,8 +5,13 @@ defmodule Cashubrew.Crypto.Secp256k1Utils do
   alias ExSecp256k1
 
   # secp256k1 parameters
-  @secp256k1_p 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F
-  @secp256k1_a 0
+  defp secp256k1_p do
+    0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F
+  end
+
+  defp secp256k1_a do
+    0
+  end
 
   @doc """
   Convert public key to x and y coordinates
@@ -46,11 +51,11 @@ defmodule Cashubrew.Crypto.Secp256k1Utils do
 
   def secp256k1_point_add({x1, y1}, {x1, y1}) do
     # Point doubling
-    numerator = 3 * x1 * x1 + @secp256k1_a
+    numerator = 3 * x1 * x1 + secp256k1_a()
     denominator = 2 * y1
-    s = mod(numerator * inv_mod(denominator, @secp256k1_p), @secp256k1_p)
-    x3 = mod(s * s - 2 * x1, @secp256k1_p)
-    y3 = mod(s * (x1 - x3) - y1, @secp256k1_p)
+    s = mod(numerator * inv_mod(denominator, secp256k1_p()), secp256k1_p())
+    x3 = mod(s * s - 2 * x1, secp256k1_p())
+    y3 = mod(s * (x1 - x3) - y1, secp256k1_p())
     {x3, y3}
   end
 
@@ -58,9 +63,9 @@ defmodule Cashubrew.Crypto.Secp256k1Utils do
     # Point addition
     numerator = y2 - y1
     denominator = x2 - x1
-    s = mod(numerator * inv_mod(denominator, @secp256k1_p), @secp256k1_p)
-    x3 = mod(s * s - x1 - x2, @secp256k1_p)
-    y3 = mod(s * (x1 - x3) - y1, @secp256k1_p)
+    s = mod(numerator * inv_mod(denominator, secp256k1_p()), secp256k1_p())
+    x3 = mod(s * s - x1 - x2, secp256k1_p())
+    y3 = mod(s * (x1 - x3) - y1, secp256k1_p())
     {x3, y3}
   end
 
@@ -90,7 +95,7 @@ defmodule Cashubrew.Crypto.Secp256k1Utils do
 
         _x = :binary.decode_unsigned(x_bin)
         y = :binary.decode_unsigned(y_bin)
-        y_neg = @secp256k1_p - y
+        y_neg = secp256k1_p() - y
 
         y_neg_bin = pad_left(:binary.encode_unsigned(y_neg), 32)
         result = <<4::8, x_bin::binary-size(32), y_neg_bin::binary-size(32)>>

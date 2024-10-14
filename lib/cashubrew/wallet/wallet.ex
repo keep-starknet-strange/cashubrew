@@ -5,8 +5,13 @@ defmodule Cashubrew.Wallet do
 
   alias Cashubrew.Crypto.BDHKE
 
-  @data_dir "./_build/.cashubrew/data"
-  @wallet_file "wallet.json"
+  defp data_dir do
+    "./_build/.cashubrew/data"
+  end
+
+  defp wallet_file do
+    "wallet.json"
+  end
 
   defmodule WalletStruct do
     @moduledoc """
@@ -44,14 +49,14 @@ defmodule Cashubrew.Wallet do
   end
 
   defp load_wallet do
-    case File.read("#{@data_dir}/#{@wallet_file}") do
+    case File.read("#{data_dir()}/#{wallet_file()}") do
       {:ok, content} -> Jason.decode!(content)
       {:error, _} -> nil
     end
   end
 
   defp store_wallet(wallet) do
-    File.mkdir_p!(@data_dir)
-    File.write!("#{@data_dir}/#{@wallet_file}", Jason.encode!(wallet))
+    File.mkdir_p!(data_dir())
+    File.write!("#{data_dir()}/#{wallet_file()}", Jason.encode!(wallet))
   end
 end
