@@ -3,6 +3,10 @@ defmodule Cashubrew.Nuts.Nut06.Info do
   Implementation and structs of the NUT-06
   """
   alias Cashubrew.Nuts.Nut00
+  alias Cashubrew.Nuts.Nut01
+  alias Cashubrew.Nuts.Nut02
+  alias Cashubrew.Nuts.Nut03
+  alias Cashubrew.Nuts.Nut04
   alias Cashubrew.Mint
 
   defstruct [
@@ -48,7 +52,8 @@ defmodule Cashubrew.Nuts.Nut06.Info do
         "0": Nut00.Info.info(),
         "1": Nut01.Info.info(),
         "2": Nut02.Info.info(),
-        "3": Nut03.Info.info()
+        "3": Nut03.Info.info(),
+        "4": Nut04.Info.info()
       },
       motd: nil
     }

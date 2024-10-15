@@ -4,7 +4,6 @@ defmodule Cashubrew.Mint do
   """
 
   use GenServer
-  alias Cashubrew.Lightning.LightningNetworkService
   alias Cashubrew.Lightning.MockLightningNetworkService
   alias Cashubrew.Nuts.Nut00.{BDHKE, BlindSignature}
   alias Cashubrew.Nuts.Nut02
@@ -255,27 +254,6 @@ defmodule Cashubrew.Mint do
 
   def get_keysets(repo, keyset_id) do
     repo.get(Schema.Keyset, keyset_id)
-  end
-
-  def create_mint_quote(amount, unit) do
-    repo = Application.get_env(:cashubrew, :repo)
-
-    {payment_request, _payment_hash} = LightningNetworkService.create_invoice!(amount, unit)
-
-    invoice_id =
-      Schema.PendingInvoice.create!(repo, %{amount: amount, payment_request: payment_request})
-
-    # 1 hour expiry
-    expiry = :os.system_time(:second) + 3600
-
-    new_quote = %{
-      quote_id: invoice_id,
-      payment_request: payment_request,
-      expiry: expiry,
-      paid: false
-    }
-
-    Schema.MintQuote.create!(repo, new_quote)
   end
 
   def get_mint_quote(quote_id) do
