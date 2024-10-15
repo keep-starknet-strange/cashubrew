@@ -31,9 +31,22 @@ defmodule Cashubrew.Nuts.Nut04.Impl do
       id: quote_id,
       payment_request: payment_request,
       expiry: expiry,
-      paid: false
+      state: "UNPAID"
     })
 
     %{quote_id: quote_id, request: payment_request, expiry: expiry}
+  end
+
+  def get_mint_quote(quote_id) do
+    repo = Application.get_env(:cashubrew, :repo)
+
+    quote = repo.get!(Schema.MintQuote, quote_id)
+
+    %{
+      quote_id: quote_id,
+      request: quote.payment_request,
+      expiry: quote.expiry,
+      state: quote.state
+    }
   end
 end

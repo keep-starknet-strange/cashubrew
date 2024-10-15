@@ -147,25 +147,6 @@ defmodule Cashubrew.Mint do
     {:reply, state.mint_pubkey, state}
   end
 
-  def handle_call({:get_mint_quote, quote_id}, _from, state) do
-    repo = Application.get_env(:cashubrew, :repo)
-    quote = repo.get(MintQuote, quote_id)
-
-    if quote do
-      case MockLightningNetworkService.check_payment(quote.payment_request) do
-        {:ok, :paid} ->
-          updated_quote = Ecto.Changeset.change(quote, state: "PAID")
-          {:ok, updated_quote} = repo.update(updated_quote)
-          {:reply, {:ok, updated_quote}, state}
-
-        _ ->
-          {:reply, {:ok, quote}, state}
-      end
-    else
-      {:reply, {:error, :not_found}, state}
-    end
-  end
-
   def handle_call({:mint_tokens, quote_id, blinded_messages}, _from, state) do
     repo = Application.get_env(:cashubrew, :repo)
     # Get quote from database
@@ -254,10 +235,6 @@ defmodule Cashubrew.Mint do
 
   def get_keysets(repo, keyset_id) do
     repo.get(Schema.Keyset, keyset_id)
-  end
-
-  def get_mint_quote(quote_id) do
-    GenServer.call(__MODULE__, {:get_mint_quote, quote_id})
   end
 
   def mint_tokens(quote, blinded_messages) do
