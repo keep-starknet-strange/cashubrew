@@ -2,12 +2,12 @@ defmodule Cashubrew.Nuts.Nut06.Info do
   @moduledoc """
   Implementation and structs of the NUT-06
   """
+  alias Cashubrew.Mint
   alias Cashubrew.Nuts.Nut00
   alias Cashubrew.Nuts.Nut01
   alias Cashubrew.Nuts.Nut02
   alias Cashubrew.Nuts.Nut03
   alias Cashubrew.Nuts.Nut04
-  alias Cashubrew.Mint
 
   defstruct [
     :name,

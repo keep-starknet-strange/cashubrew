@@ -233,7 +233,7 @@ defmodule Cashubrew.Mint do
     repo.all(Schema.Keyset)
   end
 
-  def get_keysets(repo, keyset_id) do
+  def get_keyset(repo, keyset_id) do
     repo.get(Schema.Keyset, keyset_id)
   end
 

@@ -43,5 +43,5 @@ defmodule Cashubrew.Schema.Keyset do
     end
   end
 
-  # Todo: create rotate function 
+  # Todo: create rotate function
 end
