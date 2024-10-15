@@ -4,11 +4,12 @@ defmodule Cashubrew.LNBitsApi do
   """
   Dotenv.load()
 
-  def fetch_data(path, _attributes) do
+  # Function to send a GET request
+  def make_get(endpoint) do
     api_base_url = System.get_env("LN_BITS_API_ENDPOINT")
     api_key = System.get_env("LN_BITS_API_KEY")
     headers = [{"X-Api-Key", "#{api_key}"}]
-    full_url = "#{api_base_url}#{path}"
+    full_url = "#{api_base_url}#{endpoint}"
 
     case HTTPoison.get(full_url, headers) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
@@ -23,7 +24,7 @@ defmodule Cashubrew.LNBitsApi do
   end
 
   # Function to send a POST request with a JSON body
-  def post_data(path, attributes) do
+  def make_post(endpoint, body) do
     api_base_url = System.get_env("LN_BITS_API_ENDPOINT")
     api_key = System.get_env("LN_BITS_API_KEY")
 
@@ -33,10 +34,10 @@ defmodule Cashubrew.LNBitsApi do
     ]
 
     # Convert Elixir map to JSON string
-    body = Jason.encode!(attributes)
-    full_url = "#{api_base_url}#{path}"
+    json_body = Jason.encode!(body)
+    full_url = "#{api_base_url}#{endpoint}"
 
-    case HTTPoison.post(full_url, body, headers) do
+    case HTTPoison.post(full_url, json_body, headers) do
       {:ok, %HTTPoison.Response{status_code: 201, body: response_body}} ->
         {:ok, response_body}
 
