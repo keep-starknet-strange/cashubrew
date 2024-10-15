@@ -8,7 +8,9 @@ defmodule Cashubrew.Nuts.Nut03.Impl do
 
   @spec swap!(Nut00.Proof, Nut00.BlindedMessage) :: Nut00.BlindSignature
   def swap!(proofs, blinded_messages) do
-    if Mint.check_proofs_are_used?(proofs) do
+    repo = Application.get_env(:cashubrew, :repo)
+
+    if Mint.check_proofs_are_used?(repo, proofs) do
       raise "SwapProofIsAlreadyUsed"
     end
 
@@ -30,7 +32,7 @@ defmodule Cashubrew.Nuts.Nut03.Impl do
       raise "SwapAmountMismatch"
     end
 
-    Mint.register_used_proofs(proofs)
+    Mint.register_used_proofs(repo, proofs)
 
     signatures
   end

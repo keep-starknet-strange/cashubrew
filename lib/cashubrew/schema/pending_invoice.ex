@@ -1,23 +1,21 @@
-defmodule Cashubrew.Schema.MintQuote do
+defmodule Cashubrew.Schema.PendingInvoice do
   @moduledoc """
   Schema for a mint quote.
   """
   use Ecto.Schema
   import Ecto.Changeset
 
-  schema "mint_quotes" do
-    field(:quote_id, :binary_id)
+  schema "pending_invoices" do
+    field(:amount, :integer)
     field(:payment_request, :string)
-    field(:expiry, :integer)
-    field(:paid, :boolean)
 
     timestamps()
   end
 
-  def changeset(quote, attrs) do
-    quote
-    |> cast(attrs, [:quote_id, :payment_request, :expiry, :paid])
-    |> validate_required([:quote_id, :payment_request, :expiry, :paid])
+  def changeset(pending_invoice, attrs) do
+    pending_invoice
+    |> cast(attrs, [:amount, :payment_request])
+    |> validate_required([:amount, :payment_request])
   end
 
   def create!(repo, values) do
@@ -25,7 +23,7 @@ defmodule Cashubrew.Schema.MintQuote do
     |> changeset(values)
     |> repo.insert()
     |> case do
-      {:ok, mint_quote} -> mint_quote.id
+      {:ok, pending_invoice} -> pending_invoice.id
       {:error, changeset} -> raise "Failed to insert key: #{inspect(changeset.errors)}"
     end
   end

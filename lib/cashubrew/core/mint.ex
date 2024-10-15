@@ -8,14 +8,11 @@ defmodule Cashubrew.Mint do
   alias Cashubrew.Lightning.MockLightningNetworkService
   alias Cashubrew.Nuts.Nut00.{BDHKE, BlindSignature}
   alias Cashubrew.Nuts.Nut02
-  alias Cashubrew.Query.MeltTokens
 
   alias Cashubrew.Schema
 
   alias Cashubrew.Schema.{
     Key,
-    MeltQuote,
-    MeltTokens,
     MintConfiguration,
     MintQuote,
     UsedProof
@@ -49,21 +46,20 @@ defmodule Cashubrew.Mint do
 
   @impl true
   def init(_) do
-    {:ok, %{keysets: [], mint_pubkey: nil}, {:continue, :load_keysets_and_mint_key}}
+    {:ok, %{mint_pubkey: nil}, {:continue, :load_keysets_and_mint_key}}
   end
 
   @impl true
   @spec handle_continue(:load_keysets_and_mint_key, %{
-          :keysets => any(),
           :mint_pubkey => any(),
           optional(any()) => any()
-        }) :: {:noreply, %{:keysets => any(), :mint_pubkey => binary(), optional(any()) => any()}}
+        }) :: {:noreply, %{:mint_pubkey => binary(), optional(any()) => any()}}
   def handle_continue(:load_keysets_and_mint_key, state) do
     repo = Application.get_env(:cashubrew, :repo)
     seed = get_or_create_seed(repo)
-    keysets = load_or_create_keysets(repo, seed)
+    _keysets = load_or_create_keysets(repo, seed)
     {_, mint_pubkey} = get_or_create_mint_key(repo, seed)
-    {:noreply, %{state | keysets: keysets, mint_pubkey: mint_pubkey}}
+    {:noreply, %{state | mint_pubkey: mint_pubkey}}
   end
 
   defp get_or_create_seed(repo) do
@@ -152,35 +148,6 @@ defmodule Cashubrew.Mint do
     {:reply, state.mint_pubkey, state}
   end
 
-  def handle_call({:create_mint_quote, amount, description}, _from, state) do
-    repo = Application.get_env(:cashubrew, :repo)
-
-    case LightningNetworkService.create_invoice(amount, description) do
-      {:ok, payment_request, _payment_hash} ->
-        # 1 hour expiry
-        expiry = :os.system_time(:second) + 3600
-
-        attrs = %{
-          amount: amount,
-          payment_request: payment_request,
-          expiry: expiry,
-          description: description
-          # payment_hash: _payment_hash,
-        }
-
-        case repo.insert(MintQuote.changeset(%MintQuote{}, attrs)) do
-          {:ok, quote} ->
-            {:reply, {:ok, quote}, state}
-
-          {:error, changeset} ->
-            {:reply, {:error, changeset}, state}
-        end
-
-      {:error, reason} ->
-        {:reply, {:error, reason}, state}
-    end
-  end
-
   def handle_call({:get_mint_quote, quote_id}, _from, state) do
     repo = Application.get_env(:cashubrew, :repo)
     quote = repo.get(MintQuote, quote_id)
@@ -259,85 +226,7 @@ defmodule Cashubrew.Mint do
     {:ok, signatures}
   end
 
-  def handle_call({:create_melt_quote, request, unit}, _from, state) do
-    repo = Application.get_env(:cashubrew, :repo)
-    # # Check LN invoice and info
-    {:ok, invoice} = Bitcoinex.LightningNetwork.decode_invoice(request)
-    # To call the function and print the hash:
-    {:ok, request} = RandomHash.generate_hash()
-    # Used amount
-    # If :amount exists, returns its value; otherwise returns 1000
-    amount = Map.get(invoice, :amount_msat, 1000)
-
-    fee_reserve = 0
-    # Create and Saved melt quote
-    expiry = :os.system_time(:second) + 3600
-
-    attrs = %{
-      # quote_id
-      request: request,
-      unit: unit,
-      amount: amount,
-      fee_reserve: fee_reserve,
-      expiry: expiry,
-      request_lookup_id: request
-    }
-
-    case repo.insert(MeltQuote.changeset(%MeltQuote{}, attrs)) do
-      {:ok, melt_quote} ->
-        {:reply, {:ok, melt_quote}, state}
-
-      {:error, changeset} ->
-        {:reply, {:error, changeset}, state}
-    end
-  end
-
-  def handle_call({:create_melt_tokens, quote_id, _inputs}, _from, state) do
-    repo = Application.get_env(:cashubrew, :repo)
-
-    # TODO
-    # Verify quote_id
-
-    {:ok, melt_find} = Cashubrew.Query.MeltTokens.get_melt_by_quote_id!(quote_id)
-    IO.puts("melt_find: #{melt_find}")
-
-    # Check if quote is already paid or not
-
-    # Check total amount
-
-    # Check proofs
-
-    # Verify proof spent
-
-    fee_reserve = 0
-    # Create and Saved melt quote
-
-    attrs = %{
-      # quote_id
-      request: quote_id,
-      unit: quote_id,
-      amount: 0,
-      fee_reserve: 0,
-      expiry: 0,
-      request_lookup_id: quote_id
-    }
-
-    expiry = :os.system_time(:second) + 3600
-
-    case repo.insert(MeltTokens.changeset(%MeltTokens{}, attrs)) do
-      {:ok, melt_quote} ->
-        {:reply, {:ok, melt_quote}, state}
-
-      {:error, changeset} ->
-        {:reply, {:error, changeset}, state}
-    end
-  end
-
   # Public API
-
-  def get_keysets do
-    GenServer.call(__MODULE__, :get_keysets)
-  end
 
   def get_keys_for_keyset(repo, keyset_id) do
     repo.all(
@@ -364,12 +253,29 @@ defmodule Cashubrew.Mint do
     repo.all(Schema.Keyset)
   end
 
-  def get_keyset(repo, keyset_id) do
+  def get_keysets(repo, keyset_id) do
     repo.get(Schema.Keyset, keyset_id)
   end
 
-  def create_mint_quote(amount, description) do
-    GenServer.call(__MODULE__, {:create_mint_quote, amount, description})
+  def create_mint_quote(amount, unit) do
+    repo = Application.get_env(:cashubrew, :repo)
+
+    {payment_request, _payment_hash} = LightningNetworkService.create_invoice!(amount, unit)
+
+    invoice_id =
+      Schema.PendingInvoice.create!(repo, %{amount: amount, payment_request: payment_request})
+
+    # 1 hour expiry
+    expiry = :os.system_time(:second) + 3600
+
+    new_quote = %{
+      quote_id: invoice_id,
+      payment_request: payment_request,
+      expiry: expiry,
+      paid: false
+    }
+
+    Schema.MintQuote.create!(repo, new_quote)
   end
 
   def get_mint_quote(quote_id) do
@@ -378,14 +284,6 @@ defmodule Cashubrew.Mint do
 
   def mint_tokens(quote, blinded_messages) do
     GenServer.call(__MODULE__, {:mint_tokens, quote, blinded_messages})
-  end
-
-  def create_melt_quote(request, unit) do
-    GenServer.call(__MODULE__, {:create_melt_quote, request, unit})
-  end
-
-  def create_melt_tokens(quote_id, inputs) do
-    GenServer.call(__MODULE__, {:create_melt_tokens, quote_id, inputs})
   end
 
   def check_proofs_are_used?(repo, proofs) do
