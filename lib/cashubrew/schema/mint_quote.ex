@@ -9,15 +9,16 @@ defmodule Cashubrew.Schema.MintQuote do
   schema "mint_quotes" do
     field(:payment_request, :string)
     field(:expiry, :integer)
-    field(:paid, :boolean)
+    field(:state, :string, default: "UNPAID")
 
     timestamps()
   end
 
   def changeset(quote, attrs) do
     quote
-    |> cast(attrs, [:id, :payment_request, :expiry, :paid])
-    |> validate_required([:id, :payment_request, :expiry, :paid])
+    |> cast(attrs, [:id, :payment_request, :expiry, :state])
+    |> validate_required([:id, :payment_request, :expiry, :state])
+    |> validate_inclusion(:state, ["UNPAID", "PAID", "ISSUED"])
   end
 
   def create!(repo, values) do

@@ -47,7 +47,9 @@ defmodule Cashubrew.Web.MintController do
     end
   end
 
-  def swap(conn, %Nut03.Serde.PostSwapRequest{inputs: proofs, outputs: blinded_messages}) do
+  def swap(conn, params) do
+    %Nut03.Serde.PostSwapRequest{inputs: proofs, outputs: blinded_messages} = params["body"]
+
     signatures = Nut03.Impl.swap!(proofs, blinded_messages)
 
     json(conn, %Nut03.Serde.PostSwapResponse{signatures: signatures})
@@ -62,11 +64,13 @@ defmodule Cashubrew.Web.MintController do
     {:ok, blinded_messages}
   end
 
-  def create_mint_quote(conn, %Nut04.Serde.PostMintQuoteBolt11Request{
-        amount: amount,
-        unit: unit,
-        description: _description
-      }) do
+  def create_mint_quote(conn, params) do
+    %Nut04.Serde.PostMintQuoteBolt11Request{
+      amount: amount,
+      unit: unit,
+      description: _description
+    } = params["body"]
+
     try do
       res = Nut04.Impl.create_mint_quote(amount, unit)
       json(conn, struct(Nut04.Serde.PostMintBolt11Response, %{res | state: "UNPAID"}))
@@ -76,19 +80,11 @@ defmodule Cashubrew.Web.MintController do
   end
 
   def get_mint_quote(conn, %{"quote_id" => quote_id}) do
-    case Mint.get_mint_quote(quote_id) do
-      nil ->
-        conn
-        |> put_status(:not_found)
-        |> json(%{error: "Quote not found"})
-
-      quote ->
-        json(conn, %{
-          quote: quote.id,
-          request: quote.payment_request,
-          state: quote.state,
-          expiry: quote.expiry
-        })
+    try do
+      res = Nut04.Impl.get_mint_quote(quote_id)
+      json(conn, struct(Nut04.Serde.PostMintBolt11Response, res))
+    rescue
+      e in RuntimeError -> conn |> put_status(:bad_request) |> json(Nut00.Error.new_error(0, e))
     end
   end
 

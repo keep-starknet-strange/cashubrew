@@ -23,8 +23,8 @@ defmodule Cashubrew.Lightning.LightningNetworkService do
     end
   end
 
-  def invoice_paid?(payment_hash) do
-    case LNBitsApi.make_get("api/v1/payments/#{payment_hash}") do
+  def invoice_paid?(payment_request) do
+    case LNBitsApi.make_get("api/v1/payments/#{payment_request}") do
       {:ok, response_body} ->
         response_map = Jason.decode!(response_body)
         paid = response_map["paid"]
