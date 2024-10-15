@@ -5,6 +5,7 @@ defmodule Cashubrew.Schema.PendingInvoice do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @primary_key {:id, :binary_id, autogenerate: false}
   schema "pending_invoices" do
     field(:amount, :integer)
     field(:payment_request, :string)
@@ -14,8 +15,8 @@ defmodule Cashubrew.Schema.PendingInvoice do
 
   def changeset(pending_invoice, attrs) do
     pending_invoice
-    |> cast(attrs, [:amount, :payment_request])
-    |> validate_required([:amount, :payment_request])
+    |> cast(attrs, [:id, :amount, :payment_request])
+    |> validate_required([:id, :amount, :payment_request])
   end
 
   def create!(repo, values) do
@@ -23,7 +24,7 @@ defmodule Cashubrew.Schema.PendingInvoice do
     |> changeset(values)
     |> repo.insert()
     |> case do
-      {:ok, pending_invoice} -> pending_invoice.id
+      {:ok, _} -> nil
       {:error, changeset} -> raise "Failed to insert key: #{inspect(changeset.errors)}"
     end
   end

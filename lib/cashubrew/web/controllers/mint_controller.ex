@@ -5,6 +5,7 @@ defmodule Cashubrew.Web.MintController do
   alias Cashubrew.Nuts.Nut01
   alias Cashubrew.Nuts.Nut02
   alias Cashubrew.Nuts.Nut03
+  alias Cashubrew.Nuts.Nut04
   alias Cashubrew.Nuts.Nut06
 
   def info(conn, _params) do
@@ -61,24 +62,16 @@ defmodule Cashubrew.Web.MintController do
     {:ok, blinded_messages}
   end
 
-  def create_mint_quote(conn, %{"amount" => amount, "unit" => unit}) do
-    case Mint.create_mint_quote(amount, unit) do
-      {:ok, quote} ->
-        conn
-        |> put_status(:created)
-        |> json(%{
-          quote: quote.id,
-          request: quote.payment_request,
-          state: "UNPAID",
-          expiry: quote.expiry
-        })
-
-      # TODO: use proper error
-      # https://cashubtc.github.io/nuts/00/#errors
-      {:error, reason} ->
-        conn
-        |> put_status(:bad_request)
-        |> json(%{error: reason})
+  def create_mint_quote(conn, %Nut04.Serde.PostMintQuoteBolt11Request{
+        amount: amount,
+        unit: unit,
+        description: _description
+      }) do
+    try do
+      res = Nut04.Impl.create_mint_quote(amount, unit)
+      json(conn, struct(Nut04.Serde.PostMintBolt11Response, %{res | state: "UNPAID"}))
+    rescue
+      e in RuntimeError -> conn |> put_status(:bad_request) |> json(Nut00.Error.new_error(0, e))
     end
   end
 
