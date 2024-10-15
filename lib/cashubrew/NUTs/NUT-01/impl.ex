@@ -17,16 +17,4 @@ defmodule Cashubrew.Nuts.Nut01.Impl do
 
     keysets_with_keys
   end
-
-  def keys_for_keyset_id(id) do
-    repo = Application.get_env(:cashubrew, :repo)
-    keyset = Mint.get_keyset(repo, id)
-
-    if keyset do
-      keys = Mint.get_keys_for_keyset(repo, id)
-      %{id: keyset.id, unit: keyset.unit, keys: keys}
-    else
-      raise "KeysetDoesNotExist"
-    end
-  end
 end
