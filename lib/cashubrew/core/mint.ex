@@ -4,7 +4,6 @@ defmodule Cashubrew.Mint do
   """
 
   use GenServer
-  alias Cashubrew.Lightning.MockLightningNetworkService
   alias Cashubrew.Nuts.Nut00.{BDHKE, BlindSignature}
   alias Cashubrew.Nuts.Nut02
 
