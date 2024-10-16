@@ -279,9 +279,9 @@ defmodule Cashubrew.Mint do
     Logic to verify user-provided data
     """
     defmodule Outputs do
-    @moduledoc """
-    Logic to verify protocol "outputs" (blinded messages) 
-    """
+      @moduledoc """
+      Logic to verify protocol "outputs" (blinded messages) 
+      """
       alias Cashubrew.Nuts.Nut02
 
       # Will perform all the check required upon some user provided 'output'

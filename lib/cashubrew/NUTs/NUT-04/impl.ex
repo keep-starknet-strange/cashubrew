@@ -95,18 +95,18 @@ defmodule Cashubrew.Nuts.Nut04.Impl do
     # regardless of the mint being a success or a failure.
     """
     def check_and_acquire!(repo, quote_id) do
-        mint_quote = repo.get!(Schema.MintQuote, quote_id)
+      mint_quote = repo.get!(Schema.MintQuote, quote_id)
 
-        case mint_quote.state do
-          <<1>> -> nil
-          <<0>> -> raise "InvoiceHasNotBeenPaid"
-          <<2>> -> raise "QuoteHasAlreadyBeenIssued"
-          v when Bitwise.band(v, <<0x80>>) != 0 -> raise "QuoteIsAlreadyBeingProcessed"
-          _ -> raise "QuoteNotPaid"
-        end
+      case mint_quote.state do
+        <<1>> -> nil
+        <<0>> -> raise "InvoiceHasNotBeenPaid"
+        <<2>> -> raise "QuoteHasAlreadyBeenIssued"
+        v when Bitwise.band(v, <<0x80>>) != 0 -> raise "QuoteIsAlreadyBeingProcessed"
+        _ -> raise "QuoteNotPaid"
+      end
 
-        new_state = mint_quote.state && <<0x7F>>
-        new_value = Ecto.Changeset.change(mint_quote, state: new_state)
+      new_state = mint_quote.state && <<0x7F>>
+      new_value = Ecto.Changeset.change(mint_quote, state: new_state)
 
       case repo.update(new_value) do
         {:ok, _} -> mint_quote
@@ -115,11 +115,10 @@ defmodule Cashubrew.Nuts.Nut04.Impl do
     end
 
     def release!(repo, quote_id) do
-        case Schema.MintQuote.unset_pending(repo, quote_id) do
-          {:err, e} -> raise e
-          {:ok, _} -> nil
-        end
+      case Schema.MintQuote.unset_pending(repo, quote_id) do
+        {:err, e} -> raise e
+        {:ok, _} -> nil
+      end
     end
   end
-
 end
