@@ -5,7 +5,7 @@ defmodule Cashubrew.Nuts.Nut02.Keyset do
   alias Cashubrew.Nuts.Nut00.BDHKE
   import Bitwise
 
-  defp max_order do
+  def max_order do
     64
   end
 

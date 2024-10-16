@@ -18,8 +18,17 @@ defmodule Cashubrew.Nuts.Nut04.Serde.PostMintBolt11Request do
   @moduledoc """
   The body of the post mint request
   """
+  alias Cashubrew.Nuts.Nut00.BlindedMessage
+
   @enforce_keys [:quote, :outputs]
   defstruct [:quote, :outputs]
+
+  def from_map(map) do
+    %__MODULE__{
+      quote: Map.fetch!(map, "quote"),
+      outputs: BlindedMessage.from_list(Map.fetch!(map, "outputs"))
+    }
+  end
 end
 
 defmodule Cashubrew.Nuts.Nut04.Serde.PostMintBolt11Response do

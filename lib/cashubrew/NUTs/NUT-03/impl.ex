@@ -1,10 +1,9 @@
 defmodule Cashubrew.Nuts.Nut03.Impl do
-  alias Cashubrew.Nuts.Nut00
-
   @moduledoc """
   Implementation and structs of the NUT-03
   """
   alias Cashubrew.Mint
+  alias Cashubrew.Nuts.Nut00
 
   @spec swap!(Nut00.Proof, Nut00.BlindedMessage) :: Nut00.BlindSignature
   def swap!(proofs, blinded_messages) do

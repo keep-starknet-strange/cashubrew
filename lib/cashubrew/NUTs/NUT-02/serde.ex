@@ -1,4 +1,4 @@
-defmodule Cashubrew.Nuts.Nut01.Serde.Keyset do
+defmodule Cashubrew.Nuts.Nut02.Serde.Keyset do
   @moduledoc """
   A keyset
   """
@@ -24,7 +24,7 @@ defmodule Cashubrew.Nuts.Nut02.Serde.GetKeysetsResponse do
 
   def from_keysets(keysets) do
     keysets_responses =
-      Enum.map(keysets, fn keyset -> Cashubrew.Nuts.Nut01.Serde.Keyset.from_keyset(keyset) end)
+      Enum.map(keysets, fn keyset -> Cashubrew.Nuts.Nut02.Serde.Keyset.from_keyset(keyset) end)
 
     %__MODULE__{
       keysets: keysets_responses
