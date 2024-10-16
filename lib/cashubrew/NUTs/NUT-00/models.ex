@@ -27,6 +27,12 @@ defmodule Cashubrew.Nuts.Nut00.BlindedMessage do
       B_: Map.fetch!(map, "B_")
     }
   end
+
+  def from_list(list) do
+    Enum.map(list, fn elem ->
+      __MODULE__.from_map(elem)
+    end)
+  end
 end
 
 defmodule Cashubrew.Nuts.Nut00.BlindSignature do
@@ -73,5 +79,20 @@ defmodule Cashubrew.Nuts.Nut00.Proof do
   @spec new(non_neg_integer(), String.t(), String.t(), String.t()) :: t()
   def new(amount, id, secret, C) do
     %__MODULE__{amount: amount, id: id, secret: secret, C: C}
+  end
+
+  def from_map(map) do
+    %__MODULE__{
+      amount: Map.fetch!(map, "amount"),
+      id: Map.fetch!(map, "id"),
+      secret: Map.fetch!(map, "secret"),
+      C: Map.fetch!(map, "C")
+    }
+  end
+
+  def from_list(list) do
+    Enum.map(list, fn elem ->
+      __MODULE__.from_map(elem)
+    end)
   end
 end

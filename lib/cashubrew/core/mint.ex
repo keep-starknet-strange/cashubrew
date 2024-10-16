@@ -254,4 +254,90 @@ defmodule Cashubrew.Mint do
 
     repo.insert_all(UsedProof, used_proofs)
   end
+
+  def generate_promises(repo, keyset_id, verified_outputs) do
+    Enum.reduce(verified_outputs, [], fn output, acc ->
+      key = get_key_for_amount(repo, keyset_id, output.amount)
+      {c_prime, e, s} = BDHKE.step2_bob(output."B_", key.private_key)
+
+      [
+        %Schema.Promises{
+          b: output."B_",
+          keyset_id: keyset_id,
+          amount: output.amount,
+          c: c_prime,
+          e: e,
+          s: s
+        }
+        | acc
+      ]
+    end)
+  end
+
+  defmodule Verification do
+    @moduledoc """
+    Logic to verify user-provided data
+    """
+    defmodule Outputs do
+    @moduledoc """
+    Logic to verify protocol "outputs" (blinded messages) 
+    """
+      alias Cashubrew.Nuts.Nut02
+
+      # Will perform all the check required upon some user provided 'output'
+      def verify!(repo, outputs) do
+        inner_verify!(repo, outputs, nil, [], 0)
+      end
+
+      # Empty list
+      defp inner_verify!(_repo, [], nil, _seen_B, _total_amount) do
+        raise "EmptyListOfBlindMessages"
+      end
+
+      # First elem
+      defp inner_verify!(repo, [head | tail], nil, seen_B, total_amount) do
+        verify_blind_message!(repo, head)
+        inner_verify!(repo, tail, head.id, [head."B_" | seen_B], total_amount + head.amount)
+      end
+
+      # End of list
+      defp inner_verify!(repo, [], id, _seen_B, total_amount) do
+        keyset = repo.get!(Schema.Keyset, id)
+
+        if !keyset.active do
+          raise "InactiveKeyset"
+        end
+
+        {id, total_amount}
+      end
+
+      # Middle elems
+      defp inner_verify!(repo, [head | tail], id, seen_B, total_amount) do
+        if head.id != id do
+          raise "BlindMessagesBelongsToDifferentKeysetIds"
+        end
+
+        if Enum.member?(seen_B, head."B_") do
+          "DuplicateBlindMessageInList"
+        end
+
+        verify_blind_message!(repo, head)
+        inner_verify!(repo, tail, id, [head."B_" | seen_B], total_amount + head.amount)
+      end
+
+      defp verify_blind_message!(repo, blind_message) do
+        if blind_message.amount < 0 do
+          raise "BlindMessageAmountShoulBePositive"
+        end
+
+        if blind_message.amount > 2 ** Nut02.Keyset.max_order() do
+          raise "BlindMessageAmountNotExceed2^MaxOrder"
+        end
+
+        if repo.exists?(Schema.Promises, blind_message."B_") do
+          raise "BlindedSignatureAlreadyEmittedForThisMessage"
+        end
+      end
+    end
+  end
 end
