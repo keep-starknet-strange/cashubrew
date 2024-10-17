@@ -180,12 +180,7 @@ defmodule Cashubrew.Mint do
     end
   end
 
-  def create_blinded_signatures(blinded_messages) do
-    repo = Application.get_env(:cashubrew, :repo)
-    create_blinded_signatures(repo, blinded_messages)
-  end
-
-  defp create_blinded_signatures(repo, blinded_messages) do
+  def create_blinded_signatures(repo, blinded_messages) do
     signatures =
       Enum.map(blinded_messages, fn bm ->
         # Get key from database
@@ -272,72 +267,5 @@ defmodule Cashubrew.Mint do
         | acc
       ]
     end)
-  end
-
-  defmodule Verification do
-    @moduledoc """
-    Logic to verify user-provided data
-    """
-    defmodule Outputs do
-      @moduledoc """
-      Logic to verify protocol "outputs" (blinded messages) 
-      """
-      alias Cashubrew.Nuts.Nut02
-
-      # Will perform all the check required upon some user provided 'output'
-      def verify!(repo, outputs) do
-        inner_verify!(repo, outputs, nil, [], 0)
-      end
-
-      # Empty list
-      defp inner_verify!(_repo, [], nil, _seen_B, _total_amount) do
-        raise "EmptyListOfBlindMessages"
-      end
-
-      # First elem
-      defp inner_verify!(repo, [head | tail], nil, seen_B, total_amount) do
-        verify_blind_message!(repo, head)
-        inner_verify!(repo, tail, head.id, [head."B_" | seen_B], total_amount + head.amount)
-      end
-
-      # End of list
-      defp inner_verify!(repo, [], id, _seen_B, total_amount) do
-        keyset = repo.get!(Schema.Keyset, id)
-
-        if !keyset.active do
-          raise "InactiveKeyset"
-        end
-
-        {id, total_amount}
-      end
-
-      # Middle elems
-      defp inner_verify!(repo, [head | tail], id, seen_B, total_amount) do
-        if head.id != id do
-          raise "BlindMessagesBelongsToDifferentKeysetIds"
-        end
-
-        if Enum.member?(seen_B, head."B_") do
-          "DuplicateBlindMessageInList"
-        end
-
-        verify_blind_message!(repo, head)
-        inner_verify!(repo, tail, id, [head."B_" | seen_B], total_amount + head.amount)
-      end
-
-      defp verify_blind_message!(repo, blind_message) do
-        if blind_message.amount < 0 do
-          raise "BlindMessageAmountShoulBePositive"
-        end
-
-        if blind_message.amount > 2 ** Nut02.Keyset.max_order() do
-          raise "BlindMessageAmountNotExceed2^MaxOrder"
-        end
-
-        if repo.exists?(Schema.Promises, blind_message."B_") do
-          raise "BlindedSignatureAlreadyEmittedForThisMessage"
-        end
-      end
-    end
   end
 end

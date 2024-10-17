@@ -17,10 +17,11 @@ defmodule Cashubrew.Nuts.Nut03.Impl do
       raise "SwapHasDuplicateOutputs"
     end
 
+    {keyset_id, total_amount} = Mint.Verification.Outputs.verify!(repo, blinded_messages)
     total_amount_proofs = Enum.reduce(proofs, 0, fn p, acc -> acc + p.amount end)
 
     signatures =
-      case Mint.create_blinded_signatures(blinded_messages) do
+      case Mint.create_blinded_signatures(repo, blinded_messages) do
         {:ok, signatures} -> signatures
         {:error, reason} -> raise reason
       end
