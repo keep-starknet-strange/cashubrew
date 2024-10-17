@@ -58,13 +58,11 @@ defmodule Cashubrew.Nuts.Nut04.Impl do
     mint_quote = MintQuoteMutex.check_and_acquire!(repo, quote_id)
 
     try do
-      {keyset_id, total_amount} = Mint.Verification.Outputs.verify!(repo, blinded_messages)
+      {keyset, total_amount} = Mint.Verification.Outputs.verify!(repo, blinded_messages)
 
       if total_amount != mint_quote.amount do
         raise "TotalOutputAmountDoesNotEqualMintQuoteAmount"
       end
-
-      keyset = repo.get!(Schema.Keyset, keyset_id)
 
       if !keyset.active do
         raise "KeysetIsNotActive"
@@ -80,7 +78,7 @@ defmodule Cashubrew.Nuts.Nut04.Impl do
         raise "QuoteExpired"
       end
 
-      promises = Mint.generate_promises(repo, keyset_id, blinded_messages)
+      promises = Mint.generate_promises(repo, keyset.id, blinded_messages)
       repo.insert_all(Schema.Promises, promises)
     after
       MintQuoteMutex.release!(repo, quote_id)
