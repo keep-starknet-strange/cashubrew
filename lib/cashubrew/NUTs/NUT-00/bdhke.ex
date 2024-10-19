@@ -73,9 +73,8 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
     to_hash = msg_hash <> <<counter::little-32>>
     hash = :crypto.hash(:sha256, to_hash)
 
-    with {:ok, public_key} <- load_public_key(<<2>> <> hash) do
-      {:ok, public_key}
-    else
+    case load_public_key(<<2>> <> hash) do
+      {:ok, public_key} -> {:ok, public_key}
       _ -> find_valid_point(msg_hash, counter + 1)
     end
   end
@@ -122,8 +121,6 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
   def step3_alice(c_prime, r, a_pub) do
     with {:ok, r_a_pub} <- Secp256k1Utils.point_mul(a_pub, r) do
       Secp256k1Utils.point_sub(c_prime, r_a_pub)
-    else
-      error -> error
     end
   end
 

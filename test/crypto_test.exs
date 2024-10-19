@@ -60,8 +60,8 @@ defmodule CryptoTest do
       "0000000000000000000000000000000000000000000000000000000000000001"
       |> Base.decode16(case: :lower)
 
-    {:ok, big_A} = BDHKE.load_public_key(<<2>> <> hash)
-    {:ok, c} = BDHKE.step3_alice(c_, r, big_A)
+    {:ok, big_a} = BDHKE.load_public_key(<<2>> <> hash)
+    {:ok, c} = BDHKE.step3_alice(c_, r, big_a)
 
     assert c |> Base.encode16(case: :lower) ==
              "0271bf0d702dbad86cbe0af3ab2bfba70a0338f22728e412d88a830ed0580b9de4"
