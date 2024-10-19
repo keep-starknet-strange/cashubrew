@@ -12,9 +12,9 @@ defmodule Mix.Tasks.Bench do
     Mix.Task.run("app.start")
 
     # Setup before benchmark
-    {a, a_pub} = BDHKE.generate_keypair(<<1::256>>)
+    {:ok, {a, a_pub}} = BDHKE.generate_keypair(<<1::256>>)
     secret_msg = "test_message"
-    {r, _r_pub} = BDHKE.generate_keypair(<<1::256>>)
+    {:ok, {r, _r_pub}} = BDHKE.generate_keypair(<<1::256>>)
 
     if Code.ensure_loaded?(Benchee) do
       # Run the BDHKE benchmark
@@ -38,13 +38,13 @@ defmodule Mix.Tasks.Bench do
 
   def run_bdhke_flow(a, a_pub, secret_msg, r) do
     # STEP 1: Alice blinds the message
-    {b_prime, _} = BDHKE.step1_alice(secret_msg, r)
+    {:ok, {b_prime, _}} = BDHKE.step1_alice(secret_msg, r)
 
     # STEP 2: Bob signs the blinded message
-    {c_prime, _, _} = BDHKE.step2_bob(b_prime, a)
+    {:ok, {c_prime, _, _}} = BDHKE.step2_bob(b_prime, a)
 
     # STEP 3: Alice unblinds the signature
-    c = BDHKE.step3_alice(c_prime, r, a_pub)
+    {:ok, c} = BDHKE.step3_alice(c_prime, r, a_pub)
 
     # CAROL VERIFY: Carol verifies the unblinded signature
     carol_verification = BDHKE.verify(a, c, secret_msg)

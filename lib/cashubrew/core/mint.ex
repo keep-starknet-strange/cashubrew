@@ -132,7 +132,7 @@ defmodule Cashubrew.Mint do
 
   defp derive_mint_key(seed) do
     private_key = :crypto.hash(:sha256, seed)
-    {private_key, public_key} = BDHKE.generate_keypair(private_key)
+    {:ok, {private_key, public_key}} = BDHKE.generate_keypair(private_key)
     {private_key, public_key}
   end
 
@@ -188,7 +188,7 @@ defmodule Cashubrew.Mint do
         privkey = amount_key.private_key
         # Bob (mint) signs the blinded message
         b_prime = Base.decode16!(bm."B_", case: :lower)
-        {c_prime, _e, _s} = BDHKE.step2_bob(b_prime, privkey)
+        {:ok, {c_prime, _e, _s}} = BDHKE.step2_bob(b_prime, privkey)
 
         %BlindSignature{
           amount: bm.amount,
@@ -253,7 +253,7 @@ defmodule Cashubrew.Mint do
   def generate_promises(repo, keyset_id, verified_outputs) do
     Enum.reduce(verified_outputs, [], fn output, acc ->
       key = get_key_for_amount(repo, keyset_id, output.amount)
-      {c_prime, e, s} = BDHKE.step2_bob(output."B_", key.private_key)
+      {:ok, {c_prime, e, s}} = BDHKE.step2_bob(output."B_", key.private_key)
 
       [
         %Schema.Promises{
