@@ -2,13 +2,13 @@ defmodule Cashubrew.Nuts.Nut06.Info do
   @moduledoc """
   Implementation and structs of the NUT-06
   """
-  alias Cashubrew.Mint
   alias Cashubrew.Nuts.Nut00
   alias Cashubrew.Nuts.Nut01
   alias Cashubrew.Nuts.Nut02
   alias Cashubrew.Nuts.Nut03
   alias Cashubrew.Nuts.Nut04
 
+  @derive [Jason.Encoder]
   defstruct [
     :name,
     :pubkey,
@@ -27,13 +27,14 @@ defmodule Cashubrew.Nuts.Nut06.Info do
     A Contact info
     """
     @enforce_keys [:method, :info]
+    @derive [Jason.Encoder]
     defstruct [:method, :info]
   end
 
   def info do
     info = %__MODULE__{
       name: "Cashubrew Cashu Mint",
-      pubkey: Base.encode16(Mint.get_pubkey(), case: :lower),
+      pubkey: Base.encode16(<<00, 01, 02, 03>>, case: :lower),
       version: "Cashubrew/0.1.0",
       description: "An Elixir implementation of Cashu Mint",
       description_long: nil,

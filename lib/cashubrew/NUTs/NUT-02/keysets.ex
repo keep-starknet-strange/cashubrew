@@ -10,7 +10,7 @@ defmodule Cashubrew.Nuts.Nut02.Keyset do
   end
 
   defp keyset_id_version do
-    <<0>>
+    "00"
   end
 
   @doc """

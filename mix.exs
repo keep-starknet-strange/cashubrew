@@ -6,6 +6,7 @@ defmodule Cashubrew.MixProject do
       app: :cashubrew,
       version: "0.0.1",
       elixir: "~> 1.14",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases(),
@@ -19,6 +20,10 @@ defmodule Cashubrew.MixProject do
       ]
     ]
   end
+
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   def application do
     [
