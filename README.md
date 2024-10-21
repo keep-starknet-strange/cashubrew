@@ -282,6 +282,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/MSghais"><img src="https://avatars.githubusercontent.com/u/59928086?v=4?s=100" width="100px;" alt="MSG"/><br /><sub><b>MSG</b></sub></a><br /><a href="https://github.com/keep-starknet-strange/cashubrew/commits?author=MSghais" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/tdelabro"><img src="https://avatars.githubusercontent.com/u/34384633?v=4?s=100" width="100px;" alt="Timothée Delabrouille"/><br /><sub><b>Timothée Delabrouille</b></sub></a><br /><a href="https://github.com/keep-starknet-strange/cashubrew/commits?author=tdelabro" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/alkhulaifi"><img src="https://avatars.githubusercontent.com/u/434157?v=4?s=100" width="100px;" alt="Abdullah Al-Khulaifi"/><br /><sub><b>Abdullah Al-Khulaifi</b></sub></a><br /><a href="https://github.com/keep-starknet-strange/cashubrew/commits?author=alkhulaifi" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/green-john"><img src="https://avatars.githubusercontent.com/u/896768?v=4?s=100" width="100px;" alt="John Yellow"/><br /><sub><b>John Yellow</b></sub></a><br /><a href="https://github.com/keep-starknet-strange/cashubrew/commits?author=green-john" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
