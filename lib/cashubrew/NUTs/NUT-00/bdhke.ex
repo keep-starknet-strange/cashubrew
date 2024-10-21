@@ -13,9 +13,6 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
   alias Cashubrew.Crypto.Secp256k1Utils
   alias ExSecp256k1
 
-  # Cashu parameters
-  @domain_separator "Secp256k1_HashToCurve_Cashu_"
-
   # secp256k1 parameters
   defp secp256k1_n do
     0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141
@@ -63,23 +60,26 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
   /// never happen in practice).
   """
   def hash_to_curve(message) do
-    :crypto.hash(:sha256, @domain_separator <> message)
+    :crypto.hash(:sha256, "Secp256k1_HashToCurve_Cashu_" <> message)
     |> find_valid_point()
   end
 
   defp find_valid_point(msg_hash, counter \\ 0)
 
-  defp find_valid_point(msg_hash, counter) when counter < 65_536 do
+  defp find_valid_point(msg_hash, counter) when counter < 0x10000 do
     to_hash = msg_hash <> <<counter::little-32>>
     hash = :crypto.hash(:sha256, to_hash)
 
     case load_public_key(<<2>> <> hash) do
-      {:ok, public_key} -> {:ok, public_key}
+      {:ok, public_key} -> public_key
       _ -> find_valid_point(msg_hash, counter + 1)
     end
   end
 
-  defp find_valid_point(_, _), do: {:error, "No valid point found"}
+  # Not supposed to ever happen
+  defp find_valid_point(_, _) do
+    raise("No valid point found")
+  end
 
   @doc """
   Alice's step 1: Blind the message.
@@ -88,14 +88,15 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
   Alice sends to Bob: B_ = Y + rG with r being a random blinding factor (blinding).
   This operation is called blinding.
   """
-  def step1_alice(secret_msg, blinding_factor \\ nil) do
-    {:ok, y} = hash_to_curve(secret_msg)
-    r = blinding_factor || generate_private_key() |> elem(1)
-    {:ok, r_pub} = ExSecp256k1.create_public_key(r)
-    {:ok, r_pub_compressed} = ExSecp256k1.public_key_compress(r_pub)
-    # B_ = Y + rG
-    {:ok, b_prime} = Secp256k1Utils.point_add(y, r_pub_compressed)
-    {:ok, {b_prime, r}}
+  def step1_alice(secret_msg, r) do
+    y = hash_to_curve(secret_msg)
+
+    with {:ok, r_pub} <- ExSecp256k1.create_public_key(r),
+         {:ok, r_pub_compressed} <- ExSecp256k1.public_key_compress(r_pub),
+         {:ok, b_prime} <- Secp256k1Utils.point_add(y, r_pub_compressed) do
+      # B_ = Y + rG
+      {:ok, {b_prime, r}}
+    end
   end
 
   @doc """
@@ -107,9 +108,6 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
     with {:ok, c_prime} <- Secp256k1Utils.point_mul(b_prime, a),
          {:ok, {e, s}} <- step2_bob_dleq(b_prime, a) do
       {:ok, {c_prime, e, s}}
-    else
-      error ->
-        error
     end
   end
 
@@ -129,14 +127,12 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
   Carol is the receiving user.
   This operation is called verification.
   """
-  def verify(a, c, secret_msg) do
-    {:ok, y} = hash_to_curve(secret_msg)
+  def verify?(a, c, secret_msg) do
+    y = hash_to_curve(secret_msg)
 
-    with {:ok, a_y} <- Secp256k1Utils.point_mul(y, a),
-         true <- Secp256k1Utils.point_equal?(c, a_y) do
-      true
-    else
-      _ -> false
+    case Secp256k1Utils.point_mul(y, a) do
+      {:ok, a_y} -> Secp256k1Utils.point_equal?(c, a_y)
+      {:err, _} -> false
     end
   end
 
@@ -145,35 +141,34 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
   """
   def step2_bob_dleq(b_prime, a, p \\ nil) do
     p = p || :crypto.strong_rand_bytes(32)
-    {:ok, r1} = ExSecp256k1.create_public_key(p)
-    {:ok, r1_compressed} = ExSecp256k1.public_key_compress(r1)
-    {:ok, r2} = Secp256k1Utils.point_mul(b_prime, p)
-    {:ok, a_pub} = ExSecp256k1.create_public_key(a)
-    {:ok, a_pub_compressed} = ExSecp256k1.public_key_compress(a_pub)
-    {:ok, c_prime} = Secp256k1Utils.point_mul(b_prime, a)
 
-    e = hash_e(r1_compressed, r2, a_pub_compressed, c_prime)
-    e_scalar = :binary.decode_unsigned(e)
-    a_times_e = Secp256k1Utils.mod_mul(:binary.decode_unsigned(a), e_scalar, secp256k1_n())
-    s = Secp256k1Utils.mod_add(:binary.decode_unsigned(p), a_times_e, secp256k1_n())
-    s_bin = :binary.encode_unsigned(s) |> Secp256k1Utils.pad_left(32)
-    {:ok, {e, s_bin}}
+    with {:ok, r1} <- ExSecp256k1.create_public_key(p),
+         {:ok, r1_compressed} <- ExSecp256k1.public_key_compress(r1),
+         {:ok, r2} <- Secp256k1Utils.point_mul(b_prime, p),
+         {:ok, a_pub} <- ExSecp256k1.create_public_key(a),
+         {:ok, a_pub_compressed} <- ExSecp256k1.public_key_compress(a_pub),
+         {:ok, c_prime} <- Secp256k1Utils.point_mul(b_prime, a) do
+      e = hash_e(r1_compressed, r2, a_pub_compressed, c_prime)
+      e_scalar = :binary.decode_unsigned(e)
+      a_times_e = Secp256k1Utils.mod_mul(:binary.decode_unsigned(a), e_scalar, secp256k1_n())
+      s = Secp256k1Utils.mod_add(:binary.decode_unsigned(p), a_times_e, secp256k1_n())
+      s_bin = :binary.encode_unsigned(s) |> Secp256k1Utils.pad_left(32)
+      {:ok, {e, s_bin}}
+    end
   end
 
   @doc """
   Alice verifies DLEQ proof
   """
-  def alice_verify_dleq(b_prime, c_prime, e, s, a_pub) do
+  def alice_verify_dleq?(b_prime, c_prime, e, s, a_pub) do
     with {:ok, s_g} <- ExSecp256k1.create_public_key(s),
          {:ok, s_g_compressed} <- ExSecp256k1.public_key_compress(s_g),
          {:ok, e_a} <- Secp256k1Utils.point_mul(a_pub, e),
          {:ok, r1} <- Secp256k1Utils.point_sub(s_g_compressed, e_a),
          {:ok, s_b_prime} <- Secp256k1Utils.point_mul(b_prime, s),
          {:ok, e_c_prime} <- Secp256k1Utils.point_mul(c_prime, e),
-         {:ok, r2} <- Secp256k1Utils.point_sub(s_b_prime, e_c_prime),
-         computed_e <- hash_e(r1, r2, a_pub, c_prime),
-         true <- computed_e == e do
-      true
+         {:ok, r2} <- Secp256k1Utils.point_sub(s_b_prime, e_c_prime) do
+      hash_e(r1, r2, a_pub, c_prime) == e
     else
       _ -> false
     end
@@ -182,16 +177,15 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
   @doc """
   Carol verifies DLEQ proof
   """
-  def carol_verify_dleq(secret_msg, r, c, e, s, a_pub) do
-    {:ok, y} = hash_to_curve(secret_msg)
+  def carol_verify_dleq?(secret_msg, r, c, e, s, a_pub) do
+    y = hash_to_curve(secret_msg)
 
     with {:ok, r_pub} <- ExSecp256k1.create_public_key(r),
          {:ok, r_pub_compressed} <- ExSecp256k1.public_key_compress(r_pub),
          {:ok, r_a_pub} <- Secp256k1Utils.point_mul(a_pub, r),
          {:ok, c_prime} <- Secp256k1Utils.point_add(c, r_a_pub),
-         {:ok, b_prime} <- Secp256k1Utils.point_add(y, r_pub_compressed),
-         true <- alice_verify_dleq(b_prime, c_prime, e, s, a_pub) do
-      true
+         {:ok, b_prime} <- Secp256k1Utils.point_add(y, r_pub_compressed) do
+      alice_verify_dleq?(b_prime, c_prime, e, s, a_pub)
     else
       _ -> false
     end

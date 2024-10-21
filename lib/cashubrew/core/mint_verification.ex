@@ -71,7 +71,7 @@ defmodule Cashubrew.Mint.Verification.Inputs do
 
     key = Mint.get_key_for_amount(repo, head.id, head.amount)
 
-    if !BDHKE.verify(key, head."C", head.secret) do
+    if !BDHKE.verify?(key, head."C", head.secret) do
       raise "InvalidProof"
     end
 
