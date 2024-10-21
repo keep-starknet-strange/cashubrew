@@ -7,7 +7,6 @@ config :cashubrew, Cashubrew.Web.Endpoint,
   secret_key_base: "your_secret_key_base_for_tests",
   server: false
 
-# Print only warnings and errors during test
 config :logger, level: :warning
 
 # Initialize plugs at runtime for faster test compilation
