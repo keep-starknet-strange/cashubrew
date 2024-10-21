@@ -47,7 +47,7 @@ defmodule Mix.Tasks.Bench do
     {:ok, c} = BDHKE.step3_alice(c_prime, r, a_pub)
 
     # CAROL VERIFY: Carol verifies the unblinded signature
-    carol_verification = BDHKE.verify(a, c, secret_msg)
+    carol_verification = BDHKE.verify?(a, c, secret_msg)
 
     if carol_verification do
       :ok

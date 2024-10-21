@@ -164,7 +164,7 @@ defmodule CryptoTest do
       "02a9acc1e48c25eeeb9289b5031cc57da9fe72f3fe2861d264bdc074209b107ba2"
       |> Base.decode16(case: :lower)
 
-    assert BDHKE.alice_verify_dleq(b_, c_, e, s, a_public_key)
+    assert BDHKE.alice_verify_dleq?(b_, c_, e, s, a_public_key)
   end
 
   test "Alice direct verify DLEQ" do
@@ -178,7 +178,7 @@ defmodule CryptoTest do
     {:ok, {b_, _}} = BDHKE.step1_alice(secret_msg, blinding_factor)
 
     {:ok, {c_, e, s}} = BDHKE.step2_bob(b_, a)
-    assert BDHKE.alice_verify_dleq(b_, c_, e, s, a_public_key)
+    assert BDHKE.alice_verify_dleq?(b_, c_, e, s, a_public_key)
   end
 
   test "Carol verify from Bob" do
@@ -197,11 +197,11 @@ defmodule CryptoTest do
 
     {:ok, {b_, _}} = BDHKE.step1_alice(secret_msg, r)
     {:ok, {c_, e, s}} = BDHKE.step2_bob(b_, a)
-    assert BDHKE.alice_verify_dleq(b_, c_, e, s, a_public_key)
+    assert BDHKE.alice_verify_dleq?(b_, c_, e, s, a_public_key)
 
     {:ok, c} = BDHKE.step3_alice(c_, r, a_public_key)
 
     # carol does not know B_ and C_, but she receives C and r from Alice
-    assert BDHKE.carol_verify_dleq(secret_msg = secret_msg, r, c, e, s, a_public_key)
+    assert BDHKE.carol_verify_dleq?(secret_msg = secret_msg, r, c, e, s, a_public_key)
   end
 end

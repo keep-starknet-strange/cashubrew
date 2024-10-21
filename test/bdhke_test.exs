@@ -54,7 +54,7 @@ defmodule BDHKETest do
     # ALICE VERIFY: Alice verifies the DLEQ proof
     Logger.info("\n***********************************************************")
     Logger.info("ALICE VERIFY: Alice verifies the DLEQ proof")
-    alice_verification = BDHKE.alice_verify_dleq(b_prime, c_prime, e, s, a_pub)
+    alice_verification = BDHKE.alice_verify_dleq?(b_prime, c_prime, e, s, a_pub)
     assert alice_verification, "Alice's DLEQ verification failed"
     Logger.info("Alice successfully verified the DLEQ proof")
     Logger.info("***********************************************************\n")
@@ -69,7 +69,7 @@ defmodule BDHKETest do
     # CAROL VERIFY: Carol verifies the unblinded signature
     Logger.info("\n***********************************************************")
     Logger.info("CAROL VERIFY: Carol verifies the unblinded signature")
-    carol_verification = BDHKE.carol_verify_dleq(secret_msg, r, c, e, s, a_pub)
+    carol_verification = BDHKE.carol_verify_dleq?(secret_msg, r, c, e, s, a_pub)
     assert carol_verification, "Carol's DLEQ verification failed"
     Logger.info("Carol successfully verified the unblinded signature")
     Logger.info("***********************************************************\n")
