@@ -4,6 +4,7 @@ defmodule Cashubrew.Nuts.Nut04.Info do
   """
 
   @enforce_keys [:method, :unit]
+  @derive [Jason.Encoder]
   defstruct [:method, :unit, :min_amount, :max_amount, :description]
 
   @doc """
