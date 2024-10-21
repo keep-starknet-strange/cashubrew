@@ -4,6 +4,7 @@ defmodule Cashubrew.Nuts.Nut01.Serde.GetKeysResponse do
   """
   @derive Jason.Encoder
   @enforce_keys [:keysets]
+  @derive [Jason.Encoder]
   defstruct [:keysets]
 
   def from_keysets(keysets) do
@@ -60,6 +61,7 @@ defmodule Cashubrew.Nuts.Nut01.Serde.Keyset do
   """
   @derive Jason.Encoder
   @enforce_keys [:id, :unit, :keys]
+  @derive [Jason.Encoder]
   defstruct [:id, :unit, :keys]
 
   def from_keyset(id, unit, keys) do

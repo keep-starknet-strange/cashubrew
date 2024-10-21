@@ -1,4 +1,4 @@
-defmodule Cashubrew.Nuts.Nut02.Keyset do
+defmodule Cashubrew.Nuts.Nut02.Keysets do
   @moduledoc """
   Contains the logic required for the Mint to generate keys and keysets
   """

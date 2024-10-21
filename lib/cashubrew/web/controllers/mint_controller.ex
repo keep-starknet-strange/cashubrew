@@ -15,9 +15,7 @@ defmodule Cashubrew.Web.MintController do
 
   def keysets(conn, _params) do
     keysets = Nut02.Impl.keysets()
-    json(conn, Nut02.Serde.GetKeysetsResponse.from_keysets(keysets))
-  rescue
-    e in RuntimeError -> conn |> put_status(:bad_request) |> json(Nut00.Error.new_error(0, e))
+    json(conn, Nut02.GetKeysetsResponse.from_keysets(keysets))
   end
 
   def keys(conn, _params) do

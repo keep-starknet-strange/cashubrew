@@ -4,7 +4,6 @@ defmodule Cashubrew.Schema.Keyset do
   """
   use Ecto.Schema
   import Ecto.Changeset
-  alias Cashubrew.Nuts.Nut02
   alias Cashubrew.Schema
 
   @primary_key {:id, :string, autogenerate: false}
@@ -22,7 +21,7 @@ defmodule Cashubrew.Schema.Keyset do
   end
 
   def register_keyset(keys, unit, input_fee_ppk) do
-    id = Nut02.Keyset.derive_keyset_id(keys)
+    id = Cashubrew.Nuts.Nut02.Keysets.derive_keyset_id(keys)
 
     keyset = %__MODULE__{
       id: id,

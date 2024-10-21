@@ -85,7 +85,7 @@ defmodule Cashubrew.Mint do
   defp load_or_create_keysets(repo, seed) do
     case repo.all(Schema.Keyset) do
       [] ->
-        keys = Nut02.Keyset.generate_keys(seed, keyset_generation_derivation_path())
+        keys = Nut02.Keysets.generate_keys(seed, keyset_generation_derivation_path())
 
         keyset =
           Schema.Keyset.register_keyset(
