@@ -13,7 +13,7 @@ defmodule BDHKETest do
     # INIT: Setting up Alice's keys
     Logger.info("\n***********************************************************")
     Logger.info("INIT: Setting up Alice's keys")
-    {a, a_pub} = BDHKE.generate_keypair(<<1::256>>)
+    {:ok, {a, a_pub}} = BDHKE.generate_keypair(<<1::256>>)
     Logger.info("Alice's private key (a): #{Base.encode16(a, case: :lower)}")
     Logger.info("Alice's public key (A): #{Base.encode16(a_pub, case: :lower)}")
 
@@ -26,7 +26,7 @@ defmodule BDHKETest do
     Logger.info("\n***********************************************************")
     Logger.info("PREPARE: Preparing secret message and blinding factor")
     secret_msg = "test_message"
-    {r, r_pub} = BDHKE.generate_keypair(<<1::256>>)
+    {:ok, {r, r_pub}} = BDHKE.generate_keypair(<<1::256>>)
     Logger.info("Secret message: #{secret_msg}")
     Logger.info("r private key: #{Base.encode16(r, case: :lower)}")
     Logger.info("Blinding factor (r): #{Base.encode16(r_pub, case: :lower)}")
@@ -35,7 +35,7 @@ defmodule BDHKETest do
     # STEP 1: Alice blinds the message
     Logger.info("\n***********************************************************")
     Logger.info("STEP 1: Alice blinds the message")
-    {b_prime, _} = BDHKE.step1_alice(secret_msg, r)
+    {:ok, {b_prime, _}} = BDHKE.step1_alice(secret_msg, r)
     Logger.info("Blinded message (B_): #{Base.encode16(b_prime, case: :lower)}")
     {x, y} = Secp256k1Utils.pubkey_to_xy(b_prime)
     Logger.info("S1_Blinded_message_x: #{:binary.decode_unsigned(x)}")
@@ -45,7 +45,7 @@ defmodule BDHKETest do
     # STEP 2: Bob signs the blinded message
     Logger.info("\n***********************************************************")
     Logger.info("STEP 2: Bob signs the blinded message")
-    {c_prime, e, s} = BDHKE.step2_bob(b_prime, a)
+    {:ok, {c_prime, e, s}} = BDHKE.step2_bob(b_prime, a)
     Logger.info("Blinded signature (C_): #{inspect(c_prime)}")
     Logger.info("DLEQ proof - e: #{inspect(e)}")
     Logger.info("DLEQ proof - s: #{inspect(s)}")
@@ -62,7 +62,7 @@ defmodule BDHKETest do
     # STEP 3: Alice unblinds the signature
     Logger.info("\n***********************************************************")
     Logger.info("STEP 3: Alice unblinds the signature")
-    c = BDHKE.step3_alice(c_prime, r, a_pub)
+    {:ok, c} = BDHKE.step3_alice(c_prime, r, a_pub)
     Logger.info("Unblinded signature (C): #{Base.encode16(c, case: :lower)}")
     Logger.info("***********************************************************\n")
 

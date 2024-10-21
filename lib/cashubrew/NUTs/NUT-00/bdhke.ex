@@ -14,9 +14,7 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
   alias ExSecp256k1
 
   # Cashu parameters
-  defp domain_separator do
-    "Secp256k1_HashToCurve_Cashu_"
-  end
+  @domain_separator "Secp256k1_HashToCurve_Cashu_"
 
   # secp256k1 parameters
   defp secp256k1_n do
@@ -28,17 +26,31 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
   Takes private key as input or generates a new one if not provided.
   """
   def generate_keypair(private_key \\ nil) do
-    private_key =
-      case private_key do
-        nil -> :crypto.strong_rand_bytes(32)
-        <<0, key::binary-size(32)>> -> key
-        <<key::binary-size(32)>> -> key
-        _ -> raise "Invalid private key format"
-      end
+    with {:ok, private_key} <- generate_private_key(private_key),
+         {:ok, public_key} <- generate_public_key(private_key) do
+      {:ok, {private_key, public_key}}
+    end
+  end
 
-    {:ok, public_key} = ExSecp256k1.create_public_key(private_key)
-    {:ok, compressed_public_key} = ExSecp256k1.public_key_compress(public_key)
-    {private_key, compressed_public_key}
+  def generate_private_key(private_key \\ nil) do
+    case private_key do
+      nil -> {:ok, :crypto.strong_rand_bytes(32)}
+      <<0, key::binary-size(32)>> -> {:ok, key}
+      <<key::binary-size(32)>> -> {:ok, key}
+      _ -> {:error, "Invalid private key format"}
+    end
+  end
+
+  def generate_public_key(private_key) do
+    with {:ok, public_key} <- ExSecp256k1.create_public_key(private_key) do
+      ExSecp256k1.public_key_compress(public_key)
+    end
+  end
+
+  def load_public_key(hash) do
+    with {:ok, public_key} <- ExSecp256k1.public_key_decompress(hash) do
+      ExSecp256k1.public_key_compress(public_key)
+    end
   end
 
   @doc """
@@ -51,25 +63,23 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
   /// never happen in practice).
   """
   def hash_to_curve(message) do
-    msg_hash = :crypto.hash(:sha256, domain_separator() <> message)
-    hash_to_curve_loop(msg_hash, 0)
+    :crypto.hash(:sha256, @domain_separator <> message)
+    |> find_valid_point()
   end
 
-  defp hash_to_curve_loop(msg_hash, counter) when counter < 65_536 do
+  defp find_valid_point(msg_hash, counter \\ 0)
+
+  defp find_valid_point(msg_hash, counter) when counter < 65_536 do
     to_hash = msg_hash <> <<counter::little-32>>
     hash = :crypto.hash(:sha256, to_hash)
 
-    case ExSecp256k1.create_public_key(hash) do
-      {:ok, public_key} ->
-        {:ok, compressed_key} = ExSecp256k1.public_key_compress(public_key)
-        compressed_key
-
-      _ ->
-        hash_to_curve_loop(msg_hash, counter + 1)
+    case load_public_key(<<2>> <> hash) do
+      {:ok, public_key} -> {:ok, public_key}
+      _ -> find_valid_point(msg_hash, counter + 1)
     end
   end
 
-  defp hash_to_curve_loop(_, _), do: raise("No valid point found")
+  defp find_valid_point(_, _), do: {:error, "No valid point found"}
 
   @doc """
   Alice's step 1: Blind the message.
@@ -79,13 +89,13 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
   This operation is called blinding.
   """
   def step1_alice(secret_msg, blinding_factor \\ nil) do
-    y = hash_to_curve(secret_msg)
-    r = blinding_factor || generate_keypair() |> elem(0)
+    {:ok, y} = hash_to_curve(secret_msg)
+    r = blinding_factor || generate_private_key() |> elem(1)
     {:ok, r_pub} = ExSecp256k1.create_public_key(r)
     {:ok, r_pub_compressed} = ExSecp256k1.public_key_compress(r_pub)
     # B_ = Y + rG
     {:ok, b_prime} = Secp256k1Utils.point_add(y, r_pub_compressed)
-    {b_prime, r}
+    {:ok, {b_prime, r}}
   end
 
   @doc """
@@ -95,8 +105,8 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
   """
   def step2_bob(b_prime, a) do
     with {:ok, c_prime} <- Secp256k1Utils.point_mul(b_prime, a),
-         {e, s} <- step2_bob_dleq(b_prime, a) do
-      {c_prime, e, s}
+         {:ok, {e, s}} <- step2_bob_dleq(b_prime, a) do
+      {:ok, {c_prime, e, s}}
     else
       error ->
         error
@@ -109,11 +119,8 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
   This operation is called unblinding.
   """
   def step3_alice(c_prime, r, a_pub) do
-    with {:ok, r_a_pub} <- Secp256k1Utils.point_mul(a_pub, r),
-         {:ok, c} <- Secp256k1Utils.point_sub(c_prime, r_a_pub) do
-      c
-    else
-      error -> error
+    with {:ok, r_a_pub} <- Secp256k1Utils.point_mul(a_pub, r) do
+      Secp256k1Utils.point_sub(c_prime, r_a_pub)
     end
   end
 
@@ -123,7 +130,7 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
   This operation is called verification.
   """
   def verify(a, c, secret_msg) do
-    y = hash_to_curve(secret_msg)
+    {:ok, y} = hash_to_curve(secret_msg)
 
     with {:ok, a_y} <- Secp256k1Utils.point_mul(y, a),
          true <- Secp256k1Utils.point_equal?(c, a_y) do
@@ -150,7 +157,7 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
     a_times_e = Secp256k1Utils.mod_mul(:binary.decode_unsigned(a), e_scalar, secp256k1_n())
     s = Secp256k1Utils.mod_add(:binary.decode_unsigned(p), a_times_e, secp256k1_n())
     s_bin = :binary.encode_unsigned(s) |> Secp256k1Utils.pad_left(32)
-    {e, s_bin}
+    {:ok, {e, s_bin}}
   end
 
   @doc """
@@ -176,7 +183,7 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
   Carol verifies DLEQ proof
   """
   def carol_verify_dleq(secret_msg, r, c, e, s, a_pub) do
-    y = hash_to_curve(secret_msg)
+    {:ok, y} = hash_to_curve(secret_msg)
 
     with {:ok, r_pub} <- ExSecp256k1.create_public_key(r),
          {:ok, r_pub_compressed} <- ExSecp256k1.public_key_compress(r_pub),
@@ -199,7 +206,7 @@ defmodule Cashubrew.Nuts.Nut00.BDHKE do
     data =
       Enum.map_join(keys, "", fn key ->
         {:ok, uncompressed} = ExSecp256k1.public_key_decompress(key)
-        uncompressed
+        uncompressed |> Base.encode16(case: :lower)
       end)
 
     :crypto.hash(:sha256, data)

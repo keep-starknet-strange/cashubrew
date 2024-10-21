@@ -42,7 +42,7 @@ defmodule Cashubrew.Nuts.Nut02.Keyset do
       private_key = BlockKeys.Encoding.decode_extended_key(child_key)
       private_key_bytes = :binary.part(private_key.key, 1, 32)
 
-      {_, public_key} = BDHKE.generate_keypair(private_key_bytes)
+      {:ok, {_, public_key}} = BDHKE.generate_keypair(private_key_bytes)
 
       %{
         amount: amount,

@@ -37,7 +37,7 @@ defmodule Cashubrew.Wallet do
   end
 
   def generate_wallet do
-    {private_key, public_key} = BDHKE.generate_keypair()
+    {:ok, {private_key, public_key}} = BDHKE.generate_keypair()
 
     wallet = %WalletStruct{
       private_key: Base.encode16(private_key, case: :lower),

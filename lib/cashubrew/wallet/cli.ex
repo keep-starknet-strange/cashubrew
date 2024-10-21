@@ -77,12 +77,12 @@ defmodule Cashubrew.Wallet.CLI do
     with {:ok, keyset_id} <- get_active_keyset_id() do
       amounts = split_amount(amount)
       secrets = Enum.map(amounts, fn _ -> :crypto.strong_rand_bytes(32) end)
-      rs = Enum.map(amounts, fn _ -> BDHKE.generate_keypair() end)
+      rs = Enum.map(amounts, fn _ -> BDHKE.generate_keypair() |> elem(1) end)
 
       blinded_messages =
         Enum.zip([amounts, secrets, rs])
         |> Enum.map(fn {amt, secret, {r_priv, _r_pub}} ->
-          {b_prime, _r} = BDHKE.step1_alice(secret, r_priv)
+          {:ok, {b_prime, _r}} = BDHKE.step1_alice(secret, r_priv)
 
           %BlindedMessage{
             amount: amt,
@@ -150,7 +150,7 @@ defmodule Cashubrew.Wallet.CLI do
     Enum.zip([signatures, secrets, rs])
     |> Enum.map(fn {signature, secret, {r_priv, _r_pub}} ->
       c_prime = Base.decode16!(signature["C_"], case: :lower)
-      c = BDHKE.step3_alice(c_prime, r_priv, a_pub)
+      {:ok, c} = BDHKE.step3_alice(c_prime, r_priv, a_pub)
 
       %Proof{
         amount: signature["amount"],
