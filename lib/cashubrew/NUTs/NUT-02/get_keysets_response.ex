@@ -7,8 +7,7 @@ defmodule Cashubrew.Nuts.Nut02.GetKeysetsResponse do
   defstruct [:keysets]
 
   def from_keysets(keysets) do
-    keysets_responses =
-      Enum.map(keysets, &Cashubrew.Nuts.Nut02.Keyset.from_keyset(&1))
+    keysets_responses = Enum.map(keysets, &Cashubrew.Nuts.Nut02.Keyset.from_keyset(&1))
 
     %__MODULE__{
       keysets: keysets_responses
