@@ -2,6 +2,7 @@ defmodule Cashubrew.Nuts.Nut01.Serde.GetKeysResponse do
   @moduledoc """
   The body of the get keys rest response
   """
+  @derive Jason.Encoder
   @enforce_keys [:keysets]
   defstruct [:keysets]
 
@@ -13,7 +14,7 @@ defmodule Cashubrew.Nuts.Nut01.Serde.GetKeysResponse do
     accumulator
   end
 
-  defp inner_from_keysets([%{id: id, unit: unit, keys: keys}, tail], accumulator) do
+  defp inner_from_keysets([%{id: id, unit: unit, keys: keys} | tail], accumulator) do
     inner_from_keysets(tail, [
       Cashubrew.Nuts.Nut01.Serde.Keyset.from_keyset(id, unit, keys) | accumulator
     ])
@@ -57,6 +58,7 @@ defmodule Cashubrew.Nuts.Nut01.Serde.Keyset do
   @moduledoc """
   A keyset
   """
+  @derive Jason.Encoder
   @enforce_keys [:id, :unit, :keys]
   defstruct [:id, :unit, :keys]
 

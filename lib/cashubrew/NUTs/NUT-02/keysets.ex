@@ -72,6 +72,3 @@ defmodule Cashubrew.Nuts.Nut02.Keyset do
       (:crypto.hash(:sha256, pubkeys_concat) |> Base.encode16(case: :lower) |> binary_part(0, 14))
   end
 end
-
-# TODO: add logic for wallet to handle fees
-# https://cashubtc.github.io/nuts/02/#fees
