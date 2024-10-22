@@ -3,8 +3,11 @@ defmodule Cashubrew.Schema.Keyset do
   Keyset schema for the Cashubrew mint.
   """
   use Ecto.Schema
+
   import Ecto.Changeset
+
   alias Cashubrew.Schema
+  alias Cashubrew.Nuts.Nut02
 
   @primary_key {:id, :string, autogenerate: false}
   schema "keysets" do
@@ -21,7 +24,7 @@ defmodule Cashubrew.Schema.Keyset do
   end
 
   def register_keyset(keys, unit, input_fee_ppk) do
-    id = Cashubrew.Nuts.Nut02.Keysets.derive_keyset_id(keys)
+    id = Nut02.Keysets.derive_keyset_id(keys)
 
     keyset = %__MODULE__{
       id: id,

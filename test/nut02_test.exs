@@ -48,6 +48,7 @@ defmodule Cashubrew.Nuts.Nut02Test do
 
     assert Map.has_key?(keyset2, "id")
     assert keyset2["id"] |> String.starts_with?("00")
+    assert keyset2["id"] == id
     assert keyset2["unit"] == "sat"
     assert keyset2["active"] == false
   end
