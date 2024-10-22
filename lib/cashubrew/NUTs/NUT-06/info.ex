@@ -2,10 +2,6 @@ defmodule Cashubrew.Nuts.Nut06.Info do
   @moduledoc """
   Implementation and structs of the NUT-06
   """
-  alias Cashubrew.Nuts.Nut00
-  alias Cashubrew.Nuts.Nut01
-  alias Cashubrew.Nuts.Nut02
-  alias Cashubrew.Nuts.Nut03
   alias Cashubrew.Nuts.Nut04
 
   @derive [Jason.Encoder]
@@ -50,10 +46,6 @@ defmodule Cashubrew.Nuts.Nut06.Info do
       ],
       time: System.os_time(:second),
       nuts: %{
-        "0": Nut00.Info.info(),
-        "1": Nut01.Info.info(),
-        "2": Nut02.Info.info(),
-        "3": Nut03.Info.info(),
         "4": Nut04.Info.info()
       },
       motd: nil
