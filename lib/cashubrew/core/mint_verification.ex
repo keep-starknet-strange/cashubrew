@@ -90,7 +90,7 @@ end
 
 defmodule Cashubrew.Mint.Verification.Outputs do
   @moduledoc """
-  Logic to verify protocol "outputs" (blinded messages) 
+  Logic to verify protocol "outputs" (blinded messages)
   """
 
   # Will perform all the check required upon some user provided 'output'
@@ -144,7 +144,7 @@ end
 
 defmodule Cashubrew.Mint.Verification.InputsAndOutputs do
   @moduledoc """
-  Logic to verify protocol "inputs" and "outputs" together 
+  Logic to verify protocol "inputs" and "outputs" together
   """
 
   def verify!(repo, inputs, outputs) do

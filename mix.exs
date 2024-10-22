@@ -60,7 +60,8 @@ defmodule Cashubrew.MixProject do
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
       {:bitcoinex, "~> 0.1.7"},
-      {:dotenv, "~> 3.0.0"}
+      {:dotenv, "~> 3.0.0"},
+      {:meck, "~> 0.9"}
     ]
   end
 
