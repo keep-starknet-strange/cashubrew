@@ -30,7 +30,7 @@ defmodule Cashubrew.Nuts.Nut06.Info do
   def info do
     info = %__MODULE__{
       name: "Cashubrew Cashu Mint",
-      pubkey: Base.encode16(<<00, 01, 02, 03>>, case: :lower),
+      pubkey: "0381094f72790bb014504dfc9213bd3c8450440f5d220560075dbf2f8113e9fa3e",
       version: "Cashubrew/0.1.0",
       description: "An Elixir implementation of Cashu Mint",
       description_long: nil,
@@ -46,7 +46,16 @@ defmodule Cashubrew.Nuts.Nut06.Info do
       ],
       time: System.os_time(:second),
       nuts: %{
-        "4": Nut04.Info.info()
+        "4": Nut04.Info.info(),
+        "5": %{methods: [], disabled: true},
+        "7": %{supported: false},
+        "8": %{supported: false},
+        "9": %{supported: false},
+        "10": %{supported: false},
+        "11": %{supported: false},
+        "12": %{supported: false},
+        "14": %{supported: false},
+        "15": %{methods: []},
       },
       motd: nil
     }

@@ -1,5 +1,7 @@
 defmodule Cashubrew.Web.MintController do
   use Cashubrew.Web, :controller
+  require :logger
+  require Logger
   alias Cashubrew.Mint
   alias Cashubrew.Nuts.Nut00
   alias Cashubrew.Nuts.Nut01
@@ -9,8 +11,10 @@ defmodule Cashubrew.Web.MintController do
   alias Cashubrew.Nuts.Nut06
 
   def info(conn, _params) do
-    info = Nut06.Info.info()
-    json(conn, info)
+      info = Nut06.Info.info()
+      json(conn, info)
+    rescue
+      e in RuntimeError -> conn |> put_status(:bad_request) |> json(Nut00.Error.new_error(0, e))
   end
 
   def keysets(conn, _params) do

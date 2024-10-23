@@ -34,3 +34,9 @@ priv/static/
 benchmarks/output
 
 .env
+
+# Rust related
+debug/
+target/
+Cargo.lock
+*.pdb
