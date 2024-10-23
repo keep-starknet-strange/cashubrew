@@ -1,9 +1,8 @@
 defmodule Cashubrew.Nuts.Nut02.Routes do
-  alias Cashubrew.Nuts.Nut01
-
   @moduledoc """
   List the rest routes defined in the NUT-02
   """
+  alias Cashubrew.Nuts.Nut01
 
   @doc """
   The route to query keys part of a specific keyset from the Mint

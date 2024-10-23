@@ -3,6 +3,7 @@ defmodule Cashubrew.Nuts.Nut02.Serde.Keyset do
   A keyset
   """
   @enforce_keys [:id, :unit, :active]
+  @derive [Jason.Encoder]
   defstruct [:id, :unit, :active, :input_fee_ppk]
 
   def from_keyset(keyset) do
@@ -20,11 +21,11 @@ defmodule Cashubrew.Nuts.Nut02.Serde.GetKeysetsResponse do
   The body of the get keysets rest response
   """
   @enforce_keys [:keysets]
+  @derive [Jason.Encoder]
   defstruct [:keysets]
 
   def from_keysets(keysets) do
-    keysets_responses =
-      Enum.map(keysets, fn keyset -> Cashubrew.Nuts.Nut02.Serde.Keyset.from_keyset(keyset) end)
+    keysets_responses = Enum.map(keysets, &Cashubrew.Nuts.Nut02.Serde.Keyset.from_keyset(&1))
 
     %__MODULE__{
       keysets: keysets_responses

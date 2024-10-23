@@ -3,10 +3,11 @@ defmodule Cashubrew.Nuts.Nut02.Impl do
   The mint logic for handling Nut02
   """
   alias Cashubrew.Mint
+  alias Cashubrew.Repo
+  alias Cashubrew.Schema.Keyset
 
-  def keysets do
-    repo = Application.get_env(:cashubrew, :repo)
-    Mint.get_all_keysets(repo)
+  def keysets() do
+    Repo.all(Keyset)
   end
 
   def keys_for_keyset_id!(id) do
