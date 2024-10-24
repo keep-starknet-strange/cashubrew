@@ -9,8 +9,8 @@ defmodule Cashubrew.Mint.Verification.Amount do
       raise "BlindMessageAmountShouldBePositive"
     end
 
-    if amount > 2 ** Nut02.Keyset.max_order() do
-      raise "BlindMessageAmountNotExceed2^MaxOrder"
+    if amount > Integer.pow(2, Nut02.Keyset.max_order()) do
+      raise "BlindMessageAmountNotExceed2MaxOrder"
     end
   end
 end
@@ -42,25 +42,25 @@ defmodule Cashubrew.Mint.Verification.Inputs do
 
   # Elems
   defp inner_verify!(repo, [head | tail], unit, seen_secrets, total_fee, total_amount) do
-    Cashubrew.Mint.Verification.Amount.verify!(head)
+    Cashubrew.Mint.Verification.Amount.verify!(head.amount)
 
-    if head.secret == nil or head.secret == "" do
+    if is_nil(head.secret) or head.secret == "" do
       raise "NoSecretInProof"
     end
 
-    if head.secret > max_secret_length() do
+    if String.length(head.secret) > max_secret_length() do
       raise "SecretTooLong"
     end
 
-    if Enum.member?(seen_secrets, head.secret) do
-      "DuplicateProofInList"
+    if MapSet.member?(seen_secrets, head.secret) do
+      raise "DuplicateProofInList"
     end
 
-    seen_secrets.put(head.secret)
+    updated_seen_secrets = MapSet.put(seen_secrets, head.secret)
 
     keyset = Mint.get_keyset(repo, head.id)
 
-    if keyset == nil do
+    if is_nil(keyset) do
       raise "UnkownKeyset"
     end
 
@@ -81,7 +81,7 @@ defmodule Cashubrew.Mint.Verification.Inputs do
       repo,
       tail,
       keyset.unit,
-      seen_secrets,
+      updated_seen_secrets,
       total_fee + keyset.input_fee_ppk,
       total_amount + head.amount
     )
@@ -92,6 +92,8 @@ defmodule Cashubrew.Mint.Verification.Outputs do
   @moduledoc """
   Logic to verify protocol "outputs" (blinded messages)
   """
+  alias Cashubrew.Mint
+  alias Cashubrew.Schema
 
   # Will perform all the check required upon some user provided 'output'
   def verify!(repo, outputs) do
@@ -105,7 +107,11 @@ defmodule Cashubrew.Mint.Verification.Outputs do
 
   # End of list
   defp inner_verify!(repo, [], id, _seen_Bs, total_amount) do
-    keyset = repo.get!(Schema.Keyset, id)
+    keyset = Mint.get_keyset(repo, id)
+
+    if is_nil(keyset) do
+      raise "UnkownKeyset"
+    end
 
     if !keyset.active do
       raise "InactiveKeyset"
@@ -122,21 +128,21 @@ defmodule Cashubrew.Mint.Verification.Outputs do
         raise "DifferentKeysetIds"
       end
 
-      if Enum.member?(seen_Bs, head."B_") do
-        "Duplicate"
+      if MapSet.member?(seen_Bs, head."B_") do
+        raise "DuplicateBlindedMessageInList"
       end
     end
 
-    seen_Bs.put(head."B_")
+    updated_seen_bs = MapSet.put(seen_Bs, head."B_")
 
     verify_blind_message!(repo, head)
-    inner_verify!(repo, tail, head.id, seen_Bs, total_amount + head.amount)
+    inner_verify!(repo, tail, head.id, updated_seen_bs, total_amount + head.amount)
   end
 
   defp verify_blind_message!(repo, blind_message) do
     Cashubrew.Mint.Verification.Amount.verify!(blind_message.amount)
 
-    if repo.exists?(Schema.Promises, blind_message."B_") do
+    if repo.exists?(Schema.Promises, b: blind_message."B_") do
       raise "AlreadyEmitted"
     end
   end
@@ -161,7 +167,7 @@ defmodule Cashubrew.Mint.Verification.InputsAndOutputs do
       end
 
       if output_total_amount + total_fee != input_total_amount do
-        "InvalidAmountAndFee"
+        raise "InvalidAmountAndFee"
       end
 
       # TODO when NUT-11 and NUT-14 are implemented: check output spending condition
