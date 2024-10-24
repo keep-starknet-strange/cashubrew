@@ -29,7 +29,6 @@ pub async fn info() {
             methods: [].to_vec(),
             disabled: true,
         });
-    println!("{:#?}", expected_nuts);
     let expected_name = "Cashubrew Cashu Mint";
     let expected_pubkey =
         PublicKey::from_hex("0381094f72790bb014504dfc9213bd3c8450440f5d220560075dbf2f8113e9fa3e")
