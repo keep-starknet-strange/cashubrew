@@ -11,10 +11,10 @@ defmodule Cashubrew.Web.MintController do
   alias Cashubrew.Nuts.Nut06
 
   def info(conn, _params) do
-      info = Nut06.Info.info()
-      json(conn, info)
-    rescue
-      e in RuntimeError -> conn |> put_status(:bad_request) |> json(Nut00.Error.new_error(0, e))
+    info = Nut06.Info.info()
+    json(conn, info)
+  rescue
+    e in RuntimeError -> conn |> put_status(:bad_request) |> json(Nut00.Error.new_error(0, e))
   end
 
   def keysets(conn, _params) do

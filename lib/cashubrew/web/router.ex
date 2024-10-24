@@ -38,7 +38,6 @@ defmodule Cashubrew.Web.Router do
     # NUT-05
     post("/v1/melt/quote/bolt11", MintController, :melt_quote)
     post("/v1/melt/bolt11", MintController, :melt_tokens)
-
   end
 
   scope "/", Cashubrew.Web do

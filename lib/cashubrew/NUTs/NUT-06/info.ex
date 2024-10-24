@@ -55,7 +55,7 @@ defmodule Cashubrew.Nuts.Nut06.Info do
         "11": %{supported: false},
         "12": %{supported: false},
         "14": %{supported: false},
-        "15": %{methods: []},
+        "15": %{methods: []}
       },
       motd: nil
     }
