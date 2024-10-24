@@ -4,6 +4,7 @@ defmodule Cashubrew.Mint do
   """
 
   use GenServer
+  require Logger
   alias Cashubrew.Nuts.Nut00.{BDHKE, BlindSignature}
   alias Cashubrew.Nuts.Nut02
 

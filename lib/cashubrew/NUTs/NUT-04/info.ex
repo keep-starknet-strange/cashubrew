@@ -14,7 +14,7 @@ defmodule Cashubrew.Nuts.Nut04.Info do
     %{
       methods: [
         %__MODULE__{
-          method: "bolt111",
+          method: "bolt11",
           unit: "sat"
         }
       ],
