@@ -40,10 +40,8 @@ defmodule Cashubrew.Mint.VerificationTest do
     end
 
     test "raises error for amount exceeding max order" do
-      max_order = Nut02.Keyset.max_order()
-
       assert_raise RuntimeError, "BlindMessageAmountNotExceed2MaxOrder", fn ->
-        Amount.verify!(Integer.pow(2, max_order + 1))
+        Amount.verify!(Integer.pow(2, Nut02.Keysets.max_order() + 1))
       end
     end
 

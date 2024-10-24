@@ -9,7 +9,7 @@ defmodule Cashubrew.Mint.Verification.Amount do
       raise "BlindMessageAmountShouldBePositive"
     end
 
-    if amount > Integer.pow(2, Nut02.Keyset.max_order()) do
+    if amount > Integer.pow(2, Nut02.Keysets.max_order()) do
       raise "BlindMessageAmountNotExceed2MaxOrder"
     end
   end
