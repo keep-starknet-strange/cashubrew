@@ -72,6 +72,9 @@ jobs:
           shared-key: "cache"
           save-if: false
 
+      - name: Setup db
+        run: mix ecto.setup
+
       - name: Integration tests
         run: |-
           mix phx.server &
