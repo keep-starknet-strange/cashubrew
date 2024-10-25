@@ -6,7 +6,7 @@ defmodule Cashubrew.Nuts.Nut02.Impl do
   alias Cashubrew.Repo
   alias Cashubrew.Schema.Keyset
 
-  def keysets() do
+  def keysets do
     Repo.all(Keyset)
   end
 

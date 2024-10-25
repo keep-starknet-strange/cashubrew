@@ -1,6 +1,5 @@
 defmodule Cashubrew.Nuts.Nut01Test do
   use Cashubrew.Test.ConnCase
-  alias Cashubrew.Nuts.Nut01
 
   test "active_keysets", %{conn: conn} do
     conn = get(conn, ~p"/api/v1/keys")

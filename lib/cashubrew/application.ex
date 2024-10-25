@@ -20,7 +20,7 @@ defmodule Cashubrew.Application do
       end
 
     # Always add Cashubrew.Mint after the repo
-    children = children ++ [Cashubrew.Mint]
+    children = children ++ [{Task, fn -> Cashubrew.Mint.init() end}]
 
     opts = [strategy: :one_for_one, name: Cashubrew.Supervisor]
     Supervisor.start_link(children, opts)

@@ -3,7 +3,6 @@ defmodule Cashubrew.Mint do
   Mint operations for the Cashubrew mint.
   """
 
-  use GenServer
   require Logger
   alias Cashubrew.Nuts.Nut00.{BDHKE, BlindSignature}
   alias Cashubrew.Nuts.Nut02
@@ -13,7 +12,6 @@ defmodule Cashubrew.Mint do
   alias Cashubrew.Schema.{
     Key,
     MintConfiguration,
-    MintQuote,
     UsedProof
   }
 
@@ -43,22 +41,11 @@ defmodule Cashubrew.Mint do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
-  @impl true
-  def init(_) do
-    {:ok, %{mint_pubkey: nil}, {:continue, :load_keysets_and_mint_key}}
-  end
-
-  @impl true
-  @spec handle_continue(:load_keysets_and_mint_key, %{
-          :mint_pubkey => any(),
-          optional(any()) => any()
-        }) :: {:noreply, %{:mint_pubkey => binary(), optional(any()) => any()}}
-  def handle_continue(:load_keysets_and_mint_key, state) do
+  def init do
     repo = Application.get_env(:cashubrew, :repo)
     seed = get_or_create_seed(repo)
     _keysets = load_or_create_keysets(repo, seed)
-    {_, mint_pubkey} = get_or_create_mint_key(repo, seed)
-    {:noreply, %{state | mint_pubkey: mint_pubkey}}
+    {_mint_privkey, _mint_pubkey} = get_or_create_mint_key(repo, seed)
   end
 
   defp get_or_create_seed(repo) do
@@ -137,50 +124,6 @@ defmodule Cashubrew.Mint do
     {private_key, public_key}
   end
 
-  @impl true
-  def handle_call(:get_keysets, _from, state) do
-    {:reply, state.keysets, state}
-  end
-
-  @impl true
-  def handle_call(:get_mint_pubkey, _from, state) do
-    {:reply, state.mint_pubkey, state}
-  end
-
-  def handle_call({:mint_tokens, quote_id, blinded_messages}, _from, state) do
-    repo = Application.get_env(:cashubrew, :repo)
-    # Get quote from database
-    quote = repo.get(MintQuote, quote_id)
-
-    # Return error if quote does not exist
-    if quote do
-      result =
-        Ecto.Multi.new()
-        |> Ecto.Multi.run(:verify_quote, fn _, _ ->
-          # Implement actual Lightning payment verification
-          # For now, we mock the payment as if it's been received
-          {:ok, quote}
-        end)
-        |> Ecto.Multi.update(:update_quote, fn %{verify_quote: quote} ->
-          Ecto.Changeset.change(quote, state: "ISSUED")
-        end)
-        |> Ecto.Multi.run(:create_blinded_signatures, fn _, _ ->
-          create_blinded_signatures(repo, blinded_messages)
-        end)
-        |> repo.transaction()
-
-      case result do
-        {:ok, %{create_blinded_signatures: signatures}} ->
-          {:reply, {:ok, signatures}, state}
-
-        {:error, _, reason, _} ->
-          {:reply, {:error, reason}, state}
-      end
-    else
-      {:reply, {:error, :not_found}, state}
-    end
-  end
-
   def create_blinded_signatures(repo, blinded_messages) do
     signatures =
       Enum.map(blinded_messages, fn bm ->
@@ -216,8 +159,8 @@ defmodule Cashubrew.Mint do
     repo.get_by(Key, keyset_id: keyset_id, amount: amount)
   end
 
-  def get_pubkey do
-    GenServer.call(__MODULE__, :get_mint_pubkey)
+  def get_pubkey(repo) do
+    repo.get(Schema.MintConfiguration, mint_pubkey_key())
   end
 
   def get_active_keysets(repo) do
