@@ -6,8 +6,8 @@ defmodule Cashubrew.Schema.Keyset do
 
   import Ecto.Changeset
 
-  alias Cashubrew.Schema
   alias Cashubrew.Nuts.Nut02
+  alias Cashubrew.Schema
 
   @primary_key {:id, :string, autogenerate: false}
   schema "keysets" do

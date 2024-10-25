@@ -1,8 +1,9 @@
 defmodule Cashubrew.Nuts.Nut02Test do
   use Cashubrew.Test.ConnCase
+
+  alias Cashubrew.Repo
   alias Cashubrew.Schema.Key
   alias Cashubrew.Schema.Keyset
-  alias Cashubrew.Repo
 
   test "get all keysets", %{conn: conn} do
     data = conn |> get(~p"/api/v1/keysets") |> json_response(200)
