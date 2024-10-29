@@ -3,6 +3,7 @@ defmodule Cashubrew.Nuts.Nut05.Serde.PostMeltQuoteBolt11Request do
   The body of the post melt quote request
   """
   @enforce_keys [:request, :unit]
+  @derive [Jason.Encoder]
   defstruct [:request, :unit]
 end
 
@@ -13,6 +14,7 @@ defmodule Cashubrew.Nuts.Nut05.Serde.PostMeltBolt11Request do
   alias Cashubrew.Nuts.Nut00.Proof
 
   @enforce_keys [:quote, :inputs]
+  @derive [Jason.Encoder]
   defstruct [:quote, :inputs]
 
   def from_map(map) do
@@ -28,5 +30,6 @@ defmodule Cashubrew.Nuts.Nut05.Serde.PostMeltQuoteBolt11Response do
   The body of the post melt quote response 
   """
   @enforce_keys [:quote, :amount, :fee_reserve, :state, :expiry]
+  @derive [Jason.Encoder]
   defstruct [:quote, :amount, :fee_reserve, :state, :expiry, :payment_preimage]
 end

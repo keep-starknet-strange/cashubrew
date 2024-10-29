@@ -27,6 +27,7 @@ defmodule Cashubrew.Nuts.Nut05.Impl do
 
     expiry = System.os_time(:second) + melt_quote_validity_duration_in_sec()
     quote_id = Ecto.UUID.bingenerate()
+    quote_id_as_string = Ecto.UUID.cast!(quote_id)
 
     Schema.MeltQuote.create!(repo, %{
       id: quote_id,
@@ -38,6 +39,12 @@ defmodule Cashubrew.Nuts.Nut05.Impl do
       request_lookup_id: ln_invoice.payment_hash
     })
 
-    %{quote_id: quote_id, amount: amount, fee_reserve: fee, expiry: expiry}
+    %{
+      quote: quote_id_as_string,
+      amount: amount,
+      fee_reserve: fee,
+      state: "UNPAID",
+      expiry: expiry
+    }
   end
 end

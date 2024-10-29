@@ -36,14 +36,15 @@ defmodule Cashubrew.Web.Router do
     get(Nut04.Routes.v1_mint_quote_for_quote_id(), MintController, :get_mint_quote)
     post(Nut04.Routes.v1_mint(), MintController, :mint_tokens)
 
-    # NUT-05
-    post(Nut05.Routes.v1_melt_quote(), MintController, :create_melt_quote)
     post("/v1/melt/bolt11", MintController, :melt_tokens)
   end
 
   scope "/", Cashubrew.Web do
+    pipe_through(:api)
     # NUT-06
     get("/v1/info", MintController, :info)
+    # NUT-05
+    post(Nut05.Routes.v1_melt_quote(), MintController, :create_melt_quote)
   end
 
   if Mix.env() == :dev do
