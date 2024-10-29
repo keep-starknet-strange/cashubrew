@@ -1,4 +1,4 @@
-defmodule Cashubrew.Nuts.Nut04.Info do
+defmodule Cashubrew.Nuts.Nut04.MintMethodSetting do
   @moduledoc """
   The infos retlated to this Nut support
   """
@@ -10,15 +10,10 @@ defmodule Cashubrew.Nuts.Nut04.Info do
   @doc """
   Return the map to be used in Nut06 info "nuts" field
   """
-  def info do
-    %{
-      methods: [
-        %__MODULE__{
-          method: "bolt11",
-          unit: "sat"
-        }
-      ],
-      disabled: false
+  def bolt11 do
+    %__MODULE__{
+      method: "bolt11",
+      unit: "sat"
     }
   end
 end

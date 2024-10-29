@@ -13,10 +13,4 @@ defmodule Cashubrew.Repo.Migrations.CreateMintQuote do
       timestamps()
     end
   end
-
-  # def change do
-  #   alter table(:mint_quotes) do
-  #     modify :payment_request, :text, null: false
-  #   end
-  # end
 end

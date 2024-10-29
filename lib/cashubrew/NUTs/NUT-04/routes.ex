@@ -1,6 +1,6 @@
 defmodule Cashubrew.Nuts.Nut04.Routes do
   @moduledoc """
-  List the rest routes defined in the NUT-03
+  List the rest routes defined in the NUT-04
   """
 
   @doc """
@@ -14,7 +14,7 @@ defmodule Cashubrew.Nuts.Nut04.Routes do
   The route to check a quote state
   """
   def v1_mint_quote_for_quote_id do
-    v1_mint_quote() <> "/quote_id"
+    v1_mint_quote() <> "/:quote_id"
   end
 
   @doc """

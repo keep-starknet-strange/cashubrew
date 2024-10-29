@@ -4,8 +4,8 @@ use assert_matches::assert_matches;
 use integration_tests::init_wallet;
 
 use cdk::nuts::{
-    ContactInfo, CurrencyUnit, MintInfo, MintMethodSettings, MintVersion, NUT04Settings, Nuts,
-    PaymentMethod, PublicKey,
+    ContactInfo, CurrencyUnit, MeltMethodSettings, MintInfo, MintMethodSettings, MintVersion,
+    NUT04Settings, Nuts, PaymentMethod, PublicKey,
 };
 
 #[tokio::test]
@@ -25,10 +25,16 @@ pub async fn info() {
             .to_vec(),
             false,
         ))
-        .nut05(cdk::nuts::NUT05Settings {
-            methods: [].to_vec(),
-            disabled: true,
-        });
+        .nut05(cdk::nuts::NUT05Settings::new(
+            [MeltMethodSettings {
+                method: PaymentMethod::Bolt11,
+                unit: CurrencyUnit::Sat,
+                min_amount: None,
+                max_amount: None,
+            }]
+            .to_vec(),
+            false,
+        ));
     let expected_name = "Cashubrew Cashu Mint";
     let expected_pubkey =
         PublicKey::from_hex("0381094f72790bb014504dfc9213bd3c8450440f5d220560075dbf2f8113e9fa3e")
