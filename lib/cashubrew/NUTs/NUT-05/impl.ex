@@ -39,6 +39,7 @@ defmodule Cashubrew.Nuts.Nut05.Impl do
       request_lookup_id: ln_invoice.payment_hash
     })
 
+<<<<<<< HEAD
     %{
       quote: quote_id,
       amount: amount,
@@ -52,5 +53,8 @@ defmodule Cashubrew.Nuts.Nut05.Impl do
     repo = Application.get_env(:cashubrew, :repo)
 
     repo.get!(Schema.MeltQuote, quote_id)
+=======
+    %{quote_id: quote_id, amount: amount, fee_reserve: fee, expiry: expiry}
+>>>>>>> 53ab418 (feat: impl get_melt_quote)
   end
 end

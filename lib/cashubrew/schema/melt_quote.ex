@@ -41,4 +41,14 @@ defmodule Cashubrew.Schema.MeltQuote do
       {:error, changeset} -> raise "Failed to insert key: #{inspect(changeset.errors)}"
     end
   end
+
+  def create!(repo, values) do
+    %__MODULE__{}
+    |> changeset(values)
+    |> repo.insert()
+    |> case do
+      {:ok, _} -> nil
+      {:error, changeset} -> raise "Failed to insert key: #{inspect(changeset.errors)}"
+    end
+  end
 end

@@ -2,6 +2,7 @@ defmodule Cashubrew.Web.MintController do
   use Cashubrew.Web, :controller
   require :logger
   require Logger
+  alias Cashubrew.Lightning
   alias Cashubrew.Mint
   alias Cashubrew.Nuts.Nut00
   alias Cashubrew.Nuts.Nut01
