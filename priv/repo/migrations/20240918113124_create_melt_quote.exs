@@ -3,7 +3,7 @@ defmodule Cashubrew.Repo.Migrations.CreateMeltQuote do
 
   def change do
     create table(:melt_quote) do
-      add :request, :text, null: false
+      add :request, :string, null: false
       add :unit, :string, null: false
       add :amount, :integer, null: false
       add :fee_reserve, :integer, null: false
