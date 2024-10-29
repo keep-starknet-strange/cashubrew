@@ -2,12 +2,14 @@ defmodule Cashubrew.Web.MintController do
   use Cashubrew.Web, :controller
   require :logger
   require Logger
+  alias Cashubrew.Lightning
   alias Cashubrew.Mint
   alias Cashubrew.Nuts.Nut00
   alias Cashubrew.Nuts.Nut01
   alias Cashubrew.Nuts.Nut02
   alias Cashubrew.Nuts.Nut03
   alias Cashubrew.Nuts.Nut04
+  alias Cashubrew.Nuts.Nut05
   alias Cashubrew.Nuts.Nut06
 
   def info(conn, _params) do
@@ -94,25 +96,23 @@ defmodule Cashubrew.Web.MintController do
     e in RuntimeError -> conn |> put_status(:bad_request) |> json(Nut00.Error.new_error(0, e))
   end
 
-  def melt_quote(conn, %{"request" => request, "unit" => unit}) do
-    case Mint.create_melt_quote(request, unit) do
-      {:ok, quote} ->
-        conn
-        |> put_status(:created)
-        |> json(%{
-          request: quote.request,
-          quote: quote.id,
-          amount: quote.amount,
-          fee_reserve: quote.fee_reserve,
-          state: "UNPAID",
-          expiry: quote.expiry
-        })
+  def create_melt_quote(conn, params) do
+    method = params["method"]
 
-      {:error, reason} ->
-        conn
-        |> put_status(:bad_request)
-        |> json(%{error: reason})
+    if method != "bolt11" do
+      raise "UnsuportedMethod"
     end
+
+    %Nut05.Serde.PostMeltQuoteBolt11Request{
+      request: request,
+      unit: unit
+    } = params["body"]
+
+    res = Nut05.Impl.create_melt_quote!(request, unit)
+
+    json(conn, struct(Nut05.Serde.PostMeltQuoteBolt11Response, %{res | state: "UNPAID"}))
+  rescue
+    e in RuntimeError -> conn |> put_status(:bad_request) |> json(Nut00.Error.new_error(0, e))
   end
 
   def melt_tokens(conn, %{"quote_id" => quote_id, "inputs" => inputs}) do

@@ -5,6 +5,7 @@ defmodule Cashubrew.Schema.MeltQuote do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @primary_key {:id, :binary_id, autogenerate: false}
   schema "melt_quote" do
     field(:request, :string)
     field(:unit, :string)
@@ -21,5 +22,15 @@ defmodule Cashubrew.Schema.MeltQuote do
     quote
     |> cast(attrs, [:request, :unit, :amount, :fee_reserve, :expiry, :request_lookup_id])
     |> validate_required([:request, :unit, :amount, :fee_reserve, :expiry, :request_lookup_id])
+  end
+
+  def create!(repo, values) do
+    %__MODULE__{}
+    |> changeset(values)
+    |> repo.insert()
+    |> case do
+      {:ok, _} -> nil
+      {:error, changeset} -> raise "Failed to insert key: #{inspect(changeset.errors)}"
+    end
   end
 end

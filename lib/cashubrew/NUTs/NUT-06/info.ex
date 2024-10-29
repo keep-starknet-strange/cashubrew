@@ -3,6 +3,7 @@ defmodule Cashubrew.Nuts.Nut06.Info do
   Implementation and structs of the NUT-06
   """
   alias Cashubrew.Nuts.Nut04
+  alias Cashubrew.Nuts.Nut05
 
   @derive [Jason.Encoder]
   defstruct [
@@ -46,8 +47,8 @@ defmodule Cashubrew.Nuts.Nut06.Info do
       ],
       time: System.os_time(:second),
       nuts: %{
-        "4": Nut04.Info.info(),
-        "5": %{methods: [], disabled: true},
+        "4": %{methods: [Nut04.MintMethodSetting.bolt11()], disabled: false},
+        "5": %{methods: [Nut05.MeltMethodSetting.bolt11()], disabled: false},
         "7": %{supported: false},
         "8": %{supported: false},
         "9": %{supported: false},

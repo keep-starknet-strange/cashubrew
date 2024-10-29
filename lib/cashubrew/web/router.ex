@@ -5,6 +5,7 @@ defmodule Cashubrew.Web.Router do
   alias Cashubrew.Nuts.Nut02
   alias Cashubrew.Nuts.Nut03
   alias Cashubrew.Nuts.Nut04
+  alias Cashubrew.Nuts.Nut05
 
   pipeline :browser do
     plug(:accepts, ["html"])
@@ -36,7 +37,7 @@ defmodule Cashubrew.Web.Router do
     post(Nut04.Routes.v1_mint(), MintController, :mint_tokens)
 
     # NUT-05
-    post("/v1/melt/quote/bolt11", MintController, :melt_quote)
+    post(Nut05.Routes.v1_melt_quote(), MintController, :create_melt_quote)
     post("/v1/melt/bolt11", MintController, :melt_tokens)
   end
 
