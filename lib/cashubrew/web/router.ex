@@ -45,6 +45,7 @@ defmodule Cashubrew.Web.Router do
     get("/v1/info", MintController, :info)
     # NUT-05
     post(Nut05.Routes.v1_melt_quote(), MintController, :create_melt_quote)
+    get(Nut05.Routes.v1_melt_quote_by_id(), MintController, :get_melt_quote)
   end
 
   if Mix.env() == :dev do

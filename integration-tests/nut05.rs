@@ -23,19 +23,31 @@ pub async fn melt_quote_ok() {
     assert_matches!(
         melt_quote,
         MeltQuote {
-            id,
+            ref id,
             unit: _,
             amount,
             request: _,
             fee_reserve,
             state,
             expiry,
-            payment_preimage
-        } if Uuid::try_parse(&id).is_ok()
+            ref payment_preimage
+        } if Uuid::try_parse(id).is_ok()
         && amount == Amount::from(10)
         && fee_reserve == Amount::from(1)
         && state == MeltQuoteState::Unpaid
         && expiry >= now
         && payment_preimage.is_none()
-    )
+    );
+
+    let melt_quote_status = wallet.melt_quote_status(&melt_quote.id).await.unwrap();
+
+    assert_eq!(melt_quote.id, melt_quote_status.quote);
+    assert_eq!(melt_quote.amount, melt_quote_status.amount);
+    assert_eq!(melt_quote.fee_reserve, melt_quote_status.fee_reserve);
+    assert_eq!(melt_quote.state, melt_quote_status.state);
+    assert_eq!(melt_quote.expiry, melt_quote_status.expiry);
+    assert_eq!(
+        melt_quote.payment_preimage,
+        melt_quote_status.payment_preimage
+    );
 }

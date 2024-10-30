@@ -32,4 +32,15 @@ defmodule Cashubrew.Nuts.Nut05.Serde.PostMeltQuoteBolt11Response do
   @enforce_keys [:quote, :amount, :fee_reserve, :state, :expiry]
   @derive [Jason.Encoder]
   defstruct [:quote, :amount, :fee_reserve, :state, :expiry, :payment_preimage]
+
+  def from_melt_quote(melt_quote, state, payment_preimage) do
+    %__MODULE__{
+      quote: Ecto.UUID.cast!(melt_quote.id),
+      amount: melt_quote.amount,
+      fee_reserve: melt_quote.fee_reserve,
+      expiry: melt_quote.expiry,
+      state: state,
+      payment_preimage: payment_preimage
+    }
+  end
 end
