@@ -3,6 +3,7 @@ defmodule Cashubrew.Nuts.Nut05.Impl do
   Implementation and structs of the NUT-05
   """
   alias Cashubrew.Schema
+  require Logger
 
   defp percent_fee_reserve, do: 1
   defp min_fee_reserve, do: 1
@@ -26,8 +27,7 @@ defmodule Cashubrew.Nuts.Nut05.Impl do
     fee = max(relative_fee_reserve, min_fee_reserve())
 
     expiry = System.os_time(:second) + melt_quote_validity_duration_in_sec()
-    quote_id = Ecto.UUID.bingenerate()
-    quote_id_as_string = Ecto.UUID.cast!(quote_id)
+    quote_id = Ecto.UUID.generate()
 
     Schema.MeltQuote.create!(repo, %{
       id: quote_id,
@@ -40,11 +40,17 @@ defmodule Cashubrew.Nuts.Nut05.Impl do
     })
 
     %{
-      quote: quote_id_as_string,
+      quote: quote_id,
       amount: amount,
       fee_reserve: fee,
       state: "UNPAID",
       expiry: expiry
     }
+  end
+
+  def get_melt_quote_by_id(quote_id) do
+    repo = Application.get_env(:cashubrew, :repo)
+
+    repo.get!(Schema.MeltQuote, quote_id)
   end
 end

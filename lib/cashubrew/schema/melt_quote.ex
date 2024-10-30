@@ -20,8 +20,16 @@ defmodule Cashubrew.Schema.MeltQuote do
 
   def changeset(quote, attrs) do
     quote
-    |> cast(attrs, [:request, :unit, :amount, :fee_reserve, :expiry, :request_lookup_id])
-    |> validate_required([:request, :unit, :amount, :fee_reserve, :expiry, :request_lookup_id])
+    |> cast(attrs, [:id, :request, :unit, :amount, :fee_reserve, :expiry, :request_lookup_id])
+    |> validate_required([
+      :id,
+      :request,
+      :unit,
+      :amount,
+      :fee_reserve,
+      :expiry,
+      :request_lookup_id
+    ])
   end
 
   def create!(repo, values) do

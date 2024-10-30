@@ -2,7 +2,6 @@ defmodule Cashubrew.Web.MintController do
   use Cashubrew.Web, :controller
   require :logger
   require Logger
-  alias Cashubrew.Lightning
   alias Cashubrew.Mint
   alias Cashubrew.Nuts.Nut00
   alias Cashubrew.Nuts.Nut01
@@ -96,28 +95,26 @@ defmodule Cashubrew.Web.MintController do
     e in RuntimeError -> conn |> put_status(:bad_request) |> json(Nut00.Error.new_error(0, e))
   end
 
-  def create_melt_quote(conn, params) do
-    method = params["method"]
-
+  def create_melt_quote(conn, %{"method" => method, "request" => request, "unit" => unit}) do
     if method != "bolt11" do
       raise "UnsuportedMethod"
-    end
-
-    request = params["request"]
-
-    if !request do
-      raise "NoRequest"
-    end
-
-    unit = params["unit"]
-
-    if !unit do
-      raise "NoUnit"
     end
 
     res = Nut05.Impl.create_melt_quote!(request, unit)
 
     json(conn, struct(Nut05.Serde.PostMeltQuoteBolt11Response, res))
+  rescue
+    e in RuntimeError -> conn |> put_status(:bad_request) |> json(Nut00.Error.new_error(0, e))
+  end
+
+  def get_melt_quote(conn, %{"method" => method, "quote_id" => quote_id}) do
+    if method != "bolt11" do
+      raise "UnsuportedMethod"
+    end
+
+    melt_quote = Nut05.Impl.get_melt_quote_by_id(quote_id)
+    # TODO: get actual state from ln and payment_preimage
+    json(conn, Nut05.Serde.PostMeltQuoteBolt11Response.from_melt_quote(melt_quote, "UNPAID", nil))
   rescue
     e in RuntimeError -> conn |> put_status(:bad_request) |> json(Nut00.Error.new_error(0, e))
   end

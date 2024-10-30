@@ -13,7 +13,7 @@ defmodule Cashubrew.Nuts.Nut05.Routes do
   @doc """
   The route to check a melt quote state
   """
-  def v1_melt_quote_for_quote_id do
+  def v1_melt_quote_by_id do
     v1_melt_quote() <> "/:quote_id"
   end
 
