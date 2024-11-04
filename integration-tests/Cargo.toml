@@ -9,6 +9,11 @@ rand = "0.8.5"
 assert_matches = "1.5.0"
 tokio = "1.41.0"
 uuid = "1.11.0"
+anyhow = "1.0.91"
+bitcoind = { version = "0.34.2", features = ["26_0"] }
+lnd = { version = "0.1.6", features = ["lnd_0_17_5"] }
+tonic_lnd = "0.5.1"
+ctrlc = "3.4"
 
 [[test]]
 name = "nut06"

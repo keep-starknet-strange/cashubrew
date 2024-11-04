@@ -7,6 +7,7 @@ defmodule Cashubrew.Application do
   def start(_type, _args) do
     children = [
       Cashubrew.Web.Telemetry,
+      Cashubrew.LightingNetwork.Lnd,
       {Phoenix.PubSub, name: Cashubrew.PubSub},
       Endpoint
     ]
