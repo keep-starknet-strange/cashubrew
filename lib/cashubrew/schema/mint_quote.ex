@@ -5,7 +5,7 @@ defmodule Cashubrew.Schema.MintQuote do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @primary_key {:id, :id, autogenerate: false}
+  @primary_key {:id, :binary_id, autogenerate: false}
   schema "mint_quotes" do
     field(:payment_request, :string)
     field(:amount, :integer)
