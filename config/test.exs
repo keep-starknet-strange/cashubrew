@@ -25,4 +25,6 @@ else
     pool_size: 10
 
   config :cashubrew, :repo, Cashubrew.Repo
+
+  config :cashubrew, :lnd_client, Cashubrew.LightingNetwork.MockLnd
 end

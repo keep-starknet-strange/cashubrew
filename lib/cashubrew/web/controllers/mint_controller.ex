@@ -59,10 +59,10 @@ defmodule Cashubrew.Web.MintController do
     %Nut04.Serde.PostMintQuoteBolt11Request{
       amount: amount,
       unit: unit,
-      description: _description
+      description: description
     } = params["body"]
 
-    res = Nut04.Impl.create_mint_quote!(amount, unit)
+    res = Nut04.Impl.create_mint_quote!(amount, unit, description)
     json(conn, struct(Nut04.Serde.PostMintBolt11Response, Map.put(res, :state, "UNPAID")))
   rescue
     e in RuntimeError -> conn |> put_status(:bad_request) |> json(Nut00.Error.new_error(0, e))

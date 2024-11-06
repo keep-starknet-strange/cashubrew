@@ -42,3 +42,5 @@ config :cashubrew, Cashubrew.Repo,
 config :cashubrew, :repo, Cashubrew.Repo
 
 config :cashubrew, ecto_repos: [Cashubrew.Repo]
+
+config :cashubrew, :lnd_client, Cashubrew.LightingNetwork.Lnd

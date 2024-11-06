@@ -77,10 +77,21 @@ jobs:
 
       - name: Integration tests
         run: |-
-          mix phx.server &
-          CASHUBREW_SERVER_PID=$!
-          cd integration-tests && cargo test
-          kill $CASHUBREW_SERVER_PID
+          cd integration-tests
+          touch .env
+          cargo run &
+          BTCD_AND_LND_SERVERS_PID=$!
+          # Wait until the nodes are running by checking if the the env var are exported
+          while [[ -z "${LND_URL}" ]]; do sleep 1 && source .env; done
+          cd ..
+          # mix doesn't behave when run in background, so we use `erlang -detached` instead
+          # but the `$!` thing won't work coz the app is run in another thread,
+          # so we write the actual pid in a file and later read it to kill it 
+          elixir --erl "-detached" -e "File.write! 'pid', :os.getpid" -S mix phx.server
+          cd integration-tests
+          cargo test
+          cat ../pid | xargs kill
+          kill $BTCD_AND_LND_SERVERS_PID
 
           
 
