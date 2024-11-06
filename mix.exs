@@ -63,7 +63,7 @@ defmodule Cashubrew.MixProject do
       {:dotenv, "~> 3.0.0"},
       {:meck, "~> 0.9"},
       {:protobuf, "~> 0.13.0"},
-      {:grpc, "~> 0.9.0"}
+      {:grpc, "~> 0.9"}
     ]
   end
 

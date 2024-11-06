@@ -9,10 +9,15 @@ async fn main() {
     let bitcoind = bitcoind::BitcoinD::from_downloaded().unwrap();
     assert_eq!(0, bitcoind.client.get_blockchain_info().unwrap().blocks);
     println!("Done");
-    println!("bitcoind is running");
+    println!(
+        "bitcoind is running. Listening to {:?}",
+        bitcoind.params.rpc_socket
+    );
 
     println!("Downloading lnd...");
-    let lnd_conf = LndConf::default();
+    let mut lnd_conf = LndConf::default();
+    lnd_conf.view_stdout = true;
+    lnd_conf.view_stderr = true;
     let mut lnd = Lnd::with_conf(
         lnd::exe_path().unwrap(),
         &lnd_conf,
@@ -35,7 +40,16 @@ async fn main() {
         .await
         .is_ok());
     println!("Done");
-    println!("lnd is running");
+    std::fs::write(
+        "../.env",
+        format!(
+            "export LND_URL={:?}\nexport LND_CERT={:?}\nexport LND_MACAROON={:?}",
+            lnd.grpc_url,
+            lnd.tls_cert_path(),
+            lnd.admin_macaroon_path()
+        ),
+    )
+    .unwrap();
 
     let (tx, rx) = channel();
 
