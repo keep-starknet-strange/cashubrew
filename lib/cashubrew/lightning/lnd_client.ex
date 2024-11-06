@@ -6,7 +6,6 @@ defmodule Cashubrew.LightingNetwork.Lnd do
   require Logger
 
   def start_link(arg) do
-    # Todo: validate args are valid url to ln server
     GenServer.start_link(__MODULE__, arg, name: __MODULE__)
   end
 

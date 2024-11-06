@@ -15,9 +15,7 @@ async fn main() {
     );
 
     println!("Downloading lnd...");
-    let mut lnd_conf = LndConf::default();
-    lnd_conf.view_stdout = true;
-    lnd_conf.view_stderr = true;
+    let lnd_conf = LndConf::default();
     let mut lnd = Lnd::with_conf(
         lnd::exe_path().unwrap(),
         &lnd_conf,
@@ -41,7 +39,7 @@ async fn main() {
         .is_ok());
     println!("Done");
     std::fs::write(
-        "../.env",
+        ".env",
         format!(
             "export LND_URL={:?}\nexport LND_CERT={:?}\nexport LND_MACAROON={:?}",
             lnd.grpc_url,

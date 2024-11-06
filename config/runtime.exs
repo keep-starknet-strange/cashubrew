@@ -1,5 +1,7 @@
 import Config
 
+config :cashubrew, :lnd_client, Cashubrew.LightingNetwork.MockLnd
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

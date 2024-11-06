@@ -7,21 +7,12 @@ defmodule Cashubrew.Application do
   def start(_type, _args) do
     children = [
       Cashubrew.Web.Telemetry,
-      Cashubrew.LightingNetwork.Lnd,
+      Application.get_env(:cashubrew, :lnd_client),
       {Phoenix.PubSub, name: Cashubrew.PubSub},
-      Endpoint
+      Endpoint,
+      Application.get_env(:cashubrew, :repo),
+      {Task, fn -> Cashubrew.Mint.init() end}
     ]
-
-    # Conditionally add the appropriate repo to the children list
-    children =
-      case Application.get_env(:cashubrew, :repo) do
-        Cashubrew.MockRepo -> [Cashubrew.MockRepo | children]
-        Cashubrew.Repo -> [Cashubrew.Repo | children]
-        _ -> children
-      end
-
-    # Always add Cashubrew.Mint after the repo
-    children = children ++ [{Task, fn -> Cashubrew.Mint.init() end}]
 
     opts = [strategy: :one_for_one, name: Cashubrew.Supervisor]
     Supervisor.start_link(children, opts)
