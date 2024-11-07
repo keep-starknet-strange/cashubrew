@@ -36,5 +36,6 @@ defmodule Cashubrew.Nuts.Nut04.Serde.PostMintBolt11Response do
   The body of the post mint response
   """
   @enforce_keys [:signatures]
+  @derive [Jason.Encoder]
   defstruct [:signatures]
 end

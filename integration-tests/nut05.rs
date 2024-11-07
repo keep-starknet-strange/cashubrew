@@ -23,11 +23,7 @@ pub async fn melt_quote_ok() {
     assert_matches!(
         melt_quote,
         MeltQuote {
-<<<<<<< HEAD
             ref id,
-=======
-            id,
->>>>>>> b96d0cf (test: add integration test for 05 mint quote)
             unit: _,
             amount,
             request: _,

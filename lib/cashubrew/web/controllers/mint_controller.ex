@@ -50,23 +50,30 @@ defmodule Cashubrew.Web.MintController do
     e in RuntimeError -> conn |> put_status(:bad_request) |> json(Nut00.Error.new_error(0, e))
   end
 
-  def create_mint_quote(conn, params) do
-    method = params["method"]
-
+  def create_mint_quote(conn, %{
+        "method" => method,
+        "amount" => amount,
+        "unit" => unit,
+        "description" => description
+      }) do
     if method != "bolt11" do
       raise "UnsuportedMethod"
     end
 
-    %Nut04.Serde.PostMintQuoteBolt11Request{
-      amount: amount,
-      unit: unit,
-      description: description
-    } = params["body"]
-
     res = Nut04.Impl.create_mint_quote!(amount, unit, description)
-    json(conn, struct(Nut04.Serde.PostMintBolt11Response, Map.put(res, :state, "UNPAID")))
+
+    json(
+      conn,
+      struct(
+        Nut04.Serde.PostMintBolt11Response,
+        Map.merge(res, %{signatures: [], state: "UNPAID"})
+      )
+    )
   rescue
-    e in RuntimeError -> conn |> put_status(:bad_request) |> json(Nut00.Error.new_error(0, e))
+    e in RuntimeError ->
+      conn
+      |> put_status(:bad_request)
+      |> json(%{error: e.message})
   end
 
   def get_mint_quote(conn, %{"quote_id" => quote_id, "method" => method}) do

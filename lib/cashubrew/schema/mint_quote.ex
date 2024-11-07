@@ -5,7 +5,7 @@ defmodule Cashubrew.Schema.MintQuote do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @primary_key {:id, :binary_id, autogenerate: false}
+  @primary_key {:id, :id, autogenerate: false}
   schema "mint_quotes" do
     field(:payment_request, :string)
     field(:amount, :integer)
@@ -23,7 +23,7 @@ defmodule Cashubrew.Schema.MintQuote do
   def changeset(quote, attrs) do
     quote
     |> cast(attrs, [:id, :payment_request, :amount, :unit, :expiry, :state])
-    |> validate_required([:id, :payment_request, :amout, :unit, :expiry, :state])
+    |> validate_required([:id, :payment_request, :amount, :unit, :expiry, :state])
     |> validate_inclusion(:state, [<<0>>, <<1>>, <<2>>, <<128>>, <<129>>, <<130>>])
   end
 
