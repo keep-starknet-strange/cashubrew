@@ -71,9 +71,7 @@ jobs:
         with:
           shared-key: "cache"
           save-if: false
-
-      - name: Setup db
-        run: mix ecto.setup
+          workspaces: integration-tests -> ./integration-tests
 
       - name: Integration tests
         run: |-
@@ -82,16 +80,23 @@ jobs:
           cargo run &
           BTCD_AND_LND_SERVERS_PID=$!
           # Wait until the nodes are running by checking if the the env var are exported
-          while [[ -z "${LND_URL}" ]]; do sleep 1 && source .env; done
+          while [[ -z "${LND_URL}" ]]; do sleep 5 && source .env; done
           cd ..
+          # Setup db
+          mix ecto.setup
           # mix doesn't behave when run in background, so we use `erlang -detached` instead
           # but the `$!` thing won't work coz the app is run in another thread,
           # so we write the actual pid in a file and later read it to kill it 
           elixir --erl "-detached" -e "File.write! 'pid', :os.getpid" -S mix phx.server
+          # Wait until the mix is finished compiling
+          until curl http://127.0.0.1:4000 > /dev/null; do sleep 5; done;
           cd integration-tests
           cargo test
+          # Cleanup
           cat ../pid | xargs kill
           kill $BTCD_AND_LND_SERVERS_PID
+        env:
+          MIX_ENV: dev
 
           
 

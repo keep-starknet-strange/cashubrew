@@ -3,6 +3,7 @@ defmodule Cashubrew.Nuts.Nut04.Serde.PostMintQuoteBolt11Request do
   The body of the post mint quote request
   """
   @enforce_keys [:amount, :unit]
+  @derive [Jason.Encoder]
   defstruct [:amount, :unit, :description]
 end
 
@@ -11,6 +12,7 @@ defmodule Cashubrew.Nuts.Nut04.Serde.PostMintQuoteBolt11Response do
   The body of the post mint quote response 
   """
   @enforce_keys [:quote, :request, :state, :expiry]
+  @derive [Jason.Encoder]
   defstruct [:quote, :request, :state, :expiry]
 end
 
@@ -21,6 +23,7 @@ defmodule Cashubrew.Nuts.Nut04.Serde.PostMintBolt11Request do
   alias Cashubrew.Nuts.Nut00.BlindedMessage
 
   @enforce_keys [:quote, :outputs]
+  @derive [Jason.Encoder]
   defstruct [:quote, :outputs]
 
   def from_map(map) do

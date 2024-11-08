@@ -7,10 +7,11 @@ defmodule Cashubrew.Schema.MintQuote do
 
   @primary_key {:id, :binary_id, autogenerate: false}
   schema "mint_quotes" do
+    field(:r_hash, :binary)
     field(:payment_request, :string)
-    field(:amount, :integer)
-    field(:unit, :string)
-    field(:expiry, :integer)
+    field(:add_index, :integer)
+    field(:payment_addr, :binary)
+    field(:description, :string)
     # 0 -> "UNPAID", 1 -> "PAID", 2 -> "ISSUED"
     # The msb is used as a guard against two process minting this quote at the same time.
     # It has to be set when we start the minting process and cleared in the end,
@@ -22,8 +23,16 @@ defmodule Cashubrew.Schema.MintQuote do
 
   def changeset(quote, attrs) do
     quote
-    |> cast(attrs, [:id, :payment_request, :amount, :unit, :expiry, :state])
-    |> validate_required([:id, :payment_request, :amount, :unit, :expiry, :state])
+    |> cast(attrs, [
+      :id,
+      :r_hash,
+      :payment_request,
+      :add_index,
+      :payment_addr,
+      :description,
+      :state
+    ])
+    |> validate_required([:id, :r_hash, :payment_request, :add_index, :payment_addr, :state])
     |> validate_inclusion(:state, [<<0>>, <<1>>, <<2>>, <<128>>, <<129>>, <<130>>])
   end
 

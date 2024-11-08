@@ -5,10 +5,11 @@ defmodule Cashubrew.LightingNetwork.Lnd do
   use GenServer
   require Logger
 
-  def start_link(arg) do
-    GenServer.start_link(__MODULE__, arg, name: __MODULE__)
+  def start_link(_arg) do
+    GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
+  @impl GenServer
   def init(args) do
     node_url = URI.parse(System.get_env("LND_URL"))
     creds = get_creds(System.get_env("LND_CERT"))
@@ -33,17 +34,22 @@ defmodule Cashubrew.LightingNetwork.Lnd do
   def validity, do: 86_400
 
   def create_invoice!(amount, unit, description) do
-    GenServer.call(__MODULE__, {:create_invoice, amount, unit, description}, __MODULE__)
+    GenServer.call(__MODULE__, {:create_invoice, amount, unit, description})
   end
 
-  def handle_call({:create_invoice, amount, unit, description}, _from, state) do
+  @impl GenServer
+  def handle_call(
+        {:create_invoice, amount, unit, description},
+        _from,
+        %{channel: channel, macaroon: macaroon} = state
+      ) do
     if unit != "sat" do
       raise "UnsuportedUnit"
     end
 
     amount_ms = amount * 1000
 
-    expiry = validity() + System.os_time(:second)
+    expiry = validity()
 
     request = %Cashubrew.Lnrpc.Invoice{
       memo: description,
@@ -51,15 +57,19 @@ defmodule Cashubrew.LightingNetwork.Lnd do
       expiry: expiry
     }
 
-    {:ok, response} = Cashubrew.Lnrpc.Lightning.Stub.add_invoice(state["channel"], request)
-    {:reply, response, state}
+    {:ok, response} =
+      Cashubrew.Lnrpc.Lightning.Stub.add_invoice(channel, request,
+        metadata: %{macaroon: macaroon}
+      )
+
+    {:reply, {expiry, response}, state}
   end
 
   defp get_creds(cert_path) do
     filename = Path.expand(cert_path)
 
-    # ++ [verify: true/:verify_none]
-    ssl_opts = [cacertfile: filename]
+    verify = Application.get_env(:cashubrew, :ssl_verify)
+    ssl_opts = [cacertfile: filename, verify: verify]
 
     GRPC.Credential.new(ssl: ssl_opts)
   end

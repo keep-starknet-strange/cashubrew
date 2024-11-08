@@ -2,7 +2,6 @@ defmodule Cashubrew.Web.MintController do
   use Cashubrew.Web, :controller
   require :logger
   require Logger
-  alias Cashubrew.Lightning
   alias Cashubrew.Mint
   alias Cashubrew.Nuts.Nut00
   alias Cashubrew.Nuts.Nut01
@@ -50,23 +49,27 @@ defmodule Cashubrew.Web.MintController do
     e in RuntimeError -> conn |> put_status(:bad_request) |> json(Nut00.Error.new_error(0, e))
   end
 
-  def create_mint_quote(conn, %{
-        "method" => method,
-        "amount" => amount,
-        "unit" => unit,
-        "description" => description
-      }) do
+  def create_mint_quote(
+        conn,
+        %{
+          "method" => method,
+          "amount" => amount,
+          "unit" => unit
+        } = params
+      ) do
     if method != "bolt11" do
       raise "UnsuportedMethod"
     end
+
+    description = Map.get(params, "description")
 
     res = Nut04.Impl.create_mint_quote!(amount, unit, description)
 
     json(
       conn,
       struct(
-        Nut04.Serde.PostMintBolt11Response,
-        Map.merge(res, %{signatures: [], state: "UNPAID"})
+        Nut04.Serde.PostMintQuoteBolt11Response,
+        res
       )
     )
   rescue

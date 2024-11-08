@@ -23,3 +23,5 @@ config :cashubrew, Cashubrew.Web.Endpoint, secret_key_base: System.get_env("SECR
 config :logger, level: :info
 
 config :cashubrew, :lnd_client, Cashubrew.LightingNetwork.Lnd
+
+config :cashubrew, :ssl_verify, true

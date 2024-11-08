@@ -14,11 +14,16 @@ bitcoind = { version = "0.34.2", features = ["26_0"] }
 lnd = { version = "0.1.6", features = ["lnd_0_17_5"] }
 tonic_lnd = "0.5.1"
 ctrlc = "3.4"
+lightning-invoice = { version = "0.32.0" }
 
 [[test]]
-name = "nut06"
-path = "nut06.rs"
+name = "nut04"
+path = "nut04.rs"
 
 [[test]]
 name = "nut05"
 path = "nut05.rs"
+
+[[test]]
+name = "nut06"
+path = "nut06.rs"
