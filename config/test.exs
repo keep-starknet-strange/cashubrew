@@ -28,3 +28,5 @@ else
 
   config :cashubrew, :lnd_client, Cashubrew.LightingNetwork.MockLnd
 end
+
+config :cashubrew, :ssl_verify, :verify_none

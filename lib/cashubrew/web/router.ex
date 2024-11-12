@@ -32,7 +32,6 @@ defmodule Cashubrew.Web.Router do
     post(Nut03.Routes.v1_swap(), MintController, :swap)
 
     # NUT-04
-    post(Nut04.Routes.v1_mint_quote(), MintController, :create_mint_quote)
     get(Nut04.Routes.v1_mint_quote_for_quote_id(), MintController, :get_mint_quote)
     post(Nut04.Routes.v1_mint(), MintController, :mint_tokens)
 
@@ -41,6 +40,8 @@ defmodule Cashubrew.Web.Router do
 
   scope "/", Cashubrew.Web do
     pipe_through(:api)
+    # NUT-04
+    post(Nut04.Routes.v1_mint_quote(), MintController, :create_mint_quote)
     # NUT-06
     get("/v1/info", MintController, :info)
     # NUT-05

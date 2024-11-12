@@ -22,7 +22,7 @@ config :cashubrew, Cashubrew.Web.Endpoint,
 config :cashubrew, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+config :logger, :console, format: "[$level] $message\n", lever: :debug
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
@@ -44,3 +44,5 @@ config :cashubrew, :repo, Cashubrew.Repo
 config :cashubrew, ecto_repos: [Cashubrew.Repo]
 
 config :cashubrew, :lnd_client, Cashubrew.LightingNetwork.Lnd
+
+config :cashubrew, :ssl_verify, :verify_none

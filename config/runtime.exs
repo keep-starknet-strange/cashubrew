@@ -1,6 +1,20 @@
 import Config
 
-config :cashubrew, :lnd_client, Cashubrew.LightingNetwork.MockLnd
+lnd_client =
+  case config_env() do
+    :dev -> Cashubrew.LightingNetwork.Lnd
+    :prod -> Cashubrew.LightingNetwork.Lnd
+    _ -> Cashubrew.LightingNetwork.MockLnd
+  end
+
+ssl_verify =
+  case config_env() do
+    :prod -> true
+    _ -> :verify_none
+  end
+
+config :cashubrew, :lnd_client, lnd_client
+config :cashubrew, :ssl_verify, ssl_verify
 
 if config_env() == :prod do
   database_url =
